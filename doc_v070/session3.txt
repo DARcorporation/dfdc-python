@@ -1,0 +1,128 @@
+
+    Typical DFDC session on input file sample3.case (a rotor + stator case)
+    This case has a rotor defined as blades and a stator defined as an actuator disk.
+ 
+    This text shows keyboard inputs.
+
+    All commands can be in lowercase.
+
+    Blank lines below are for clarity.  They are NOT Returns!
+
+    Indentation in the command listing below indicates 
+    the menu level to help navigation.
+
+
+
+    Start DFDC with an input-file argument, such as the sample3g.case input case file:
+
+      % cd runs
+      % ../bin/dfdc sample3.case      (giving the full filename is required)
+
+     There will be lots of input echo beginning with sections of the input case data
+     followed by information on the elements (centerbody and duct airfoils). You should
+     this at a prompt:
+
+ =========================================================
+ 
+  QUIT   Exit program
+ 
+  LOAD f Read ducted fan case from file
+  SAVE f Write current ducted fan case to file
+ 
+ .OPER   Direct operating point(s)
+ .GDES   Geometry design facility
+ .QDES   Mixed-inverse design facility
+ 
+  PANE   Regenerate paneled geometry from buffer geometry
+ .PPAR   Show/change paneling
+  PCOP   Copy buffer geometry directly into paneling
+  PWRT f Write paneling parameters to disk file
+  PGET f Get paneling parameters from disk file
+ 
+ .PLOP   Plotting options
+  NAME s Change case name
+ 
+ DFDC   c>
+
+      You type commands at the prompt to initiate actions.  Try this...
+
+OPER       enter operating menu
+xy         show geometry of duct and disks
+
+exec       execute case and converge operating point
+
+      At this point you should see a plot of the duct and centerbody with rotor 
+      (bladed rotor) outlined with LE/TE lines, and stator (actuator disk w/o LE/TE
+      line)
+
+cpx   display the Cp's vs x on duct + force summary
+
+      This case corresponds to a rotor/stator with ~240N of total thrust (specified 
+      by a circulation (BGAM~= +10 on rotor, -10 on stator). Note the white circle at the 
+      TE (this is the stagnation point!)
+
+      This is a static hover case, lets try tracing some streamlines on the plot...
+
+slc
+b     with cursor on plot of duct, hit "b" key to trace both upstream/downstream 
+u     hit "u" to trace upstream only 
+d     hit "d" to trace downstream only
+.
+q     hit "q" key when you want to stop
+
+Lets try the same at Vinf=20
+
+vinf 20
+e          converge the 20m/s case
+
+slc   trace some more streamlines, watch the difference, look for stag. point 
+b     with cursor on plot of duct, hit "b" key to trace both upstream/downstream 
+b     try several...
+.
+q     hit "q" key when you want to stop
+
+hard       make hardcopy with streamlines
+
+cpx        back to the normal Cp,x plot
+
+Lets look at the rotor blading
+
+plot 2     shows axial view of rotor
+plot 3     show blade CL,GAM,Mach for rotor
+
+Now, lets design a stator blading
+
+2          set disk #2 as working disk, should see OPERi(2) as prompt
+desi       design blades for stator
+cpx        show side view, big chords on that stator!
+plot 2     axial view of stator (no camber shown, looks like zero-lift direction near axial)
+show       get dump of blade params, including solidity (over 1.3 at hub)
+
+nbld 9     set blade count to 9
+cl 0.7     set stator CL=0.7 
+desi       redesign stator to same circulation, new blade count and CL
+cpx        show side view of blading
+show       get dump of blade params, lower solidity (~0.85 at hub)
+plot 3     show blade CL,GAM,Mach for stator
+
+Now lets do a BL analysis on the duct walls
+
+bl         get into BL submenu
+bl         do BL analysis using current (free) transition
+plot       plot BL data, shows Q velocity on walls
+o          change ordinate for plot
+h          to BL shape factor
+           hit return to get back to BL submenu
+tr         set transition points for turbulent flow
+.02 .02    set transition to near LE
+bl         run new BL analysis
+plot       plot BL shape factor, different!
+           hit return to get out of plot
+           hit return to get out of BL submenu
+
+forces     check forces on duct and centerbody (including viscous)
+
+  <Return>   return to main DFDC menu
+
+quit        end DFDC session and close plot file
+

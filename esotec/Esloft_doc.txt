@@ -1,0 +1,344 @@
+
+SUBROUTINE ESLOFT User Guide                Last update: 24 October 2014
+-----------------------------------------------------------------------
+Rotor/Stator Blade Lofting in DFDC
+
+Philip Carter
+Esotec Developments
+philip (at) esotec (dot) org
+
+Current versions: 
+DFDC core code v0.70
+Subroutine ESLOFT v0.9
+Package: DFDC v070-ES3.2a
+
+
+Major changes in this version
+-----------------------------
+Splined t and t/c distributions.
+Save duct and centerbody coordinates to file.
+Automatic storage of blade blockage data.
+Persistent airfoils and loft settings across disks.
+DISP and SHOW functionality switched.
+Various commands changed for compatibility with CROTOR.
+Bug fixes.
+
+
+Overview
+--------
+ESLOFT is a tool for getting rotor designs out of DFDC and into CAD for subsequent 3D modeling, meshing or manufacture. This is accomplished by calculating on the rotor geometry along with blade thickness (input) and airfoil geometries (parent airfoils) to generate points files which can be lofted in 3D CAD systems. 
+
+The definition of blade thickness plays a central role in ESLOFT. A smooth thickness distribution is desired for both aerodynamic and structural reasons. Since chord is defined by the blade design, defining the distribution of thickness (t) or thickness/chord (t/c) along the blade allows for section t/c to be determined at any station radius. Sections are interpolated to the required t/c from parent airfoils bounding that t/c (or extrapolated as necessary - see below).
+
+A uniform paneling scheme facilitates the interpolation of parent airfoils. Each parent is paneled with the specified points per side and density factor (le/te) relative to the airfoil arc length (te-le), allowing for simple linear interpolation between bounding parent airfoil coordinate points relative to t/c. 
+
+[Note: To gain insight into this paneling/interpolation scheme, execute PLOP 0 then BLOW or Z to zoom in to the parent airfoil leading edges. Compatible bounding parent airfoils will generally produce children which perform every bit as well as their parents. Interpolating between incompatible parents might yield a section better than them both - or worse, as the case may be.] 
+
+
+General program execution
+-------------------------
+At DFDC top level:
+
+LOAD <case file>, then LOFT. 
+
+Enter ? to get a menu listing. When first entering ESLOFT the user must load a parent airfoil set (LSET) or at least two individual parent airfoils (LAF) before proceeding further. Entering ESLOFT without a loaded rotor will limit the user to working with parent airfoils. The first time LSET is invoked, the airfoil set is loaded into each disk, while subsequently only the current disk is affected. Parent airfoils and settings remain persistent across disks. Switch between disks as in OPER. 
+
+The program operates on four execution levels:
+ 1. Parent airfoil processing.
+ 2. Loft configuration and thickness distribution.
+ 3. Blended sections (interpolated and normalized).
+ 4. Transformed sections (dimensioned, translated, rotated).
+
+Calculations are executed at these levels as required, transparently to the user. When a rotor and at least two parent airfoils are loaded, all commands become available. The loft is recalculated and displayed whenever loft parameters are modified, or it can be displayed at any time with DISP (or d). 
+
+ESLOFT is seamlessly integrated with DFDC. If you leave ESLOFT and return without quitting DFDC, parent airfoils and loft settings will remain as you left them and the loft will reflect any changes made to rotor geometry. 
+
+ESLOFT combines flexibility with ease of use. If you have sufficient confidence in the default settings, the minimum command sequence for calculating a loft in ESLOFT and saving dimensioned points files to disk is as follows:
+
+LSET <esloft airfoil file>
+
+SAVT 0
+
+<ret> to select default filenames
+
+Done. 
+
+
+Parent Airfoils
+---------------
+
+         SHOW <s> Show parent airfoil set 
+         LSET f   Load parent airfoil set from file 
+         SSET f   Save parent airfoil set to file 
+         NSET s   Name parent airfoil set 
+         DAF  i   Delete  airfoil from current set 
+         LAF  f   Load an airfoil from file 
+         SAF  i   Save an airfoil to file 
+         ALFZ i   Specify parent airfoil zero-lift alpha 
+         PANE ir  Specify parameters and repanel parents 
+
+To streamline parent airfoil management ESLOFT uses its own file format for parent airfoil sets. ESLOFT files contain paneled coordinates for (currently up to 12) parent airfoils along with their names and zero-lift alphas. Geometry data for each airfoil is calculated when a set is loaded. 
+
+Assemble your own airfoil sets by loading airfoils (LAF) and saving (SSET). Or use one of the example sets. 
+
+When an individual airfoil is loaded (LAF) it is processed as follows:
+
+- the section is normalized to unit chord with chordline on le and te.
+- the section is repaneled to current parameters.
+- geometry data is calculated and stored.
+- the user is asked to input the section's zero-lift alpha (A0).
+
+Airfoils must have a trailing edge thickness of at least 0.0001, an arbitrary limitation imposed for the sake of CAD systems which typically require loft contours to be closed by connecting the trailing edge points.
+
+ESLOFT parent airfoil sets are always ordered according to decreasing t/c. Whenever an airfoil is added to or deleted from a set the arrays are shuffled to maintain this ordering. 
+
+A parent set cannot contain two airfoils of the same t/c. If an airfoil with t/c within 0.005 (0.5%) of a current parent is loaded, the user has the option of overwriting or aborting. This is an arbitrary limitation but a sensible one. Since sections are interpolated relative to t/c, dissimilar parents of similar t/c will produce short period waves in the blade surface. For best results, use only as many parents as necessary and adjust the thickness distribution to achieve appropriate spacing between parents on the t/c curve. 
+
+A parent airfoil set must contain at least two parents. If you need more than 12 parents increase NAFX. All sections in an .esloft file are normalized and identically paneled, so don't try to create an .esloft file manually.
+
+Repaneling (PANE) always applies to the whole parent set. Hence, all sections in ESLOFT's arrays (parent, interpolated or transformed) are paneled to the same parameters. Current max points per side is 100 - increase NPX for more. 
+
+SHOW (or s) displays parent airfoil data and plots the set. For more detailed 
+parent airfoil plots, use PLOP.
+
+Use SAF to save a parent airfoil to a standard XFOIL .dat file for analysis or modification. If the t/c remains similar the user can reimport the modified airfoil (LAF) and overwrite the current version directly.
+
+
+Notes on Zero-Lift Alpha
+------------------------
+ESLOFT interpolates parent airfoil A0 data to the loft stations relative to t/c and makes a correction to beta upon comparison with A0 data produced by AERO. The reasoning is as follows. A0 is the dominant airfoil-related parameter affecting beta while varying widely between sections (driven mainly by camber). When setting up parameters in AERO it will not always be clear where a particular section will be located on the blade. Hence it is convenient to keep this data with the airfoil geometry itself and make the correction in ESLOFT. 
+
+Consequently, while A0 settings in AERO directly influence beta in DFDC, and are therefore important when analysing fixed geometries, they do not affect the lofted blade angles, which are adjusted according to parent airfoil alpha-zero. It remains important to set up the AERO parameters carefully, however, in particular dCL/dAlpha, the lift curve slope, which also has a direct influence on beta, though the variance between airfoil sections will typically be less than that of A0.
+
+Note that normalization will rotate an airfoil with a maladjusted chordline; hence it is advisable to normalize the airfoil in XFOIL before calculating its zero-lift alpha. The correct A0 data to provide ESLOFT is found by extrapolating (if required) the 'linear' region of the lift curve to the zero-lift axis. 
+
+Negative BGam disks require that the sign of A0 be reversed in AERO (along with other settings), most easily accomplished with the FLIP command. A "Set for negative BGam" message is displayed in AERO when an airfoil is so configured. (Note that a bug in earlier versions of FLIP neglected to reverse A0 along with the other parameters - this is fixed in vES3a.) ESLOFT analogously reverses the parent airfoil A0s for negative BGam disks, enabling consistent beta corrections. 
+
+
+Loft Configuration
+------------------
+
+         DISP <d> Display current loft configuration 
+         THIC i   Specify thickness distribution mode 
+         PARA r   Specify parabolic axis location 
+         THUB r   Specify blade thickness at hub 
+         TTIP r   Specify blade thickness at tip 
+         STN  ir  Specify station number and density (hub/tip) 
+         OSHO rr  Specify overshoot at hub and tip      
+         PAX  rr  Specify pitch axes at hub and tip (x/c) 
+         TGAP r   Specify rotor geometric tip gap 
+         DIH  r   Specify dihedral at tip (circular arc) 
+
+
+DISP (or d) calculates (if necessary), displays and plots the current loft configuration. Lofts will initially reflect the default settings (see DEF below).
+
+
+Defining Blade Thickness
+------------------------
+Creating an optimum thickness distribution for a given rotor and parent airfoil set is the center of the lofting process. This is done in two steps:
+
+1. Specify thickness at hub and tip. 
+2. Specify the thickness (or thickness/chord) distribution. 
+
+Hub and tip thickness can be specified implicity (by locating a parent airfoil there) or explicitly (THUB or TTIP, mm). Set THUB or TTIP to zero to set hub or tip thickness implicitly according to the thickest (or thinnest) parent t/c. To locate another parent at the hub or tip, simply delete the unwanted parent (DAF i). 
+
+When entering hub or tip thickness explicitly, care is needed to avoid unreasonable extrapolations. Add parents of suitable t/c or delete airfoils from the parent set as required. 
+
+Six thickness distribution modes are available:
+ 1  Linear    t/c 
+ 2  Parabolic t/c
+ 3  Splined   t/c
+ 4  Linear    t 
+ 5  Parabolic t
+ 6  Splined   t
+
+Execute THIC i (or t) to select these directly. 
+
+The parabolic distributions fit a parabolic curve to the hub and tip t or t/c with the user controlling the location of the parabolic 'x' axis (in units of bladelengths inboard of the hub). Use PARA to move the axis. A smaller value will increase curvature and vice versa. Obviously the axis cannot be moved outboard of the inboard station.
+
+Selecting either of the spline modes brings up a window allowing user modification of the current splined t or t/c. These call the same spline modification routines as MODB and MODC in MODI. If no thickness data is present when splined t or t/c is selected, the initial distribution is assumed to be linear. Splined distributions are transformed automatically with any modification to loft parameters such as hub or tip thickness, overshoot or station paneling. To modify the spline again manually, re-execute THIC 3 or 6. Keep in mind that user-modification of splined t or t/c can reset hub and/or tip thickness.
+
+The t/c distribution modes are generally more practical and reliable for typical rotor geometries. The t distributions can easily produce a t/c curve exceeding the parent airfoil t/c range. In these cases sections are extrapolated from the two parents of nearest t/c. While sometimes this works, it can also generate garbage sections. Warning messages are displayed whenever a loft extrapolates sections beyond 0.0001 of the nearest parent t/c. Note that this applies only to the nominal blade; sections are extrapolated to meet overshoot stations as required without displaying warning messages. Nevertheless, the user might consider adjusting blade thickness settings (or parent airfoils) to ensure that overshoot sections are interpolated as well.
+
+As a visual aid to the designer the loft configuration plot shows the radial locations of parent airfoils fitted to the t/c curve. A t/c curve with regions exceeding hub t/c may present multiple instances of a parent (as often occurs with the t distribution modes). If parents are shown piled up at the hub or tip you know the t/c curve has gone wild - a good indication that your loft needs some work...
+
+Keep in mind that parent airfoil radial locations are independent of the core calculation, which interpolates (or if necessary extrapolates) airfoils to a specific t/c from parents of bounding (or closest) t/c, irrespective of the parents' location on the blade.
+
+
+General Loft Settings
+---------------------
+STN controls the loft paneling, being the number of stations (not including overshoot stations) and their relative spacing, varying linearly from hub to tip. Increasing station density decreases spacing at the hub relative to the tip spacing. Current max stations is 36 (with 2 reserved for overshoot). Increase NLSX if you need more. Keep in mind that too many stations can be counterproductive. The untwisted blade geometry plot is a high resolution plot splined to the loft stations; observing the geometry while zoomed in and changing loft parameters can provide insight into optimum station paneling. 
+
+OSHO (overshoot) extrapolates the blade geometry beyond nominal length - to facilitate fitting to the hub, for instance, or for manufacturing purposes. Overshoot adds just one station beyond the hub and/or tip, with splined chord and beta, and has no effect on nominal blade geometry. Note that chord and beta are extrapolated at constant curvature. 
+
+PAX moves the airfoil axis along the camberline - the pitch axis (x/c) at each station is linearly interpolated from the hub and tip pitch axis settings.
+
+TGAP is the same command as in OPER, accepting mm units but ignoring the 
+secondary input. 
+
+DIH curves the blade in a circular arc root to tip, in the direction of the rotational axis (positive in the low pressure direction), specified in mm at the tip. Designers have used such geometries (not necessarily circular) to offset centripetal forces with thrust forces, leading to lower stresses in the blade. 
+
+
+Secondary Loft Settings
+-----------------------
+
+         DEF      Reset loft parameters to default settings 
+         BANG     Toggle local/global beta display (BGAM<0)
+         NLOF s   Specify base name for loft output 
+         UNIT i   Specify units for loft output 
+         DIM      Toggle 2D/3D points files 
+         ROTA     Toggle left/right hand rotation 
+         WRIT f   Save loft configuration data to file 
+
+DEF restores the default loft parameters, currently as follows:
+
+   Loft stations             16  (not including overshoot stations)
+   Station density           1.5 (hub/tip)
+   Overshoot                 0.0  at hub and tip
+   Pitch axes                0.35 at hub and tip (x/c)
+   Dihedral                  0.0  mm - z offset of camberline at tip
+   Hub thickness             0.0  set by thickest parent located at hub
+   Tip thickness             0.0  set by thinnest parent located at tip
+   Thickness distribution    Linear t/c 
+   Parabolic axis            0.3  bladelengths (for parabolic t and t/c)
+
+Execute DEF at any time to return the loft to these settings. The default settings are intended to be 'safe' - they will produce a reasonable loft in the majority of cases (assuming reasonable parents) and provide a platform for subsequent adjustments. Note that DEF resets loft configuration settings only; parent airfoils and output settings remain unchanged.
+
+Defaults can be changed in subroutines LOFTINIT1 and LOFTINIT2 at the end of module esloft.f.
+
+NLOF allows the specification of a loft output base name different from the rotor name (the default), anticipating multiple lofts of the same rotor. When writing multiple points files to disk the user has the option of manually naming each file or having ESLOFT create unique filenames by appending suffixes to the base name (recommended). In the case of overwriting files, the user is given the options of aborting or overwriting just one file or all. 
+
+Unique filenames are assembled as follows: 
+
+  Normalized sections   :   base_name-stn#.dat
+  Transformed sections  :   base_name-stn#.txt
+  Station radius file   :   base_name-radii.txt
+  Centerbody coordinates:   base_name-cbody.txt
+  Duct coordinates      :   base_name-duct.txt
+
+Output UNITs can be meters, centimeters, millimeters or inches. This setting is reflected in transformed section plots, coordinate files and station radii output. 
+
+The DIM toggle allows for 2D or 3D points file output, with 3D adding the third z (radial) dimension (constant in each file).
+
+Use ROTA to toggle between left and right hand rotation. The default is left hand (leading edge to the left). This setting is reflected in transformed section plots and points files.
+
+WRIT writes current loft configuration and parent airfoil data to disk. 
+
+
+File Output
+-----------
+
+         SAVN ii  Save Normalized section(s) to file 
+         SAVT ii  Save Transformed section(s)   "  |
+         SAVC     Save Centerbody coordinates   "  | output
+         SAVD     Save Duct coordinates         "  | units
+         SAVR     Save loft station Radii       "  | 
+         DISR     Display loft station Radii       | 
+
+As for plotting, sections representing any sequence of stations can be saved to disk, either normalized or transformed. The argument 0 will save all sections. 
+
+SAVT writes transformed lofted points files to disk, dimensioned according to UNIT. Sections are dimensioned (scaled), rotated and translated according to blade geometry and loft settings, producing points files suitable for lofting in 3D CAD software. Sections are rotated around the intersection of the pitch axis and camberline (not the chordline), then translated on the rotational axis according to the (circular arc) DIH setting.
+
+Normalized section output (SAVN) saves interpolated sections to disk for analysis and verification in XFOIL or other software. The format is a named XFOIL .dat file. Sections will generally run in XFOIL with default ESLOFT paneling (nevertheless, repaneling in XFOIL is advised for analysis in XFOIL). Transformed points files will also open in XFOIL, whether 2D or 3D. 
+
+SAVC and SAVD anticipate that users lofting blades will also want to loft the centerbody and duct. Like the transformed section files, output is plain text coordinate files reflecting the current units and dimensionality (2D/3D). 3D files contain a constant z coordinate of zero.
+
+SAVR and DISR output station radius data, essential when saving 2D points files (the radius data is needed to set up loft planes in CAD software). As with the transformed points files, station radius data are dimensioned according to UNIT. A station radius file is automatically written to disk whenever all transformed sections are written, whether 2D or 3D. 
+
+
+Section Plotting
+----------------
+
+         PLOP ii  Plot parent section(s) 
+         PLON ii  Plot normalized blended section(s) 
+         PLOT ii  Plot transformed section(s) 
+        .DATA     Plot transformed section data vs radius 
+
+PLOP, PLON and PLOT are built on XFOIL plotting routines with modifications and additional code to support multiple section plots. These commands accept any integer arguments in the range of parents or loft stations, in any order. The argument 0 plots all sections. 
+
+The DATA command plots transformed section data under the following submenu, all plotted vs blade radius:
+
+ Lofted Section Data Plots
+ -------------------------------------
+   1  blade thickness
+   2  max thickness/chord
+   3  max thickness/chord x/c
+   4  max camber
+   5  max camber x/c
+   6  section area
+   7  leading edge radius
+   8  trailing edge thickness
+   9  trailing edge angle
+   10 zero-lift alpha - aero and esloft
+   11 beta - dfdc and esloft
+   12 chord
+ --------------------------------------
+   A  toggle abscissa cm/inches
+   L  limits for plot
+   Z  zoom plot with cursor
+   R  reset plot limits
+   AN annotate plot
+   H  hardcopy plot
+   W  write plot data to file
+
+These should be self-explanatory. 10 and 11 indicate corrections made to beta data by ESLOFT. 3 and 5 are a good test of parent airfoil compatibility. Radial geometric and aerodynamic "smoothness" is dependent on a compatible parent airfoil set. Hence, ESLOFT does not remove the need for good parent airfoil design and selection. These data plots can assist the airfoil designer in refining the parent set. 
+
+
+Plot Controls
+-------------
+
+         BLOW <b> Blowup airfoil plot region 
+         RESE <r> Reset current airfoil plot scale and origin 
+         REPL     Replot current airfoil plot 
+         HARD     Hardcopy current plot 
+        .ANNO     Annotate plot 
+         SIZE r   Change absolute plot size 
+         Z        Zoom   
+         U        Unzoom
+
+These work the same as in DFDC generally. Note that Zoom and Unzoom work with all plots and are independent of BLOW and RESE. BLOW adjusts the axes of airfoil plots while Zoom does not. 
+
+BLOW, RESE and REPL work similarly as in XFOIL. They work with all three section plot commands: PLOP, PLON, PLOT. 
+
+The plotting system is quite capable - for instance, the user can zoom in to a multi-section plot with BLOW or Zoom, modify section paneling with PANE, then execute REPL and watch the paneling update in the plot window. 
+
+Or, plot transformed sections with PLOT 0, zoom in to the tip sections with BLOW or Zoom, modify the dihedral (DIH 10), then REPL and observe the effect of the command. 
+
+Note that REPL will not function with the section plots if the number of parent airfoils has changed (following PLOP) or the number of loft stations (following PLON or PLOT). In these cases indices must be respecified. 
+
+
+
+ADDENDUM: How to Loft ESLOFT Points Files in SolidWorks
+-------------------------------------------------------
+While the following pertains specifically to SolidWorks, it should be broadly applicable to other CAD software. 
+
+When your loft has been configured in ESLOFT, set output units and save 3D points files to disk with SAVT 0. 
+
+Open a new Part in SolidWorks and set the same units. 
+
+For each file do the following:
+
+- Go to Insert/Curve/Curve through XYZ Points
+
+- Select 'Browse' then 'Files of type: .txt' to make the files visible. Open the file and hit OK.
+
+- Select a trailing edge point on the imported 3D curve. Shift-Click on 'Front Plane' so that both are selected.
+
+- Go to Reference Geometry/Plane. Make sure 'Parallel Plane at Point' is selected and click through. 
+
+- Make sure the new plane is selected in the feature tree and open a new sketch. 
+
+- In the new sketch, select the 3D curve then 'Convert Entities'. A black (fully defined) profile will appear in the sketch.
+
+- Select the line tool and connect the lower trailing edge point to the upper point, in that order (make sure they are indeed connected!). Close the sketch. 
+
+When each profile has been imported into a sketch and closed at the trailing edge, go to the Lofted Boss/Base feature. 
+
+Zoom in and select each profile in turn by clicking on the upper trailing edge point (it is suggested to begin at the root, in particular for round tip cases). When all profiles have been selected, click through and the loft appears.
+
+Note that round-tip cases with positive tip cut have no tip profile, which is assumed to be a point. Tip cosmetics can be performed beyond the outboard station as desired.
+
+
+END  !  Esloft_doc
+
+

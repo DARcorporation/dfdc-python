@@ -1,0 +1,69 @@
+This is the DFDC source deck Issues file, 
+
+***************************************************************************
+DFDC 0.60  7/15/05 HHY
+
+Sporatic problems with convergence for defined rotors with changes in
+thrust.  Solver appears to have problem when rotor load crosses through 
+zero (perhaps problem with WT, defined by B*GAM or the BGAM-CL solver).  
+This needs to be tracked down.  Workaround is to recognize that loadings which
+reduce loading toward zero may cause problem, may need to restart case when 
+you get lots of warnings about Mach limits in CLFUNC.
+
+Fixed in 0.61 and following versions
+
+***************************************************************************
+DFDC 0.63  9/13/05 HHY
+
+New solver needs options to drive to power, set RPM or pitch, etc. Changes 
+to solver required.  
+
+SL tracer needs repackaging for more general use as subroutine.
+
+Need to add SL tracing of drag items into grid for losses.
+
+Need to add RVF (real viscous flow) effects.
+
+***************************************************************************
+DFDC 0.64  9/21/05 HHY
+
+Need to add rotor and drag object submenus to support multiple drag objects
+and (soon) multiple blade rows
+
+***************************************************************************
+DFDC 0.65  9/28/05 HHY
+
+Solver changes may eliminate GTH (gamma-theta) added vorticity on wakes
+
+Need to finish multiple blade options, new submenus for BLAD, etc
+
+Redesign stuff needs work for thick wall ducts
+
+***************************************************************************
+DFDC 0.70pre1  10/26/05 HHY
+
+At last, the multiple blade version!  
+
+There have been many, many changes but there is much to do...
+
+Need to revisit the force-free vorticity condition on the hub streamline
+
+Need to finish new submenus for BLAD, LOFT(soon...), VANE etc
+
+Redesign stuff still needs work for thick wall ducts
+
+Need to add BL entropy loss into streamline grid
+
+Need to finish streamline trace data saves and submenu
+
+Need to add more turbo-blading design parameters and display them
+
+Need to add section design and loading guideline display for stators and rotors
+
+***************************************************************************
+DFDC 0.70rel  11/05 HHY
+
+Need to redo BL calcs to be included as part of regular force calcs (using
+viscous flag).
+
+Need to catch up with the 0.70pre1 issues...

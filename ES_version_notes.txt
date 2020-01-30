@@ -1,0 +1,126 @@
+
+DFDC-ES Version Notes
+------------------------------------------------------------------------
+
+DFDC 070-ES3.3
+3 February 2015
+
+SAVB command in LOFT saves ESBLADE file to disk for importing into 3D CAD. Well worth a decimal point for those who have real world requirements... (the 'a' suffix is henceforth dropped)
+
+
+DFDC 070-ES3.2a-win32
+24 January 2015
+
+This Windows build should be significantly more stable than ES3.1a. Plotting and terminal output have been fixed, among many other glitches. 
+
+(Note that the plotting fix is a temporary workaround. It appears that a bug in the win-related plotlib code is causing problems with plot initialization, the workaround being replot calls following each plot. Cumbersome, but it works until a more elegant cure can be found...) 
+
+For convenience, docs have been converted to Windows line endings. 
+
+
+DFDC 070-ES3.2a
+25 October 2014
+
+Complete overhaul of the blade blockage user interface. Design with blade blockage correction is now greatly streamlined. All relevant commands are now in OPER, while blade blockage data is automatically stored following geometry changes and when leaving disks in LOFT. See current DFDC_BladeBlockage.pdf for details. 
+
+
+DFDC 070-ES3.1a
+10 January 2014
+
+Bug fix in blade blockage auto update in LOFT.
+
+
+DFDC 070-ES3a
+5 January 2014
+
+A major update (long overdue), including the following changes and extensions:
+
+- Blade blockage correction code. This feature remains experimental until more data comes in. See the file DFDC_BladeBlockage.pdf.
+
+- ESLOFT is upgraded with features introduced in ESLOFTX for CROTOR, such as splined t and t/c (which I find indispensable). Other features include output of duct and centerbody coordinate files. Loft airfoils and settings are now persistent across disks. Some commands have changed from vES2a, for compatibility with CROTOR. See Esloft_doc.txt.
+
+- A MODI menu for editing rotor and stator blade chord and/or beta, partly scavenged from XROTOR, but implementing a buffer model similar to GDES. The menu should be self-explanatory. The INTE command may seem superfluous but was put to use designing a counter-rotating system with mirror image rotors (for a client using two CR units of opposite rotation, thus halving blade tooling with little performance compromise).
+
+- AERO has seen an important bug fix in the FLIP command, which now inverts zero-lift alpha correctly. Users loading multiple disk cases are advised to ensure that negative BGam disks are assigned a positive alpha-zero in AERO. The message 'Set for negative BGam' is displayed when the CLmax, CLmin, and A0 parameters are appropriately configured (these along with CLCDmin and CM are inverted by FLIP). With this proviso, beta and alpha are now reported consistently for negative BGam disks.
+
+- Since the section t/c and secondary dCd/dCl parameters in v0.70 served no purpose other than to confuse the user, they have been removed from AERO displays and input. (For compatibility, these parameters remain part of the case file format.) As a bonus, AERO parameter files are now compatible with those of XROTOR/CROTOR. A command remains to read the old DFDC aero file format if required. One can now switch between disks without leaving AERO, which has been relocated to the top level menu.
+
+- A new ACT command in OPER streamlines the design process by setting each disk to an actuator disk and assigning a uniform BGam across disks (negative for the second rotor or stators) before executing the case to initialize the flow for design - all in one command. 
+
+- The CL command is now specific to positive or negative BGam disks and CL is persistent across disks (defaults are +/-0.8). This feature, along with the ACT command, greatly facilitates the design/redesign process, in particular for multi-disk cases.
+
+- Various commands broken in ES2a are fixed, along with many minor bugs, while cosmetic enhancements have continued. 
+
+In summary, DFDC v070-ES3a is still not "finished" (thus is still designated an alpha version), but most of what is there works, adding up to solid core functionality. It is released in this state due to the importance of the bug fixes and the blade blockage code. Enhanced functionality and usability can be built upon this maturing foundation.
+
+Finally, an important word of advice to DFDC users. If ever a calculation blows up or doesn't converge, quit out and restart DFDC, go straight to the case you want to analyse, set it up (including tip gap or whatever) and EXECute before converging any other case. I have never seen a case not converge following this action (assuming reasonable geometry). DFDC can be fussy about where it begins its calculation, which is the consequence of the previous calculation (converged or not), and sometimes the code likes to start over.
+
+Note that the GDES routines have not been touched and will require future attention once core functionality is in place.
+
+PJC
+5 Jan 2014
+
+
+-----------------------------------------------------------------------
+DFDC 070-ES2a 
+October 2009
+
+DEL fixed in AERO
+DIH added to ESLOFT
+Section rotational axis is now on the camberline.
+
+
+------------------------------------------------------------------------
+DFDC v070-ES2 
+8 May 2009
+
+ESLOFT docs and airfoil files are in the ./esotec/esloft directory.
+
+Three targets have been added since previous versions:
+esloft.f
+lplots.f
+xfsubs.f
+
+Makefiles have been modified accordingly. Be sure to rebuild the plot library. 
+
+Version 0.70 Windows .exe and .lib files are past dated and have been removed. Development of this version has been Unix only.
+
+NOTE: the version designation retains the '070' to reflect the reality that the core 
+code has not changed since that version. ES2 is the second update from Esotec.
+
+Please report bugs. 
+
+PJC
+Esotec Developments
+philip (at) esotec (dot) org
+
+
+------------------------------------------------------------------------
+DFDC v070-ES1 
+15 Feb 2009
+
+v070-ES1 docs and cases are in the Esotec directory.
+
+*Windows files in this package are identical to v0.70*
+
+Unix source files are documented with specific changes. The following source files have been modified from v0.70: 
+
+/src-driver/
+dfdc.f
+gdes.f
+list.f
+oper.f
+oplots.f
+rplots.f
+
+/src-lib/
+aero.f
+airio.f
+DFDC.INC
+dfdcsubs.f
+rotoper.f
+
+Build sequence is unchanged (see README.txt).
+
+PJC
+

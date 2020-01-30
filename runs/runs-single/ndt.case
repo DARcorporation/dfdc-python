@@ -1,0 +1,60 @@
+DFDC Version  0.55 
+FatDuct + CB test case                                                          
+
+OPER
+!        Vinf         Vref          RPM
+   0.0000       50.000       8000.0    
+!         Rho          Vso          Rmu           Alt
+   1.2260       340.00      0.17800E-04   0.0000    
+!       XDwake        Nwake
+  0.80000               20
+!       Lwkrlx
+            F
+ENDOPER
+
+AERO
+!  #sections
+     1
+!   Xisection
+   0.0000    
+!       A0deg        dCLdA        CLmax         CLmin
+   0.0000       6.2800       1.5000      -1.0000    
+!  dCLdAstall     dCLstall      Cmconst         Mcrit
+  0.50000      0.20000       0.0000      0.70000    
+!       CDmin      CLCDmin     dCDdCL^2
+  0.12000E-01  0.10000      0.50000E-02
+!       REref        REexp
+  0.20000E+06  0.35000    
+ENDAERO
+
+ROTOR
+!       Xdisk        Nblds       NRPdef
+  0.12000                5           11
+!  #stations
+    10
+!           r        Chord         Beta
+  0.50491E-01  0.89142E-01   69.012    
+  0.61567E-01  0.79785E-01   59.142    
+  0.72644E-01  0.71300E-01   51.825    
+  0.83721E-01  0.63979E-01   46.272    
+  0.94798E-01  0.57777E-01   41.952    
+  0.10587      0.52541E-01   38.509    
+  0.11695      0.48103E-01   35.699    
+  0.12803      0.44316E-01   33.354    
+  0.13911      0.41061E-01   31.349    
+  0.15018      0.38243E-01   29.596    
+ENDROTOR
+
+GEOM
+    0.0 0.0
+    1.0 0.0
+    999.0 999.0
+    0.0 1.0
+    1.0 1.0
+ENDGEOM
+!GEOM
+!FatDuct + CB test case
+!     0.000000    0.000000
+!  999.0 999.0
+!     0.304542    0.159526
+!ENDGEOM

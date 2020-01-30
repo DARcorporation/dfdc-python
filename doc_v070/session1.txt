@@ -1,0 +1,106 @@
+
+    Typical DFDC session on input file sample1.case
+ 
+    This text shows keyboard inputs.
+
+    All commands can be in lowercase.
+
+    Blank lines below are for clarity.  They are NOT Returns!
+
+    Indentation in the command listing below indicates 
+    the menu level to help navigation.
+
+
+
+    Start DFDC with an input-file argument, such as the sample1.case input case file:
+
+      % cd runs
+      % ../bin/dfdc sample1.case      (giving the full filename is required)
+
+     There will be lots of input echo beginning with sections of the input case data
+     followed by information on the elements (centerbody and duct airfoils). You should
+     see something like this at a prompt:
+
+ =========================================================
+ 
+  QUIT   Exit program
+ 
+  LOAD f Read ducted fan case from file
+  SAVE f Write current ducted fan case to file
+ 
+ .OPER   Direct operating point(s)
+ .GDES   Geometry design facility
+ .QDES   Mixed-inverse design facility
+ 
+  PANE   Regenerate paneled geometry from buffer geometry
+ .PPAR   Show/change paneling
+  PCOP   Copy buffer geometry directly into paneling
+  PWRT f Write paneling parameters to disk file
+  PGET f Get paneling parameters from disk file
+ 
+ .PLOP   Plotting options
+  NAME s Change case name
+ 
+ DFDC   c>
+
+      You type commands at the prompt to initiate actions.  Try this...
+
+OPER       enter operating menu
+cpx        plot unconverged case with geometry and wake grid
+
+exec       execute case and converge operating point
+
+      At this point you should see a plot of the duct (below) and the pressures (Cp)
+      on the duct walls and wakes.  The case corresponds to an actuator disk with 
+      specified circulation (BGAM=10, corresponding to roughly 200N total thrust).
+      The orange line is the pressure on the duct (note the jump at the axial station 
+      for the rotor).  The red line is the pressures on the centerbody.  
+      The downstream orange and green lines show the wake pressures 
+      (note how the pressures on the centerbody are lower (-Cp's) than on the duct wake).
+
+vref 75    this changes the reference velocity (for the Cp's), changes display only.
+
+pvel       this displays the rotor velocities in absolute frame and blade relative frame
+    
+vinf 50    this changes the freestream inflow to 50m/s
+
+exec       execute case and converge operating point, note how duct thrust drops
+
+vinf 0
+
+exec       get back to hover condition
+
+plot 3     show the radial distribution of circulation (summary plot w. forces)
+
+force      show table of forces on problem elements (element 1 and 2 are CB and duct)
+
+desi       design a rotor blade for this flow condition and loading (BGAM=10)
+
+plot 2     show the disk outline from axial view
+
+plot 1     show the blade shape in 3-views
+
+exec       execute case with specified rotor
+
+plot 3     show blade data
+
+CL 1.2 0.8 set design CL for new blade 
+
+desi       design new blade to higher CL
+
+plot 2     show the blade
+
+hard       make postscript plot to file plot.ps
+
+vinf 10    set axial freestream to 10m/s
+exec       converge case with rotor at 10m/s (note lower duct thrust)
+
+plot 3     show blade operating point
+hard       make postscript plot to file plot.ps
+
+  <Return>   return to main DFDC menu
+
+save myrotor.case   save current case with rotor design
+
+quit        end DFDC session and close plot file
+

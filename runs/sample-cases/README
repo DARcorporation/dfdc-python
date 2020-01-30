@@ -1,0 +1,10 @@
+README for DFDC sample case files
+
+These files correspond to the example session1.txt, session2.txt and 
+session3.txt files.
+
+sample1.case    sample case with actuator disk
+sample2.case    sample case with actuator disk and aero data for design
+sample3.case    rotor/stator sample case (stator defined as actuator disk)
+
+

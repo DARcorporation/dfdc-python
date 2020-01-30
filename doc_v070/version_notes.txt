@@ -1,0 +1,257 @@
+This is the DFDC source deck dfdc-dist, 
+
+
+***************************************************************************
+DFDC 0.55  1/31/05   HHY
+
+This is the first source release of the interrim code.  The program is not
+complete by any means and will be undergoing constant revision for the next
+few months. Users are advised to stay "flexible".
+
+This version is based on the old (incorrect) theory documents of 12/04 and
+assumes that the wake vorticity is set by a rotor local wake advance ratio
+(WBGAM in the code).  This version implements that theory but has shown 
+issues for incorrect wake loading when the wake radius changes significantly.
+
+This version implements a duct and centerbody geometry with single rotor
+in the duct.   The rotor can be an actuator disk or a bladed rotor.  An
+actuator disk specifies a disk circulation (which corresponds to a loading 
+defined by an enthalpy jump (total pressure jump) at the rotor disk.
+
+For the time being the most stable numerical scheme analyzes the actuator
+disk cases.  
+
+Note that the initializer for the rotor-only cases is not implemented. These
+cases may require the user to start them with an assumed thrust (OPER command
+RINT with a thrust level) 
+
+A very initial version of the rotor drag model using line source elements is 
+implemented but these elements (source lines to represent rotor section
+drag blockage) do not automatically set their strength. 
+For the moment they can be set using the SING command to directly set the 
+source strength (see theory manual).
+
+The raw beginning of the DRAGOBJ is implemented but these elements (source
+lines to represent drag blockage) do not automatically set their strength. 
+For the moment they can be set using the SING command to directly set the 
+source strength (see theory manual).
+
+This version implements file load and save for either a DFDC duct file format
+using keywords to separate data items, or optionally you can read a simple 
+XFOIL multi-element airfoil file (for the duct/CB walls) using the GLOA 
+command (from the main menu).
+
+
+***************************************************************************
+DFDC 0.56  2/2/05   HHY
+
+Minor changes before release.  Added quick hack for FOM display to oplots.f
+Fixed SAVE option to dfdc.f (did not save comment lines for ACTDISK). Added
+FOM to global common. Fiddled with rotor analysis convergence params (needs 
+rewrite for more solid convergence).  
+
+
+***************************************************************************
+DFDC 0.57  2/3/05   HHY
+
+Changes to rotor blade initializer (sets BGAM from geometry for imported
+rotors).  New command RINI to re-initialize from blade itself.  
+
+Added automatic source setup for drag objects and rotor blade drag elements. 
+They are now included in the system w/o intervention.  Note that CDA input
+for drag objects now corresponds to CDave = CDA/A (need changes to theory
+manual).
+
+Fixed PLOT 12 plotting bug (overwriting NP!). 
+
+***************************************************************************
+DFDC 0.58  2/8/05   HHY
+
+Changes to GDES for setting reference point for elements.  Added options
+to set reference point to LE,TE,user or cursor specified points.
+
+Added option to OPER for geometry plotting box, GBOX command.  This takes
+an Xmin,Ymin and Xmax,Ymax box to use for detail area plotting of Cp and 
+other rotor data.
+
+***************************************************************************
+DFDC 0.59  2/18/05   HHY
+
+Changes to oper.f for CPWR command to properly write x,y,cp,q data for 
+elements to file.
+
+***************************************************************************
+DFDC 0.60  3/7/05 through 7/10/05   HHY
+
+Added multi-plane cascade lift effects to aero.f (changes lift slope as 
+function of blade station solidity).
+
+Fixes and clean-up on old solver. More robust criteria for SOR relaxation.
+
+Added option to drive blade pitch to match thrust for defined rotors.
+
+Fixes to UVC flow survey option.
+
+Added streamline trace and display options.
+
+Reduced written output with LDBG flag for added output diagnostics
+
+Bug fixes for duct and CB forces with TE closure panels (gave wrong forces
+for both, but CB forces were mostly affected.
+
+***************************************************************************
+DFDC 0.62  8/23/05 HHY
+
+New solver, explicitly satisfies zero pressure on wake streamlines.
+BC on body wakes set to match vorticity at duct or CB TE.
+
+Fixes to streamline tracer.
+
+***************************************************************************
+DFDC 0.63  9/13/05 HHY
+
+Remove almost all traces of old solver.
+
+Added Q (velocity magnitude) display as alternative to Cp displays.
+
+Added stagnation point finder and display.
+
+More trace options (fwd/backwards/both) to streamline tracer.
+
+***************************************************************************
+DFDC 0.64  9/21/05 HHY
+
+Cleaned up considerable bugs in paneling routines, much more robust default
+paneling, user specified paneling now read at same time as case loading
+
+GDES functions now all work on complete airfoils 
+(however some do NOT work on centerbodies for now)
+
+Multiple drag objects now allowed (up to 10 by current dimensioning)
+
+Fixed OPER menu listing of commands
+
+Fixed SAVE bug in DFDC main
+
+***************************************************************************
+DFDC 0.65  9/28/05 HHY
+
+Where to start...many changes
+
+All plotting displays in OPER are now cleaned up immensely, new XY geometry
+display added
+
+Solver changes:  many...
+  Problems with setting VMAVG and calculating GTH (gamma on wakes) were fixed
+  these caused the centerbody wake to slowly collapse if wakes were relaxed.
+  Bugs with setting TE closure panel strengths were found as well, now fixed
+  VMAVG limiter added to avoid transients with zero velocities
+
+Bug in UVC flow survey velocities, Cp's and flow data fixed.
+
+Bug in Cp calculation fixed for added enthalpy, entropy and circulation (was
+not properly setting these for out-of-duct points).
+
+Tip gap model now implemented (command TGAP in OPER).  Matches some test data
+very well, may need additional input parameter for zero-loss tip gap limit.
+The tip gap is modeled by modifying the grid at the shroud end of the rotor
+to add two radial points.  The circulation in the actual gap is set (and held
+to) zero (BGAM=0).  This produces a very realistic behavior for large gaps, 
+some test data seems to show that a minimum gap should produce less loss, stay
+tuned...
+
+Thin surface ducts (zero thickness, like a bellmouth) now work, and appear
+to work (in my test cases anyway) in QDES for design as well.  
+Some kinks remain in QDES for regular thick ducts, however, and this needs 
+further work.
+
+The solver issues may prompt more changes to solver to eliminate the GAM-GTH 
+duality, issue not settled yet...
+
+***************************************************************************
+DFDC 0.66  10/8/05 HHY
+
+This version adds BL analysis to duct and centerbody walls.
+
+A new command has been added to the OPER menu, BL, which adds capability to
+calculate BL's from the inviscid velocity on the walls.  Note that this is 
+not an interacted BL (as used in XFOIL).  The BL analysis here assumes that
+the wall velocities are unchanged by viscous effects.  
+
+The BL submenu includes options for setting transition parameters and does
+plotting of BL parameters.  
+
+Viscous forces are now calculated (integrated Cf on walls) and added to
+inviscid forces.
+
+
+***************************************************************************
+DFDC 0.70pre1  10/26/05 HHY
+
+This version adds the long-awaited multiple blade capability (rotor+stator,
+etc, in all the endless possibilities).  The code is changed quite a bit
+for this release to add these capabilities.
+
+The multiple blades are handled by an index (1,2,etc) that can be typed
+in at the OPER menu to change the working disk/blade row.  Subsequent commands
+that refer to a blade row (like RPM, PITCH, AERO, or plot commands that 
+display data for a blade row) then use the index for the working disk.  The
+index of the working disk is displayed only if more than one blade row is 
+defined, and is shown as:
+.OPERi(1)  <- refers to disk #1 as the working disk
+to change working blade to disk #2 type 2 at the prompt and you will get:
+.OPERi(2)  <- disk #2 is now the working disk
+
+A stator that is designed to deswirl a rotor with a BGAM=10 has a BGAM=-10,
+i.e. you are designing a stator to remove the circulation.  This has some 
+implications, a negative circulation implies a negative CL (this depends on
+how you define CL but to remain simplistic in DFDC a BGAM<0 will be generated
+by a CL<0.  Note that the AERO data for the disk (which is defined separately
+for each disk/blade row) will need to be manually "inverted" (CLMAX,CLMIN,
+CLCDMIN) adjusted so that it corresponds correctly for the CL<0 required.
+Note that DFDC will not allow you to design a stator (or rotor) with negative
+chord so it tries to do the right thing, the correct input for designing such
+a stator/rotor is to specify -CLdes.  Note that RPM can be positve or negative,
+to indicate rotation direction.  Beware that RPM>0 with BGAM>0 implies power>0,
+as does RPM<0 with BGAM<0. RPM>0 with BGAM<0 implies negative power. Keep this
+in mind...
+
+The code now can plot the dCL/dAlf in the PLOT 12 option for each disk (as well
+as a lot of other new stuff, like solidity, loading, etc).  Docs are needed to 
+explain all this new stuff...
+
+The blade outlines are now plotted on the meridional views as soon as they 
+are designed (actuator disks are plotted as simple lines, as before).  You
+will find, for example, that a stator really needs lots of blades to avoid 
+driving the chord (solidity) through the roof (this impacts the loading 
+through the CLalf which reduces as solidity is raised.  
+
+Note that a stator design seems to show blades that are oriented almost
+streamwise.  DFDC displays the blade outline defined by the chordline to the
+zero lift angle.  A real section designed for the high turning that is 
+required for a stator will have very high camber (i.e. LE drooped into the
+swirl direction, TE lined up with the streamwise direction). Options to 
+design stator blading will be added soon and will display candidate sections.
+Note that "regular" airfoils will probably not work well as stator sections.
+
+
+***************************************************************************
+DFDC 0.70rel  11/29/05 HHY
+
+This is a cleaned up version of the 0.70pre1 code.  
+
+
+
+This has a few bug fixes but differs principally with addition of the src-dll
+directory.  
+
+The src-dll directory contains source and Makefiles for a DLL version of DFDC 
+for Win32 (though it compiles code, a non-dll version library and test code 
+under Unix for test purposes).  The Win32 make process in this directory uses
+Makefile.NT to produce a Win32 DFDC DLL (library with core solver functions).
+
+Note that the Win32 DLL is intended for use with a Win32 GUI (developed 
+separately).  A normal Win32 executable for DFDC can be made from the ./bin
+directory using Makefile.NT.
+
+

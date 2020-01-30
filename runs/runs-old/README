@@ -1,0 +1,31 @@
+README for DFDC sample files
+
+This directory contains sample and test files for DFDC
+
+DStestA.case    actuator disk with single drag object
+DStestATE0.case DStestA.case with zero TE thickness on shroud foil
+DStestA2D.case  actuator disk with two drag objects
+
+DStestR.case    rotor case with single drag object
+DStestR2D.case  rotor case with two drag objects
+
+test0.case      test case with actuator disk (with repaneling file test0.pan)
+test2.case      test case with long CB, actuator disk
+test3.case      test case with long duct, actuator disk
+test4.case      test case with no CB contraction at TE, actuator disk
+test5.case      test4 case with long wake
+test5-x.case    test5 cases with various wake lengths
+
+testactdisk.case  actuator disk sample case
+testrotor.cas     rotor sample case
+
+test-with-pan.case  testcase with PANELING definition saved in case file
+
+thin2A.case     thin (zero thickness) duct case with actuator disk
+thin2A.case     redesign of thin2A to give lower Cp on bellmouth
+
+The file ductcbgeom.dat contains an "airfoil" file with the centerbody and 
+duct wall geometry (two foils).  
+
+The "geometry" directory contains raw coordinate foil definitions for 
+several CB and shrouds

@@ -1,0 +1,753 @@
+ 
+DFDC  0.70 User Primer                                        Dec 4 2005
+Harold Youngren, Aerocraft, Inc.
+Mark Drela, MIT Aero & Astro
+
+
+
+History
+=======
+DFDC is an analysis code for axisymmetric ducted rotor design and analysis.
+Wall BL analysis was introduced with version 0.66, this solves for the wall
+shear forces with an a-posteriori BL calculation (not interacted with the 
+inviscid flow, as is done in XFOIL).
+
+The 0.70 version adds analysis and design for a ducted rotor with stator.
+
+
+General Description
+===================
+DFDC has a number of features intended for rapid duct and ducted rotor
+design and analysis.  
+
+ Axisymmetric components
+   Centerbody 
+   Duct walls 
+   Rotor
+   Stator
+   Drag sources
+
+ Input file
+   Keyword-driven case input file
+
+ Aerodynamic outputs
+   Duct forces and moments
+   Rotor forces 
+   Stator forces
+
+ Analysis capability
+   Duct with actuator disk (specified loading)
+   Duct with rotor blade (specified blade geometry)
+   Stator modeled as actuator disk (with swirl and torque)
+   Stator modeled as bladed disk
+   Specify rotor/stator axial position
+   Freestream velocity
+   Rotor RPM 
+   Drive to specified thrust
+   Effects of duct drag sources
+
+ Rotor/Stator design capability
+   Design blade chord to specified circulation
+   Design blade twist for specified chord and circulation
+   Blade pitch and twist changes
+
+ Geometric redesign of duct walls
+   XFOIL-like geometry modification (GDES)
+
+ BL analysis of duct and centerbody walls, viscous forces
+
+ Aerodynamic redesign of duct walls to specified pressures
+
+
+
+Input Files
+===========
+DFDC works with a single input file in plain text format.  This file
+contains the duct case data, the duct geometry data, actuator disk or rotor
+blade data and drag source data.  The sections of this file are separated by 
+keywords and can be input in any order.
+
+Optionally a second file can be used, containing information to redistribute
+points on the duct and centerbody walls.  This paneling file has a name
+xxx.pan (where xxx is the prefix from the case name).  Optionally, the paneling
+information can be put directly into the case file so that only one file is 
+needed.  Note that user-specified paneling information is normally not needed,
+the automatic point distribution scheme works for most inputs without further
+interaction.
+
+The user provides files xxx.case which is typically created
+using any text editor.  Sample files are provided for use as templates.
+These can be manually edited, although this is not really necessary
+since it is may be more convenient to edit the contents in DFDC and then
+write out the file again.
+
+Comments can be added to the input file using either a ! or # character to
+start the comment line.  These lines are read but not used.
+
+The first part of the input file has a header that identifies the DFDC code
+and version number.   This line is followed by a title line identifying the 
+case (this is printed in plots and output print).
+
+
+Sample Input files
+==================
+A sample input file for DFDC for a simple case with duct and actuator disk 
+looks like this:
+
+DFDC Version  0.70
+FatDuct + CB test case (single actuator disk)
+
+OPER
+!  Vinf         Vref          RPM
+   0.0000       50.000       8000.0    
+!  Rho          Vso          Rmu           Alt
+   1.2260       340.00      0.17800E-04   0.0000    
+!  XDwake       Nwake
+  0.80000       20
+!  Lwkrlx
+            F
+ENDOPER
+
+ACTDISK
+!  Xdisk       NRPdef
+  0.12000        11
+!  #stations
+    10
+  0.50491E-01   10.000    
+  0.61567E-01   10.000    
+  0.72644E-01   10.000    
+  0.83721E-01   10.000    
+  0.94798E-01   10.000    
+  0.10587       10.000    
+  0.11695       10.000    
+  0.12803       10.000    
+  0.13911       10.000    
+  0.15018       10.000    
+ENDACTDISK
+
+GEOM
+FatDuct + CB test case                                                         
+     0.306379    0.035928
+     0.296701    0.039168
+     0.285768    0.041795
+     0.274184    0.043576
+     0.262095    0.044564
+     0.248578    0.044839
+     0.232723    0.044847
+     0.216580    0.044866
+     0.200407    0.044882
+     0.184232    0.044898
+     0.168060    0.044913
+     0.151899    0.044930
+     0.135773    0.044950
+     0.120000    0.044952
+     0.109361    0.044999
+     0.099680    0.044922
+     0.090039    0.044561
+     0.080630    0.043916
+     0.071451    0.042966
+     0.062540    0.041690
+     0.053933    0.040075
+     0.045705    0.038107
+     0.037900    0.035771
+     0.030604    0.033068
+     0.023901    0.030001
+     0.017880    0.026585
+     0.012632    0.022848
+     0.008231    0.018825
+     0.004736    0.014551
+     0.002179    0.010047
+     0.000586    0.005293
+     0.000000    0.000000
+  999.0 999.0
+     0.304542    0.159526
+     0.296440    0.162842
+     0.285240    0.167270
+     0.273301    0.171796
+     0.261206    0.176188
+     0.249026    0.180416
+     0.236794    0.184470
+     0.224549    0.188335
+     0.212269    0.192017
+     0.200020    0.195490
+     0.187807    0.198746
+     0.175647    0.201771
+     0.163586    0.204547
+     0.151644    0.207051
+     0.139859    0.209267
+     0.128379    0.211153
+     0.117508    0.212618
+     0.106950    0.213649
+     0.096610    0.214255
+     0.086498    0.214421
+     0.076647    0.214136
+     0.067113    0.213390
+     0.057935    0.212174
+     0.049193    0.210487
+     0.040949    0.208332
+     0.033312    0.205736
+     0.026403    0.202735
+     0.020339    0.199393
+     0.015227    0.195790
+     0.011135    0.192004
+     0.008090    0.188086
+     0.006112    0.184067
+     0.005242    0.180005
+     0.005484    0.176154
+     0.006854    0.172546
+     0.009324    0.169289
+     0.012842    0.166404
+     0.017419    0.163862
+     0.023109    0.161648
+     0.029956    0.159771
+     0.037937    0.158256
+     0.046983    0.157103
+     0.057025    0.156294
+     0.067995    0.155792
+     0.079836    0.155546
+     0.092531    0.155498
+     0.106044    0.155585
+     0.120000    0.155721
+     0.134221    0.155902
+     0.148679    0.156177
+     0.163490    0.156523
+     0.178507    0.156897
+     0.193399    0.157258
+     0.208123    0.157586
+     0.222751    0.157864
+     0.237332    0.158088
+     0.251898    0.158254
+     0.266506    0.158365
+     0.281130    0.158423
+     0.294972    0.158441
+     0.304466    0.158439
+ENDGEOM
+
+
+A sample input file with a bladed rotor, aero data for the blade sections,
+and a drag object upstream of the duct is shown below:
+
+DFDC Version  0.70
+FatDuct + CB test case (single rotor disk + drag object)
+
+OPER
+!  Vinf         Vref          RPM
+   0.0000       50.000       8000.0    
+!  Rho          Vso          Rmu           Alt
+   1.2260       340.00      0.17800E-04   0.0000    
+!  XDwake       Nwake
+  0.80000       20
+!  Lwkrlx
+            F
+ENDOPER
+
+AERO
+!  #sections
+     1
+!  Xisection
+   0.0000    
+!  A0deg        dCLdA        CLmax         CLmin
+   0.0000       6.2800       1.5000      -1.0000    
+!  dCLdAstall   dCLstall      Cmconst         Mcrit
+  0.50000      0.20000       0.0000      0.70000    
+!  CDmin        CLCDmin        dCDdCL^2
+  0.12000E-01  0.10000      0.50000E-02
+!  REref        REexp
+  0.20000E+06  0.35000    
+ENDAERO
+
+ROTOR
+!   Xdisk        Nblds       NRPdef
+  0.12000         5           11
+!  #stations
+    10
+!     r        Chord         Beta
+  0.50491E-01  0.59431E-01   72.604    
+  0.61567E-01  0.55238E-01   62.306    
+  0.72644E-01  0.51337E-01   54.568    
+  0.83721E-01  0.47984E-01   48.599    
+  0.94798E-01  0.45217E-01   43.869    
+  0.10587      0.42988E-01   40.020    
+  0.11695      0.41230E-01   36.810    
+  0.12803      0.39884E-01   34.071    
+  0.13911      0.38899E-01   31.680    
+  0.15018      0.38242E-01   29.548    
+ENDROTOR
+
+DRAGOBJ
+!  #pts
+     3
+!   x            r          CDA
+  0.40000E-01  0.60000E-01  0.40000E-01
+  0.40000E-01  0.80000E-01  0.35000E-01
+  0.40000E-01  0.12000E-00  0.30000E-01
+ENDDRAGOBJ
+
+GEOM
+FatDuct + CB test case                                                         
+     0.306379    0.035928
+     0.296701    0.039168
+     0.285768    0.041795
+.
+.    same geometry as first sample above
+.
+     0.002179    0.010047
+     0.000586    0.005293
+     0.000000    0.000000
+  999.0 999.0
+     0.304542    0.159526
+     0.296440    0.162842
+     0.285240    0.167270
+.
+.    same geometry as first sample above
+.
+     0.281130    0.158423
+     0.294972    0.158441
+     0.304466    0.158439
+ENDGEOM
+
+
+A sample input file with a bladed rotor + aero data for the blade sections 
+and an actuator disk stator is shown below:
+
+DFDC Version  0.70 
+Bladed rotor + actdisk stator test case                                             
+
+OPER
+!        Vinf         Vref          RPM1         RPM2
+  0.00000E+00   50.000       8000.0          0.0    
+!         Rho          Vso          Rmu           Alt
+   1.2260       340.00      0.17800E-04  0.00000E+00
+!       XDwake        Nwake
+  0.80000               20
+!       Lwkrlx
+            F
+ENDOPER
+
+AERO
+!  #sections
+     1
+!   Xisection
+  0.00000E+00
+!       A0deg        dCLdA        CLmax         CLmin
+  0.00000E+00   6.2800       1.5000      -1.0000    
+!  dCLdAstall     dCLstall      Cmconst         Mcrit
+  0.50000      0.20000      0.00000E+00  0.70000    
+!       CDmin      CLCDmin     dCDdCL^2
+  0.12000E-01  0.10000      0.50000E-02
+!       REref        REexp
+  0.20000E+06  0.35000    
+ENDAERO
+
+ROTOR
+!       Xdisk        Nblds       NRsta
+  0.12000                6           11
+!  #stations
+    10
+!           r        Chord         Beta
+  0.50494E-01  0.68423E-01   77.017    
+  0.61571E-01  0.63974E-01   64.527    
+  0.72648E-01  0.59613E-01   55.142    
+  0.83725E-01  0.55667E-01   48.577    
+  0.94801E-01  0.52241E-01   43.957    
+  0.10588      0.49327E-01   40.191    
+  0.11696      0.46879E-01   37.057    
+  0.12803      0.44839E-01   34.396    
+  0.13911      0.43155E-01   32.088    
+  0.15019      0.41782E-01   30.041    
+ENDROTOR
+
+
+AERO
+!  #sections
+     1
+!   Xisection
+  0.00000E+00
+!       A0deg        dCLdA        CLmax         CLmin
+  0.00000E+00   6.2800       1.0000      -1.5000    
+!  dCLdAstall     dCLstall      Cmconst         Mcrit
+  0.50000      0.20000      0.00000E+00  0.70000    
+!       CDmin      CLCDmin     dCDdCL^2
+  0.12000E-01 -0.10000      0.50000E-02
+!       REref        REexp          TOC      dCDdCL^2
+  0.20000E+06  0.35000      0.10000      0.20000E-01
+ENDAERO
+
+ACTDISK
+! Xdisk   NRPdef
+  0.22     11
+! #stations
+  3
+! r     BGam
+ 0.02   -10.0
+ 0.06   -10.0
+ 0.10   -10.0
+ENDACTDISK
+
+GEOM
+FatDuct + CB test case                                                          
+     0.306379    0.035928
+     0.304409    0.036661
+     0.299975    0.038172
+.
+.    same geometry as first sample above
+.
+     0.000818    0.006237
+     0.000220    0.003272
+     0.000000    0.000000
+  999.0 999.0
+     0.304542    0.159526
+     0.300090    0.161360
+     0.294089    0.163786
+.
+.    same geometry as first sample above
+.
+    0.296938    0.158442
+     0.301213    0.158441
+     0.304466    0.158439
+ENDGEOM
+
+
+Coordinate system
+-----------------
+The geometry is described in the following Cartesian system:
+
+  X   axial downstream
+  Y   radial coordinate (also R sometimes)
+
+Input data is assumed to be defined in MKS, coordinates in meters!.
+
+
+
+Sections of the Input File
+==========================
+
+The file is divided into sections by keywords.
+
+Operating point section
+=======================
+
+This section contains the flow condition and operating point data for the
+case.  The first line contains the freestream velocity, reference velocity
+and RPM (used for actuator disk to estimate swirl effects, or a rotor for 
+operating condition).  The second line contains the fluid properties and/or
+the altitude (used to set atmosphere properties if they are otherwise set to
+0.0).  The next line contains the downstream vortex wake length to be used 
+for the flow domain (in duct diameters, use 0.75 to 2 diameters for most 
+cases).   The number of points to use in the wake is set here (20 works well).
+The last input is a flag to set automatic wake realignment and regridding, 
+normally not used as it slows the case convergence).  
+
+OPER
+!   Vinf         Vref          RPM
+   0.0000       50.000       8000.0    
+!    Rho         Vso          Rmu           Alt
+   1.2260       340.00      0.17800E-04   0.0000    
+!  XDwake        Nwake
+  0.80000        20
+!  Lwkrlx
+     F
+ENDOPER
+
+For cases with multiple rotors an extra RPM value is read in the next field
+
+OPER
+!   Vinf         Vref          RPM1          RPM2
+   0.0000       50.000       8000.0          0.0
+!    Rho         Vso          Rmu           Alt
+   1.2260       340.00      0.17800E-04   0.0000    
+!  XDwake        Nwake
+  0.80000        20
+!  Lwkrlx
+     F
+ENDOPER
+
+
+Aero properties section
+=======================
+
+This section starts with the AERO keyword and ends with ENDAERO. 
+This section contains aerodynamic data that is used for each blade element in 
+a rotor analysis or design.  The data is used for a parametric model of the
+lifting and drag properties of an airfoil section (2D section).  The details
+of the model are presented in the aero.f code sections but are derived from
+the XROTOR aero model for blade elements.  
+
+The aero properties are used for bladed disk analysis for the blade elements. 
+They are also used when a bladed rotor or stator is designed.
+
+Any number (one or more) aero "sections" are used, located on the blade by
+a XIsection coordinate (XI = r/R). If two or more aero "sections are specifed  
+the aero properties for any blade element at XI=xi_i will be obtained by 
+interpolation of aero properties of aero "sections" whose XIsection values
+bound the desired blade element radial station.  If only one section is present
+its aero properties will be used for the whole blade from hub to tip.
+
+AERO
+!  #sections
+     1
+!  Xisection
+   0.0000    
+!  A0deg        dCLdA        CLmax         CLmin
+   0.0000       6.2800       1.5000      -1.0000    
+!  dCLdAstall   dCLstall      Cmconst         Mcrit
+  0.50000      0.20000       0.0000      0.70000    
+!  CDmin        CLCDmin        dCDdCL^2
+  0.12000E-01  0.10000      0.50000E-02
+!  REref        REexp
+  0.20000E+06  0.35000    
+ENDAERO
+
+Note that if one rotor disk is used only one set of aero properties are 
+needed (or none at all, in which case a default set is used). The AERO
+data should precede the associated rotor or actuator disk definition. 
+
+If a case has two disks (rotor/stator or ?) each AERO/disk definition is 
+treated as a composite definition, i.e. the first aero data is assumed
+to refer to the first disk defined (ACTDISK or ROTOR), the second aero data 
+is assumed to refer to the second disk defined (ACTDISK or ROTOR).  The AERO
+data should normally precede its intended disk definition.
+
+Note that, for the current release, the aero properties must be altered for
+a disk with negative circulation (BGAM).  DFDC does not automatically "flip" 
+the aero properties for a blade with negative circulation.  The negative 
+circulation means that negative CL's will generate the negative circulation 
+(as the chord is never allowed to go negative!!).  This means the user should
+input the aero properties with CLmax, CLmin, CLCDmin reversed.  This means that
+-CLmax is input as CLmin, -CLmin is input as CLmax and CLCDmin=-CLCDmin. 
+
+The plotted or output print of disk properties will show negative CL's for 
+disks with negative circulation.  
+ 
+
+Actuator disk section
+=======================
+
+This section contains a specification for an actuator disk to model the 
+duct rotor.  The section starts with the ACTDISK keyword and ends with
+ENDACTDISK.   
+
+The actuator disk is specified by an axial location for the
+disk (Xdisk) which must be located between the duct and centerbody leading
+and trailing edges.  The number of points to use to represent the actuator 
+disk loading (NRPdef) is also required (normallly 11-15 points is enough). 
+
+Adding rotor/actuator disk analysis points slows the method as each rotor
+radial station emits a vortex wake (which has Nwake+ points on each).
+
+The rotor loading is specified by a set of radial stations with specified 
+blade loading (B*GAMMA, or BGAM in the code) corresponding to bound 
+circulation on the blade and (with OMEGA) to pressure loading and thrust.
+
+Note that the user can specify any number of radial stations that characterize
+the disk loading, these will be interpolated to the rotor analysis stations.
+Note that actuator disks are not defined along with rotors, use one or the 
+other!
+
+ACTDISK
+!  Xdisk       NRPdef
+  0.12000        11
+!  #stations
+    10
+  0.50491E-01   10.000    
+  0.61567E-01   10.000    
+   .             .
+  0.13911       10.000    
+  0.15018       10.000    
+ENDACTDISK
+
+
+Rotor section
+=======================
+
+This section contains a specification for a bladed disk in the ducted fan.
+The section starts with the ROTOR keyword and ends with ENDROTOR.   
+
+The rotor is specified by an axial location for the rotor (Xdisk) which must 
+be located between the duct and centerbody leading and trailing edges.  The
+number of rotor blades (Nblds) is specified here.
+The number of points to use to represent the rotor blade elements (NRPdef) 
+is also required (normallly 11-15 points is enough). 
+
+Adding rotor/actuator disk analysis points slows the method as each rotor
+radial station emits a vortex wake (which has Nwake+ points on each).
+
+The rotor is specified by a set of radial stations with specified 
+blade chord and blade angle.  The blade angle is measured from the plane
+of rotor rotation (0 for flat pitch, 90deg for axial inflow direction). The
+radial station and chord are assumed to be dimensional in meters.
+
+Note that the user can specify any number of radial stations that characterize
+the rotor, these will be interpolated to the rotor analysis stations.  Rotors, 
+once defined, take precedence over actuator disks. Normally you don't use both.
+
+ROTOR
+!   Xdisk        Nblds       NRPdef
+  0.12000         5           11
+!  #stations
+    10
+!     r        Chord         Beta
+  0.50491E-01  0.59431E-01   72.604    
+  0.61567E-01  0.55238E-01   62.306    
+  0.72644E-01  0.51337E-01   54.568    
+  0.83721E-01  0.47984E-01   48.599    
+  0.94798E-01  0.45217E-01   43.869    
+  0.10587      0.42988E-01   40.020    
+  0.11695      0.41230E-01   36.810    
+  0.12803      0.39884E-01   34.071    
+  0.13911      0.38899E-01   31.680    
+  0.15018      0.38242E-01   29.548    
+ENDROTOR
+
+
+Drag object section
+===================
+
+This section starts with the DRAGOBJ keyword and ends with ENDDRAGOBJ. 
+This section contains a CDA (drag area) and X,Y (x,r in axisymmetric system) 
+coordinates of the drag line.  This is used to set up a line source that will
+represent the blockage and loss of the drag object on the flow field.
+
+DRAGOBJ
+!  #pts
+     3
+!   x            r          CDA
+  0.40000E-01  0.60000E-01  0.40000E-01
+  0.40000E-01  0.80000E-01  0.35000E-01
+  0.40000E-01  0.12000E-00  0.30000E-01
+ENDDRAGOBJ
+
+The DRAG menu in DFDC can be used to edit, change or add drag objects.  Drag 
+objects are saved in the case file when it is written.
+
+
+Geometry section
+================
+
+This section starts with the GEOM keyword and ends with ENDGEOM. The lines 
+between these keywords are assumed to be an XFOIL-format multi-element airfoil
+coordinate file containing the centerbody and duct wall coordinates.  The two
+sets of coordinates are separated by an extra line with 
+ 
+999.  999.  
+ 
+The coordinates are in X,Y order as used in XFOIL, ordered from upper surface
+TE to LE to lower surface TE.  CCW order is preferred but DFDC will reverse 
+foils with CW input order automatically.  Note that the centerbody is normally 
+cut by the X axis but can be described as a symmetrical foil.  In this case 
+DFDC will cut the foil at the X axis to make a half-body shape.
+
+Coordinates for DFDC are currently assumed to be dimensional in meters for
+compatibility with the assumed MKS system used in the code.  Options for
+other dimensional systems may be added to DFDC.
+
+
+Paneling data section
+======================
+
+This section contains specifications for distribution of panel nodes on the 
+duct and centerbody walls.  Normally not needed, this option is available
+for use with cases where the default panel distribution scheme fails or 
+does not give adequate node distribution.  If the user specifies paneling
+information (in the PPAR submenu) the PANELING section data will be added 
+to the output save file (so that the case can be recreated when it is 
+run again).  This is NOT normally needed as part of the case file.
+
+PANELING
+!  #elements   #refinement zones
+     2     4
+!  #panel nodes
+    62
+!  curv_expon  curv_smooth    dsL/dsAvg    dsR/dsAvg
+   1.0000       1.0000      0.60000      0.60000    
+!      s1/smax      s2/smax     ds/dsAvg
+   0.0000       0.0000       1.0000    
+   0.0000       0.0000       1.0000    
+   0.0000       0.0000       1.0000    
+   0.0000       0.0000       1.0000    
+!  #panel nodes
+    99
+!  curv_expon  curv_smooth    dsL/dsAvg    dsR/dsAvg
+   1.0000       1.0000      0.60000      0.60000    
+!      s1/smax      s2/smax     ds/dsAvg
+   0.0000       0.0000       1.0000    
+   0.0000       0.0000       1.0000    
+   0.0000       0.0000       1.0000    
+   0.0000       0.0000       1.0000    
+ENDPANELING
+
+The inputs to this section correspond to the inputs to the PPAR submenu.
+
+
+=======================================================================================
+
+Some Program Options for the User
+=================================
+These features are not available in the input dataset but can be selected
+by the user while DFDC is running.
+
+Geometric Manipulation
+======================
+This is patterned after the XFOIL GDES options to manipulate the foils that
+define the duct and centerbody.
+
+
+BL Analysis
+===========
+For the current release the BL analysis is done manually by the user (not 
+automatically after setting a viscous toggle).  
+
+BL analysis is done in a BL submenu.  The unit RN for the case is derived 
+from the flow conditions and geometry (assumed to be in MKS).  The user 
+can set the transition points, the default is free transition (like XFOIL).  
+BL parameters can be plotted on the duct walls and viscous (shear) forces are 
+added to the forces calculated by the program.
+
+
+Flow Survey
+===========
+The user can query the flow properties at any location using the UVC (or UV)
+commands to select an X, Y location.  
+
+
+Streamline Tracing
+==================
+The user can enter points at which to trace streamlines in the flowfield. 
+This option is entered by the SLC keyword.
+
+
+Plotting Options
+================
+
+The top-level PLOP command produces the plot option menu,
+shown below with the default values.  Most of these parameters
+must be changed before the first plot is made, otherwise they
+may not have the intended effect.
+
+ ...............................................
+
+  G raphics-enable flag         T
+  C olor PostScript output?     F
+  I ndividual PS file output?   F
+  A spect ratio of plot object   0.0000
+  S ize of plot object           9.00"
+  P age dimensions              11.00 x  8.50"
+  M argins from page edges       0.00",  0.00"
+  F ont size (relative)          0.0170
+  W indow/screen size fraction   0.7000
+  O rientation of plot:        Landscape 
+  B lowup input method:        Keyboard  
+
+      Option, Value   (or <Return>)    c>  
+
+Normally, all hardcopy goes to the single multi-page plot.ps file.
+Toggling the Individual PS file flag to T will place successivehardcopy pages in an individual files, named
+plot000.ps
+plot001.ps
+plot002.ps
+etc.
+These may then be used to create mode animation, etc.
+
+The other parameters and options are mostly self-explanatory.
+
+

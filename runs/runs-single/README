@@ -1,0 +1,13 @@
+README for DFDC single rotor sample files
+
+This directory contains sample and test files for DFDC with single disk rotors
+
+DStestA.case    actuator disk with single drag object
+DStestR.case    rotor case with single drag object
+
+nasaTN3122.case duct and rotor from NASA TN-3122 test report (w/o stators)
+                Note that this model may not correspond exactly to the NASA
+                test geometry...
+
+torp.case       sample case with torpedo-like body and aft ducted rotor
+

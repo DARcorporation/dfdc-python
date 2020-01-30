@@ -1,0 +1,16 @@
+README for DFDC sample case files with multiple rotors (rotor/stator)
+
+This directory contains sample and test files for DFDC, rotor/stator cases
+
+DStestA2-A10.case   case with actuator disk rotor (BGAM=10) and stator (BGAM=-10)
+Note: these cases show varying degrees of circulation cancellation by stator
+DStestA2-A0.case    case with actuator disk rotor (BGAM=10) and stator (BGAM=0)
+DStestA2-A1.case    case with actuator disk rotor (BGAM=10) and stator (BGAM=-1)
+DStestA2-A2.case    case with actuator disk rotor (BGAM=10) and stator (BGAM=-2)
+DStestA2-A8.case    case with actuator disk rotor (BGAM=10) and stator (BGAM=-8)
+
+DStestR2.case    case with bladed rotor and stator (derived from DStestA2-A10)
+DStestR2.oper    output from DStestR2.case showing rotor/stator operating point
+
+DStestR2-A10.case case with bladed rotor and act disk stator (BGAM=-10)
+
