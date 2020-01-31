@@ -192,6 +192,194 @@ SUBROUTINE PANCOP
 END
 ! PANCOP
 
+SUBROUTINE PANGEN(LQUERY)
+    !------------------------------------------------------------------
+    !     Generates panel nodes X,Y from buffer-airfoil XB,YB arrays.
+    !     If LQUERY=T, then user's interaction is requested.
+    !------------------------------------------------------------------
+    INCLUDE 'DFDC.INC'
+    LOGICAL LQUERY
+    !
+    LOGICAL LCPLOT
+    DIMENSION SG(IPX)
+    !
+    DATA LCPLOT / .FALSE. /
+    !
+    IF(NBEL.EQ.0) RETURN
+    NEL = NBEL
+    !
+    !---- process each element
+    DO 100 IEL = 1, NBEL
+        !
+        IB1 = IBFRST(IEL)
+        IB2 = IBLAST(IEL)
+        NBPTS = IB2 - IB1 + 1
+        IP1 = IPFRST(IEL)
+        IP2 = IPLAST(IEL)
+        NPPTS = IP2 - IP1 + 1
+        IF(LDBG) THEN
+            WRITE(*, *) 'PANGEN IEL ', IEL
+            WRITE(*, *) 'IB1,IB2 ', IB1, IB2
+            WRITE(*, *) 'IP1,IP2 ', IP1, IP2
+        ENDIF
+        !
+        IF(NPPTS.LE.1 .AND. NBPTS.LE.1) THEN
+            !------- don't try to panel point or ring element
+            NG = 1
+            SG(1) = 0.
+            !
+        ELSE
+            !
+            IF(LQUERY) THEN
+                !-------- set current spacing so SGCURV has something to plot
+                IF(NPPTS.GT.1) THEN
+                    !--------- set SG from existing paneled geometry, if defined
+                    NG = NPPTS
+                    DO IP = IP1, IP2
+                        IG = IP - IP1 + 1
+                        SG(IG) = (SP(IP) - SP(IP1)) / (SP(IP2) - SP(IP1))
+                    ENDDO
+                ELSEIF(NBPTS.GT.1) THEN
+                    !--------- or, set SG from buffer geometry
+                    NG = NBPTS
+                    DO IB = IB1, IB2
+                        IG = IB - IB1 + 1
+                        SG(IG) = (SB(IB) - SB(IB1)) / (SB(IB2) - SB(IB1))
+                    ENDDO
+                    IF(NPAN(IEL).LE.0) NPAN(IEL) = NBPTS
+                ELSE
+                    WRITE(*, *)
+                    WRITE(*, *) '  No current paneling to modify'
+                    WRITE(*, *) '  Input case and/or Execute PANE command'
+                    RETURN
+                ENDIF
+                !
+            ELSE
+                !--------- no initial paneling for SGCURV
+                SG(1) = 0.
+            ENDIF
+            !
+            !         WRITE(*,1150) IEL
+            ! 1150    FORMAT(
+            !     & /' ============================================================='
+            !     &//'  Element', I4)
+            !
+            !------- surface element... generate spacing array SG
+            !
+            CALL SGCURV(LQUERY, LCPLOT, NBPTS, &
+                    XB(IB1), XBS(IB1), &
+                    YB(IB1), YBS(IB1), &
+                    SB(IB1), &
+                    IPX, NG, SG, &
+                    NPAN(IEL), CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL), &
+                    NRPNX, SRPN1(1, IEL), SRPN2(1, IEL), CRRAT(1, IEL))
+        ENDIF
+        !
+        IF(LQUERY) THEN
+            !---- Set flag for spacing defined, unset user-defined flag
+            LRSPCDEF = .TRUE.
+            LRSPCUSR = .TRUE.
+        ENDIF
+        !
+        !------ starting and ending indices for this element IEL
+        IF(IEL.EQ.1) THEN
+            IP1 = 1
+            IP2 = NG
+        ELSE
+            IP1 = IPLAST(IEL - 1) + 1
+            IP2 = IPLAST(IEL - 1) + NG
+        ENDIF
+        IF(IP2.GT.IPX) STOP 'PANGEN: Array overflow on IPX'
+        !
+        IF(LQUERY) THEN
+            IPDEL = IP2 - IPLAST(IEL)
+            IF(NPTOT + IPDEL.GT.IPX) STOP 'PANGEN: Array overflow on IPX'
+            !
+            !-------- move current points in subsequent elements to make/take-up room
+            IF(IPDEL.GT.0) THEN
+                KP1 = NPTOT
+                KP2 = IPLAST(IEL) + 1
+                KPD = -1
+            ELSE
+                KP1 = IPLAST(IEL) + 1
+                KP2 = NPTOT
+                KPD = +1
+            ENDIF
+            DO KP = KP1, KP2, KPD
+                SP(KP + IPDEL) = SP(KP)
+                XP(KP + IPDEL) = XP(KP)
+                YP(KP + IPDEL) = YP(KP)
+                XPS(KP + IPDEL) = XPS(KP)
+                YPS(KP + IPDEL) = YPS(KP)
+            ENDDO
+            DO KEL = IEL + 1, NEL
+                IPFRST(KEL) = IPFRST(KEL) + IPDEL
+                IPLAST(KEL) = IPLAST(KEL) + IPDEL
+            ENDDO
+        ENDIF
+        !
+        !------ set panel nodes at fractional arc length locations SG
+        DO IP = IP1, IP2
+            IG = IP - IP1 + 1
+            SBI = SB(IB1) + (SB(IB2) - SB(IB1)) * SG(IG)
+            !
+            XP(IP) = SEVAL(SBI, XB(IB1), XBS(IB1), SB(IB1), NBPTS)
+            YP(IP) = SEVAL(SBI, YB(IB1), YBS(IB1), SB(IB1), NBPTS)
+        ENDDO
+        IPFRST(IEL) = IP1
+        IPLAST(IEL) = IP2
+        !
+        !------ centroid location
+        XPCENT(IEL) = XBCEN2DT(IEL)
+        YPCENT(IEL) = YBCEN2DT(IEL)
+
+        !------ spline and set other stuff for element IEL
+        CALL XYPSPL(IEL)
+        !
+        !------ set indices of TE panel, if any
+        CALL ITPSET(IEL)
+        !
+        I = IPFRST(IEL)
+        N = IPLAST(IEL) - IPFRST(IEL) + 1
+        CALL MINMAX(N, XP(I), XPMINE(IEL), XPMAXE(IEL))
+        CALL MINMAX(N, YP(I), YPMINE(IEL), YPMAXE(IEL))
+    100  CONTINUE
+    !
+    !---- set total number of panel vertices
+    NPTOT = IPLAST(NEL)
+    !
+    !---- set overall min,max over all elements
+    CALL MINMAX(NEL, XPMINE, XPMIN, DUMMY)
+    CALL MINMAX(NEL, YPMINE, YPMIN, DUMMY)
+    CALL MINMAX(NEL, XPMAXE, DUMMY, XPMAX)
+    CALL MINMAX(NEL, YPMAXE, DUMMY, YPMAX)
+    !
+    !---- default reference point location for each element
+    DO IEL = 1, NEL
+        XPREFE(IEL) = 0.0
+        YPREFE(IEL) = 0.0
+    ENDDO
+    !
+    !---- we now have a new geometry... invalidate any existing solution
+    LNCVP = .FALSE.
+    LQAIC = .FALSE.
+    LQGIC = .FALSE.
+    LQCNT = .FALSE.
+    LSYSP = .FALSE.
+    LGSYS = .FALSE.
+    LGAMU = .FALSE.
+    LGAMA = .FALSE.
+    LSIGP = .FALSE.
+    LSIGM = .FALSE.
+    !
+    LQSPEC = .FALSE.
+    LGSAME = .FALSE.
+    !
+    RETURN
+END
+! PANGEN
+
+
 
 SUBROUTINE PANWRT
     !-----------------------------------------

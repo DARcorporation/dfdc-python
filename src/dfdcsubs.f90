@@ -462,6 +462,105 @@ END
 ! DFINIT
 
 
+SUBROUTINE GENGEOM
+    !----------------------------------------------------
+    !     Generates case geometry from buffer airfoils
+    !     and does the necessary geometry processing.
+    !----------------------------------------------------
+    INCLUDE 'DFDC.INC'
+    LOGICAL ERROR, LQUERY
+    !
+    !---- process current buffer geometry to identify element types and
+    !     set element parameters
+    !      write(80,*) 'before geproc'
+    !      CALL XYBDMP
+    !      CALL GEPROC
+    !      IF(LDBG) THEN
+    !        CALL GEPRINT(LUNDBG)
+    !      ENDIF
+    !
+    !========================================================================
+    !---- Check for respacing flag to redistribute points on buffer geometry
+    IF(LRSPC) THEN
+        !
+        !---- If paneling parameters are unset then reset default paneling
+        !     parameters for buffer geometry elements
+        !      write(*,*) 'gengeom  npan',NPAN(1)
+        IF(.NOT.LRSPCDEF) THEN
+            !          WRITE(*,*) 'Setting default respacing parameters'
+            CALL PANDEF(0)
+        ENDIF
+        !
+        !        WRITE(*,*) 'Repaneling buffer geometry'
+        LQUERY = .FALSE.
+        CALL PANGEN(LQUERY)
+        !
+    ELSE
+        !        WRITE(*,*) 'Copying buffer geometry into panel arrays'
+        CALL PANCOP
+    ENDIF
+    !
+    !----------------------------------------------------------------
+    !---- At this point the input airfoils are in the panel geometry
+    LGSAME = .TRUE.
+    !
+    !---- Adjust paneling on airfoils for rotor and wake grid
+    CALL ADJPANL
+    !      write(80,*) 'after ADJPANL PDMP'
+    !      CALL XYPDMP(80)
+    !
+    !---- Reset # of elements to buffer geometry, remaining elements are added
+    !     to this: drag elements, rotor line sources, then vortex wakes
+    NEL = NBEL
+    !
+    !---- Set up drag area element(s)
+    CALL SETDRGOBJ
+    !
+    !---- Set up rotor points
+    CALL ROTORINIT
+    !
+    !---- Set up rotor wake grid from repaneled airfoils
+    CALL INIGRD
+    !
+    !---- Set up rotor wake elements from wake grid
+    CALL SETROTWAK
+    !
+    !---- Sets up control points and pointers to panels
+    CALL CVPGEN
+    !
+    !---- Initialize rotor/wake pointers
+    CALL ROTPINIT
+    !
+    !---- List all defined elements
+    IF(LDBG) THEN
+        CALL PELIST(6)
+        CALL PELIST(LUNDBG)
+    ENDIF
+    CALL WAKEBOX
+    !
+    !----------------------------------------------------------------
+    !---- invalidate any existing solution
+    LNCVP = .FALSE.
+    LQAIC = .FALSE.
+    LQGIC = .FALSE.
+    LQCNT = .FALSE.
+    LSYSP = .FALSE.
+    LGSYS = .FALSE.
+    LGAMU = .FALSE.
+    LGAMA = .FALSE.
+    LSIGP = .FALSE.
+    LSIGM = .FALSE.
+    !
+    NQSP = 0
+    NSEG = 0
+    !
+    WRITE(*, *)
+    WRITE(*, *) 'Geometry loaded'
+    !
+    RETURN
+END
+! GENGEOM
+
 
 SUBROUTINE PELIST(LU)
     !------------------------------------------------------
