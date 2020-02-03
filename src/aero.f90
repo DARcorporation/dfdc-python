@@ -81,7 +81,6 @@ contains
     !
     
     SUBROUTINE SETIAERO
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -115,7 +114,6 @@ contains
     SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
             & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
             & MCRIT, TOC, REREF, REXP)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -183,7 +181,6 @@ contains
     SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
             & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
             & MCRIT, TOC, REREF, REXP)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -311,7 +308,6 @@ contains
     SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, CLIFT, &
             & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, STALLF, &
             & CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -452,7 +448,6 @@ contains
     
     SUBROUTINE GETALF(NR, IS, XI, SECSIG, SECSTAGR, CLIFT, W, ALF, ALF_CL, &
             & ALF_W, STALLF)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -544,7 +539,6 @@ contains
         !------------------------------------------------------------
         !
         !C    INCLUDE 'DFDC.inc'
-        USE F77KINDS
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -767,6 +761,7 @@ contains
     
     
     SUBROUTINE OPFILE(LU, FNAME)
+        use m_userio, only: askc, asks
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -845,6 +840,7 @@ contains
     
     
     SUBROUTINE GETCLFACTOR(SIGMA, STAGGER, CLFACTOR)
+        use m_spline, only: sevlin
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

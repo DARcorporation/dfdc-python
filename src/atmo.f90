@@ -33,6 +33,7 @@ contains
     !=========================================================================
     
     SUBROUTINE ATMO(ALSPEC, DELTAT, VSOALT, RHOALT, RMUALT)
+        use m_spline, only: seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

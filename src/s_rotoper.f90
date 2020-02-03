@@ -4,7 +4,8 @@ contains
 
 
     SUBROUTINE CONVGTH(NITER, RLXF, WXEPS)
-        USE I_DFDC
+        use m_rotoper, only: vmavgcalc, vmavginit, updrotvel, gthcalc
+        use m_solve, only: gamsolv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -96,7 +97,8 @@ contains
 
 
     SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
-        USE I_DFDC
+        use m_rotoper, only: vmavgcalc, updrotvel, tqcalc, vmavginit, gthcalc
+        use m_solve, only: gamsolv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -247,7 +249,10 @@ contains
 
 
     SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
-        USE I_DFDC
+        use m_inigrd, only: setgrdflw
+        use m_solve, only: gamsolv
+        use m_rotoper, only: vmavgcalc, vmavginit, updrotvel, gthcalc
+        use m_aero, only: getclcdcm
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -478,7 +483,9 @@ contains
 
 
     SUBROUTINE CONVGTHBGT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
-        USE I_DFDC
+        use m_rotoper, only: tqcalc, updrotvel
+        use m_aero, only: getclcdcm
+        use m_solve, only: gamsolv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

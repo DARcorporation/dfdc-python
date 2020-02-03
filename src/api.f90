@@ -34,8 +34,8 @@ contains
     CONTAINS
     
         SUBROUTINE init()
+        use m_dfdcsubs, only: dfinit
             ! bind(c, name = 'init')
-            USE I_DFDC
             IMPLICIT NONE
             !
             !*** Start of declarations rewritten by SPAG
@@ -49,8 +49,8 @@ contains
         END SUBROUTINE INIT
     
         SUBROUTINE set_case(fname)
+        use m_dfdcsubs, only: dfload
             ! bind(c, name = 'set_case')
-            USE I_DFDC
             IMPLICIT NONE
             !
             !*** Start of declarations rewritten by SPAG
@@ -63,8 +63,8 @@ contains
         END SUBROUTINE SET_CASE
     
         SUBROUTINE get_case(fname)
+        use m_dfdcsubs, only: dfsave
             ! bind(c, name = 'get_case')
-            USE I_DFDC
             IMPLICIT NONE
             !
             !*** Start of declarations rewritten by SPAG
@@ -75,8 +75,12 @@ contains
         END SUBROUTINE GET_CASE
     
         SUBROUTINE oper()
+        use m_inigrd, only: setgrdflw
+        use m_rotoper, only: rotinitbgam, tqcalc, rotrprt, rotinitbld
+        use m_wakesubs, only: wakereset
+        use s_rotoper, only: convgthbg
+        use m_dfdcsubs, only: gengeom
             ! bind(c, name = 'oper')
-            USE I_DFDC
             IMPLICIT NONE
             !
             !*** Start of declarations rewritten by SPAG

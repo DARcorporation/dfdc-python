@@ -45,6 +45,7 @@ contains
     !
     !
     SUBROUTINE AREAD(FNAME, LU, IBX, NBX, XB, YB, NB, NBL, NAME, ISPARS, IFTYPE)
+        use m_userio, only: getflt
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -212,6 +213,7 @@ contains
     
     
     SUBROUTINE AREADNR(LU, IBX, NBX, XB, YB, NB, NBL, NAME, ISPARS, IFTYPE)
+        use m_userio, only: getflt
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

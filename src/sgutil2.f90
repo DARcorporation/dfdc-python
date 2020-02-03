@@ -106,6 +106,7 @@ contains
     
     SUBROUTINE SGCOPF(S1, S2, N, SOFF1, SWT1, SOFF2, SWT2, FOFF, F1, FX1, X1, N1, &
             & F2, FX2, X2, N2)
+        use m_spline, only: seval, deval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

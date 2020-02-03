@@ -34,7 +34,9 @@ contains
     !
     
     SUBROUTINE ADJPANL
-        USE I_DFDC
+        use m_sgutil2, only: sgshft, sgrenum, isgfind, sgcopy
+        use m_geom, only: itpset, xypspl
+        use m_spline, only: seval, sinvrt
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -503,6 +505,7 @@ contains
     
     
     SUBROUTINE SGSPLUPD(X1, XS1, Y1, YS1, S1, N1, X2, XS2, Y2, YS2, S2, N2)
+        use m_spline, only: segspl, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

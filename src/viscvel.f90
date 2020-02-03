@@ -6,7 +6,8 @@ contains
     
     
     SUBROUTINE GETVEL(FNAME1)
-        USE I_DFDC
+        use m_spline, only: spline
+        use m_userio, only: asks, askr
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -85,7 +86,7 @@ contains
     
     
     SUBROUTINE SAVVEL(FNAME1)
-        USE I_DFDC
+        use m_userio, only: asks
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -150,7 +151,7 @@ contains
     
     
     SUBROUTINE UVINFL(RR, WWA, WWT)
-        USE I_DFDC
+        use m_spline, only: seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

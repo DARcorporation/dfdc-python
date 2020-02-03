@@ -38,7 +38,8 @@ contains
     
     
     SUBROUTINE QCPFOR
-        USE I_DFDC
+        use m_forces, only: cpcalc, fcoeff
+        use m_system, only: qcsum
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -734,7 +735,7 @@ contains
     
     
     SUBROUTINE GETUV(XX, YY, US, VS)
-        USE I_DFDC
+        use m_qaic, only: qfcalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

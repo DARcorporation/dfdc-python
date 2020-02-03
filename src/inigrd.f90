@@ -35,7 +35,8 @@ contains
     
     
     SUBROUTINE INIGRD
-        USE I_DFDC
+        use m_userio, only: askr
+        use m_xutils, only: setexp
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -281,7 +282,6 @@ contains
     
     
     SUBROUTINE UPDGRD
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -344,7 +344,6 @@ contains
     
     
     SUBROUTINE RLXGRD
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -399,7 +398,6 @@ contains
     
     
     SUBROUTINE SETGRDFLW
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -468,7 +466,6 @@ contains
     
     
     SUBROUTINE CLRGRDFLW
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -501,7 +498,6 @@ contains
     
     
     SUBROUTINE ROTBG2GRD(N)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -547,7 +543,7 @@ contains
     
     
     SUBROUTINE GETGRDFLW
-        USE I_DFDC
+        use m_grdutils, only: uvgrdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -595,7 +591,6 @@ contains
     
     
     SUBROUTINE INLSFCN
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -632,7 +627,6 @@ contains
     
     
     SUBROUTINE RLXGRD2
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -678,6 +672,7 @@ contains
     
     SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, KBCINL, &
             & KBCOUT, KBCBOT, KBCTOP)
+        use m_spline, only: deval, spline, seval, scalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

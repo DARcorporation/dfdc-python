@@ -34,7 +34,8 @@ contains
     !=========================================================================
     
     SUBROUTINE XYPSPL(IEL)
-        USE I_DFDC
+        use m_spline, only: scalc, seval, segspl
+        use m_geutil, only: lefind
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -133,7 +134,6 @@ contains
     
     
     SUBROUTINE CVPGEN
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -247,7 +247,6 @@ contains
     
     
     SUBROUTINE XYCSET(IEL)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -352,7 +351,6 @@ contains
     
     
     SUBROUTINE ANPSET(IEL)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -475,7 +473,6 @@ contains
     
     
     SUBROUTINE ITPSET(IEL)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

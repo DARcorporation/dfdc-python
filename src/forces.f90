@@ -80,7 +80,7 @@ contains
     
     
     SUBROUTINE CPADDHS(XX, YY, CP, DHH, DSS, VTT)
-        USE I_DFDC
+        use m_grdutils, only: xygrdfind
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

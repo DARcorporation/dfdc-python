@@ -67,6 +67,7 @@ contains
     
     
     SUBROUTINE NCALC(X, Y, S, N, XN, YN)
+        use m_spline, only: segspl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -118,6 +119,7 @@ contains
     
     
     SUBROUTINE LEFIND(SLE, X, XP, Y, YP, S, N)
+        use m_spline, only: d2val, seval, deval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -208,6 +210,7 @@ contains
     
     
     SUBROUTINE CNORM(X, XP, Y, YP, S, N, XTRAN, YTRAN, SCALE, ANGLE)
+        use m_spline, only: seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -269,6 +272,8 @@ contains
     SUBROUTINE GEOPAR(X, XP, Y, YP, S, N, T, SLE, CHORD, RADLE, ANGTE, AREA, &
             & EIXXA, EIYYA, EIXYA, ASKN, EIXXT, EIYYT, EIXYT, THICK, &
             & CAMBR, VOLM, VSKN, ASRF, RGXV, RGYV)
+        use m_spline, only: seval, curv
+        use m_xutils, only: atanc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -660,6 +665,7 @@ contains
     
     
     SUBROUTINE TEGAP(X, XS, Y, YS, S, N, DOC, GAPNEW)
+        use m_spline, only: scalc, seval, segspl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -740,6 +746,7 @@ contains
     
     SUBROUTINE TCSET(X, XP, Y, YP, S, N, TMAX, CMAX, TFAC, CFAC, XNEW, YNEW, &
             & LNEWSET)
+        use m_spline, only: deval, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -856,6 +863,7 @@ contains
     
     
     SUBROUTINE YSYM(X, XP, Y, YP, S, NX, N, ISIDE, XNEW, YNEW, NNEW)
+        use m_spline, only: seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -953,6 +961,7 @@ contains
     
     
     SUBROUTINE LERSCL(X, XP, Y, YP, S, N, DOC, RFAC, XNEW, YNEW)
+        use m_spline, only: deval, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1051,6 +1060,7 @@ contains
     
     SUBROUTINE FLAP(X, XS, Y, YS, S, N, XF, YF, ADEF, INSID, XNEW, YNEW, NNEW, &
             & TOPS, ATOP, XTOP, YTOP, BOTS, ABOT, XBOT, YBOT)
+        use m_spline, only: deval, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1391,6 +1401,8 @@ contains
     
     
     SUBROUTINE GETXYF(X, XP, Y, YP, S, N, TOPS, BOTS, XF, YF)
+        use m_spline, only: seval, sinvrt
+        use m_userio, only: askr
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1465,6 +1477,7 @@ contains
     
     
     SUBROUTINE SSS(SS, S1, S2, DEL, XBF, YBF, X, XP, Y, YP, S, N, ISIDE)
+        use m_spline, only: d2val, seval, deval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1632,6 +1645,7 @@ contains
     
     
     SUBROUTINE CLIS(X, XP, Y, YP, S, N)
+        use m_spline, only: curv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

@@ -35,6 +35,7 @@ contains
     
     SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, NGX, NG, SG, &
             & NPTS, CVEX, SMOF, FSL, FSR, NREF, SREF1, SREF2, CRRAT)
+        use m_spline, only: trisol, segspl, seval, curv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -295,6 +296,7 @@ contains
     
     
     SUBROUTINE SETCRV(SNEW, NPTS, SB, HH, N)
+        use m_spline, only: seval, splina
         !------------------------------------------------------------------
         !     Sets spacing array SNEW(i) based on surface curvature.
         !

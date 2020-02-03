@@ -59,7 +59,8 @@ contains
     !=========================================================================
     !
     SUBROUTINE DFINIT(LDEBUG)
-        USE I_DFDC
+        use m_atmo, only: atmo
+        use m_aero, only: putaero
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -487,7 +488,10 @@ contains
     
     
     SUBROUTINE GENGEOM
-        USE I_DFDC
+        use m_geom, only: cvpgen
+        use m_pnsubs, only: pancop, pangen, pandef
+        use m_inigrd, only: inigrd
+        use m_adjpanl, only: adjpanl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -594,7 +598,6 @@ contains
     
     
     SUBROUTINE PELIST(LU)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -694,7 +697,7 @@ contains
     
     
     SUBROUTINE GEPROC
-        USE I_DFDC
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -819,7 +822,6 @@ contains
     
     
     SUBROUTINE GEPRINT(LU)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -917,7 +919,8 @@ contains
     
     
     SUBROUTINE ELPROC(IEL)
-        USE I_DFDC
+        use m_spline, only: segspl, scalc, seval, sinvrt
+        use m_geutil, only: lefind, axcalc, aecalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1108,7 +1111,6 @@ contains
     
     
     SUBROUTINE WAKEBOX
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1168,7 +1170,6 @@ contains
     
     
     SUBROUTINE SETDRGOBJ
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1199,7 +1200,8 @@ contains
     
     
     SUBROUTINE ROTORINIT
-        USE I_DFDC
+        use m_aero, only: setiaero
+        use m_spline, only: segspl, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1462,7 +1464,8 @@ contains
     
     
     SUBROUTINE SETROTWAK
-        USE I_DFDC
+        use m_spline, only: segspl, seval
+        use m_aero, only: setiaero
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1598,7 +1601,8 @@ contains
     
     
     SUBROUTINE ADDWAKE(X, Y, N)
-        USE I_DFDC
+        use m_geom, only: xypspl
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1663,7 +1667,6 @@ contains
     
     
     SUBROUTINE UPDROTWAK
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1758,7 +1761,6 @@ contains
     
     
     SUBROUTINE ROTPINIT
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1860,7 +1862,8 @@ contains
     
     
     SUBROUTINE ADDELEM5_2PT(X1, Y1, X2, Y2, NPTS)
-        USE I_DFDC
+        use m_geom, only: xypspl
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1941,7 +1944,8 @@ contains
     
     
     SUBROUTINE ADDELEM5(X, Y, N)
-        USE I_DFDC
+        use m_geom, only: xypspl
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2008,7 +2012,8 @@ contains
     
     
     SUBROUTINE ADDELEM6(X, Y, N)
-        USE I_DFDC
+        use m_geom, only: xypspl
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2072,7 +2077,11 @@ contains
     
     
     SUBROUTINE DFLOAD(FNAMIN, FERROR)
-        USE I_DFDC
+        use m_userio, only: getflt, rdline, strip
+        use m_pnsubs, only: panget
+        use m_airio, only: areadnr
+        use m_atmo, only: atmo
+        use m_aero, only: putaero
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2561,7 +2570,9 @@ contains
     
     
     SUBROUTINE DFSAVE(FNAMEIN)
-        USE I_DFDC
+        use m_userio, only: asks, strip
+        use m_aero, only: getaero
+        use m_airio, only: awrite
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

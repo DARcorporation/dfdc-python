@@ -39,7 +39,6 @@ contains
     !=========================================================================
     
     SUBROUTINE PANDEF(IELDEF)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -137,7 +136,8 @@ contains
     
     
     SUBROUTINE PANCOP
-        USE I_DFDC
+        use m_geom, only: itpset, xypspl
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -226,7 +226,10 @@ contains
     ! PANCOP
     
     SUBROUTINE PANGEN(LQUERY)
-        USE I_DFDC
+        use m_geom, only: itpset, xypspl
+        use m_spline, only: seval
+        use m_sgutil, only: sgcurv
+        use m_geutil, only: minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -426,7 +429,6 @@ contains
     
     
     SUBROUTINE PANWRT
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -481,7 +483,7 @@ contains
     
     
     SUBROUTINE PANGET(FNAME, ERROR)
-        USE I_DFDC
+        use m_userio, only: asks, strip
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

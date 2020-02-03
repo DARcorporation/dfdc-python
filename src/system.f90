@@ -36,7 +36,6 @@ contains
     ! This version assumes delta(B*GAM)*WT/WM defined at each rotor center
     
     SUBROUTINE SYSP
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -314,7 +313,6 @@ contains
     
     
     SUBROUTINE CLRSYS
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -354,7 +352,6 @@ contains
     
     
     SUBROUTINE GSYS(LSYS, LQFF, LVWK, IP1, IP2, IZ1, IZ2)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -885,7 +882,6 @@ contains
     
     
     SUBROUTINE SYSPQ
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1001,7 +997,6 @@ contains
     
     
     SUBROUTINE QSYS
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1421,7 +1416,6 @@ contains
     
     
     SUBROUTINE GXYLIN(K, JP, RES_GAM, RES_SIG, RES_XP, RES_YP)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1467,7 +1461,6 @@ contains
     
     
     SUBROUTINE GUCALC(LGUQI, LVWK, IP1, IP2)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1542,7 +1535,7 @@ contains
     
     
     SUBROUTINE GUMAKE(IU, AIC)
-        USE I_DFDC
+        use m_gauss, only: baksub
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1619,7 +1612,7 @@ contains
     
     
     SUBROUTINE GSOLVE
-        USE I_DFDC
+        use m_gauss, only: baksub
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1709,7 +1702,7 @@ contains
     
     
     SUBROUTINE GSOLVE0
-        USE I_DFDC
+        use m_gauss, only: baksub
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1799,7 +1792,6 @@ contains
     
     
     SUBROUTINE GUVWK(IRADD)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1852,7 +1844,6 @@ contains
     
     
     SUBROUTINE GUSUM
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1954,7 +1945,6 @@ contains
     
     
     SUBROUTINE QCSUM
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2012,7 +2002,6 @@ contains
     
     
     SUBROUTINE QCUSET
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2087,7 +2076,6 @@ contains
     
     
     SUBROUTINE QCUSUM
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2161,7 +2149,6 @@ contains
     
     
     SUBROUTINE SETGSTE
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2241,7 +2228,6 @@ contains
     
     
     SUBROUTINE NWDOTS(IEL, DS1NW, DS2NW, DN1NW, DN2NW)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2288,7 +2274,6 @@ contains
     
     
     SUBROUTINE SWDOTS(IEL, DS1SW, DS2SW, DN1SW, DN2SW)
-        USE I_DFDC
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

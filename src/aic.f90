@@ -34,6 +34,7 @@ contains
     
     SUBROUTINE PANAIC(JFRST, JLAST, XP, YP, NF, XF, YF, JPAN1, JPAN2, IFTYPE, &
             & GAM, SIG, JDIM, QF, QF_GAM, QF_SIG)
+        use m_lamp, only: lamp, lampc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -132,6 +133,7 @@ contains
     
     SUBROUTINE LINAIC(JFRST, JLAST, XP, YP, NF, XF, YF, VOR, SOU, JDIM, QF, &
             & QF_VOR, QF_SOU)
+        use m_lamp, only: ring
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -419,6 +421,7 @@ contains
     SUBROUTINE PANAICD(JFRST, JLAST, XP, YP, NF, XF, YF, JPAN1, JPAN2, IFTYPE, &
             & GAM, SIG, JDIM, QF, QF_GAM, QF_SIG, QF_XP, QF_YP, &
             & QF_XF, QF_YF)
+        use m_lamp, only: dlampc, dlamp
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -538,6 +541,7 @@ contains
     
     SUBROUTINE LINAICD(JFRST, JLAST, XP, YP, NF, XF, YF, VOR, SOU, JDIM, QF, &
             & QF_VOR, QF_SOU, QF_XP, QF_YP, QF_XF, QF_YF)
+        use m_lamp, only: dring
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

@@ -36,7 +36,13 @@ contains
     
     
     SUBROUTINE GAMSOLV
-        USE I_DFDC
+        use m_inigrd, only: setgrdflw
+        use m_gauss, only: ludcmp
+        use m_geom, only: cvpgen
+        use m_rotoper, only: vmavginit, setrotorsrc, stgfind, setdrgobjsrc
+        use m_system, only: qcsum, gsolve, gsys, sysp
+        use m_qaic, only: qaic
+        use m_vels, only: qcpfor
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -102,7 +108,13 @@ contains
     
     
     SUBROUTINE GAMSOL
-        USE I_DFDC
+        use m_inigrd, only: setgrdflw
+        use m_gauss, only: ludcmp
+        use m_geom, only: cvpgen
+        use m_rotoper, only: vmavginit, setrotorsrc, stgfind, setdrgobjsrc
+        use m_system, only: gusum, qcsum, gucalc, gsys, sysp
+        use m_qaic, only: qaic
+        use m_vels, only: qcpfor
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
