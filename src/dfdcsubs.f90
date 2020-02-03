@@ -1,3 +1,4 @@
+!*==DFINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
@@ -55,13 +56,30 @@
 !=========================================================================
 !
 SUBROUTINE DFINIT(LDEBUG)
-    INCLUDE 'DFDC.INC'
-    LOGICAL LDEBUG
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    LOGICAL :: LDEBUG
+    !
+    ! Local variables
+    !
+    REAL :: A0, CDMIN, CLDMIN, CLMAX, CLMIN, CMCON, DCDCL2, &
+            & DCDCL2S, DCLDA, DCLDA_STALL, DCL_STALL, MCRIT, &
+            & REREF, REXP, RPM, TOC, XISECT
+    CHARACTER(10), SAVE :: DIGITS
+    INTEGER :: I, IB, IC, IEL, IP, IPACT, IR, IRPN, K1, &
+            & K2, KP, L, N, NPOL
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------
     !     Sets all initial defaults
     !--------------------------------------
-    CHARACTER*10 DIGITS
-    DATA DIGITS / '0123456789' /
+    DATA DIGITS/'0123456789'/
     !
     !---- Set version (in case this code is used by DLL w/o main DFDC routine)
     !
@@ -165,22 +183,23 @@ SUBROUTINE DFINIT(LDEBUG)
         !
         ATIP(N) = 0.0
         ADISK(N) = 0.0
-        XDISK(N) = 999.   ! default rotor disk location
+        XDISK(N) = 999.  ! default rotor disk location
         NRBLD(N) = 5
         OMEGA(N) = 0.0
-    END DO
+    ENDDO
     !---- default blade is rotor with RPM=1000
     RPM = 1000.0
     OMEGA(1) = PI * RPM / 30.0
     !
-    TGAP = 0.0    ! no tip gap on rotor
-    TGAPZL = 0.0    ! tip gap of zero loss (default is zero)
+    TGAP = 0.0  ! no tip gap on rotor
+    TGAPZL = 0.0  ! tip gap of zero loss (default is zero)
     !
     NRP = 0
     NRC = 0
     !
-    NRSTA = 11     ! default # of radial stations
-    XDWKLEN = 1.5  ! default wake length in duct diameters
+    NRSTA = 11   ! default # of radial stations
+    XDWKLEN = 1.5
+    ! default wake length in duct diameters
     XWAKE = -999.
     NWAKE = 0
     !
@@ -206,47 +225,48 @@ SUBROUTINE DFINIT(LDEBUG)
                 VIND(L, IR, N) = 0.0
                 VABS(L, IR, N) = 0.0
                 VREL(L, IR, N) = 0.0
-            END DO
+            ENDDO
             CHR(IR, N) = CHDES(IR)
             CLR(IR, N) = CLDES(IR)
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
     !---------------------------------------------------------------
     !--- Setup aerodynamic data for blade elements
     !--- Default aero properties
     !
-    A0 = 0.         ! zero lift angle of attack   radians
-    DCLDA = 6.0       ! lift curve slope            /radian
-    CLMAX = 1.5      ! stall Cl
-    CLMIN = -0.5      ! negative stall Cl
-    DCL_STALL = 0.1  ! CL increment from incipient to total stall
-    DCLDA_STALL = 0.1  ! stalled lift curve slope    /radian
-    CMCON = -0.1     ! section Cm  (for pitch-axis moments)
-    CDMIN = 0.013   ! minimum Cd
-    CLDMIN = 0.5     ! Cl at minimum Cd
-    DCDCL2 = 0.03    ! d(Cd)/d(Cl**2)
-    DCDCL2S = 0.0     ! d(Cd)/d(Cl**2) secondary (annulus) drag (dead)
-    REREF = 200000.   ! Reynolds Number at which Cd values apply
-    REXP = -0.4      ! Exponent for Re scaling of Cd:  Cd ~ Re**exponent
-    MCRIT = 0.8       ! Critical Mach number
-    TOC = 0.1       ! section thickness ratio (dead)
+    A0 = 0.       ! zero lift angle of attack   radians
+    DCLDA = 6.0     ! lift curve slope            /radian
+    CLMAX = 1.5    ! stall Cl
+    CLMIN = -0.5    ! negative stall Cl
+    DCL_STALL = 0.1
+    ! CL increment from incipient to total stall
+    DCLDA_STALL = 0.1
+    ! stalled lift curve slope    /radian
+    CMCON = -0.1   ! section Cm  (for pitch-axis moments)
+    CDMIN = 0.013 ! minimum Cd
+    CLDMIN = 0.5   ! Cl at minimum Cd
+    DCDCL2 = 0.03  ! d(Cd)/d(Cl**2)
+    DCDCL2S = 0.0   ! d(Cd)/d(Cl**2) secondary (annulus) drag (dead)
+    REREF = 200000. ! Reynolds Number at which Cd values apply
+    REXP = -0.4    ! Exponent for Re scaling of Cd:  Cd ~ Re**exponent
+    MCRIT = 0.8     ! Critical Mach number
+    TOC = 0.1     ! section thickness ratio (dead)
     !
-    XPAXIS = 0.35     ! x/c location of pitch axis for blade plots, lofting
+    XPAXIS = 0.35   ! x/c location of pitch axis for blade plots, lofting
     !
     !--- Install default data into aero section #1 for each disk
     DO N = 1, NRX
         NAERO(N) = 1
         XISECT = 0.0
-        CALL PUTAERO(N, NAERO(N), XISECT, A0, CLMAX, CLMIN, &
-                DCLDA, DCLDA_STALL, DCL_STALL, &
-                CDMIN, CLDMIN, DCDCL2, DCDCL2S, &
-                CMCON, MCRIT, TOC, REREF, REXP)
+        CALL PUTAERO(N, NAERO(N), XISECT, A0, CLMAX, CLMIN, DCLDA, &
+                & DCLDA_STALL, DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, &
+                & CMCON, MCRIT, TOC, REREF, REXP)
         !--- set pointers from blade sections to aero sections
         DO I = 1, IRX
             IAERO(I, N) = 1
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
     !---- no BL solution yet
     LVISC = .FALSE.
@@ -264,7 +284,7 @@ SUBROUTINE DFINIT(LDEBUG)
         ICBLBEG(2, IEL) = 0
         ICBLEND(1, IEL) = 0
         ICBLEND(2, IEL) = 0
-    END DO
+    ENDDO
     !---- no inflow velocities defined
     NINFL = 0
     !
@@ -448,7 +468,8 @@ SUBROUTINE DFINIT(LDEBUG)
     LGTICK = .TRUE.
     LGPARM = .TRUE.
     !
-    LGEOPLX = .FALSE.  ! for xfoil plot routines
+    LGEOPLX = .FALSE.
+    ! for xfoil plot routines
     !
     !---- do not print neg. rpm Beta and Alfa output in local coordinates
     LCOORD = .FALSE.
@@ -457,18 +478,27 @@ SUBROUTINE DFINIT(LDEBUG)
     LLOAD = .FALSE.
     !
     !
-    RETURN
-END
+END SUBROUTINE DFINIT
+!*==GENGEOM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! DFINIT
 
 
 SUBROUTINE GENGEOM
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    LOGICAL :: LQUERY
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------
     !     Generates case geometry from buffer airfoils
     !     and does the necessary geometry processing.
     !----------------------------------------------------
-    INCLUDE 'DFDC.INC'
-    LOGICAL ERROR, LQUERY
     !
     !---- process current buffer geometry to identify element types and
     !     set element parameters
@@ -481,15 +511,13 @@ SUBROUTINE GENGEOM
     !
     !========================================================================
     !---- Check for respacing flag to redistribute points on buffer geometry
-    IF(LRSPC) THEN
+    IF (LRSPC) THEN
         !
         !---- If paneling parameters are unset then reset default paneling
         !     parameters for buffer geometry elements
         !      write(*,*) 'gengeom  npan',NPAN(1)
-        IF(.NOT.LRSPCDEF) THEN
-            !          WRITE(*,*) 'Setting default respacing parameters'
-            CALL PANDEF(0)
-        ENDIF
+        !          WRITE(*,*) 'Setting default respacing parameters'
+        IF (.NOT.LRSPCDEF) CALL PANDEF(0)
         !
         !        WRITE(*,*) 'Repaneling buffer geometry'
         LQUERY = .FALSE.
@@ -532,7 +560,7 @@ SUBROUTINE GENGEOM
     CALL ROTPINIT
     !
     !---- List all defined elements
-    IF(LDBG) THEN
+    IF (LDBG) THEN
         CALL PELIST(6)
         CALL PELIST(LUNDBG)
     ENDIF
@@ -554,113 +582,133 @@ SUBROUTINE GENGEOM
     NQSP = 0
     NSEG = 0
     !
-    WRITE(*, *)
-    WRITE(*, *) 'Geometry loaded'
+    WRITE (*, *)
+    WRITE (*, *) 'Geometry loaded'
     !
-    RETURN
-END
+END SUBROUTINE GENGEOM
+!*==PELIST.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! GENGEOM
 
 
 SUBROUTINE PELIST(LU)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IEL, IP1, IP2, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Lists elements defined in panel geometry
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- print out element info
     DO IEL = 1, NEL
-        WRITE(LU, 1001)
-        WRITE(LU, 1005) IEL
+        WRITE (LU, 1001)
+        WRITE (LU, 1005) IEL
         !
         IP1 = IPFRST(IEL)
         IP2 = IPLAST(IEL)
         I = IP1
         N = IP2 - IP1 + 1
         !
-        WRITE(LU, 1010) N
+        WRITE (LU, 1010) N
         !
-        IF    (NETYPE(IEL).EQ.0) THEN
-            IF(LBODY(IEL)) THEN
-                IF(LXBOD(IEL)) THEN
-                    WRITE(LU, 2000) 'Closed body on axis'
-                ELSE
-                    WRITE(LU, 2000) 'Closed body'
-                ENDIF
+        IF (NETYPE(IEL)==0) THEN
+            IF (.NOT.(LBODY(IEL))) THEN
+                WRITE (LU, 2000) 'Open surface'
+            ELSEIF (LXBOD(IEL)) THEN
+                WRITE (LU, 2000) 'Closed body on axis'
             ELSE
-                WRITE(LU, 2000) 'Open surface'
+                WRITE (LU, 2000) 'Closed body'
             ENDIF
             !
-        ELSEIF(NETYPE(IEL).EQ.1) THEN
-            WRITE(LU, 2000) 'Prescribed wake surface'
+        ELSEIF (NETYPE(IEL)==1) THEN
+            WRITE (LU, 2000) 'Prescribed wake surface'
             !
-        ELSEIF(NETYPE(IEL).EQ.2) THEN
-            WRITE(LU, 2000) 'Prescribed line singularity on axis'
+        ELSEIF (NETYPE(IEL)==2) THEN
+            WRITE (LU, 2000) 'Prescribed line singularity on axis'
             !
-        ELSEIF(NETYPE(IEL).EQ.3) THEN
-            WRITE(LU, 2000) 'Prescribed ring singularity'
+        ELSEIF (NETYPE(IEL)==3) THEN
+            WRITE (LU, 2000) 'Prescribed ring singularity'
             !
-        ELSEIF(NETYPE(IEL).EQ.4) THEN
-            WRITE(LU, 2000) 'Prescribed point singularity'
+        ELSEIF (NETYPE(IEL)==4) THEN
+            WRITE (LU, 2000) 'Prescribed point singularity'
             !
-        ELSEIF(NETYPE(IEL).EQ.5) THEN
-            WRITE(LU, 2000) 'Source-only line singularity'
+        ELSEIF (NETYPE(IEL)==5) THEN
+            WRITE (LU, 2000) 'Source-only line singularity'
             !
-        ELSEIF(NETYPE(IEL).EQ.6) THEN
-            WRITE(LU, 2000) 'Rotor source-only line singularity'
+        ELSEIF (NETYPE(IEL)==6) THEN
+            WRITE (LU, 2000) 'Rotor source-only line singularity'
             !
-        ELSEIF(NETYPE(IEL).EQ.7) THEN
-            WRITE(LU, 2000) 'Rotor vortex wake line'
+        ELSEIF (NETYPE(IEL)==7) THEN
+            WRITE (LU, 2000) 'Rotor vortex wake line'
             !
         ENDIF
         !
-        IF(LTPAN(IEL)) THEN
-            WRITE(LU, 2000) 'TE-gap panel will be used'
-        ENDIF
+        IF (LTPAN(IEL)) WRITE (LU, 2000) 'TE-gap panel will be used'
         !
-        IF(IEWAKE(IEL).NE.0) THEN
-            WRITE(LU, 2100) 'Prescribed-wake element', IEWAKE(IEL), &
-                    '  is attached'
-        ENDIF
+        IF (IEWAKE(IEL)/=0) WRITE (LU, 2100)                          &
+                & 'Prescribed-wake element', &
+                & IEWAKE(IEL), '  is attached'
         !
-        IF(NETYPE(IEL).EQ.0 .OR.&
-                NETYPE(IEL).EQ.1 .OR.&
-                NETYPE(IEL).EQ.2) THEN
-            WRITE(LU, 1050) XPLE(IEL), YPLE(IEL), &
-                    XPTE(IEL), YPTE(IEL)
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)==2)  &
+                & THEN
+            WRITE (LU, 1050) XPLE(IEL), YPLE(IEL), XPTE(IEL), &
+                    & YPTE(IEL)
         ELSE
-            WRITE(LU, 1060) 'First point at', XP(IP1), YP(IP1)
-            WRITE(LU, 1060) 'Last  point at', XP(IP2), YP(IP2)
+            WRITE (LU, 1060) 'First point at', XP(IP1), YP(IP1)
+            WRITE (LU, 1060) 'Last  point at', XP(IP2), YP(IP2)
         ENDIF
         !
     ENDDO
     !
-    WRITE(LU, 1001)
+    WRITE (LU, 1001)
     !
     RETURN
     !...............................................................
-    1001 FORMAT(/' -----------------------------------------------')
-    1005 FORMAT(' Element', I3, ' ...')
-    1010 FORMAT('   Number of input coordinate points:', I4)
-    1020 FORMAT('     delta(x) =', F10.5, '   Scale =', F10.5, &
-            /'     delta(y) =', F10.5, '   Angle =', F10.5, ' deg')
-    1050 FORMAT('    LE x,y  =', 2F10.5&
-            /'    TE x,y  =', 2F10.5)
-    1060 FORMAT(' ', A, ' x,y  =', 2F10.5)
-    2000 FORMAT('   ', A)
-    2100 FORMAT('   ', A, I3, A)
-END
+    1001 FORMAT (/' -----------------------------------------------')
+    1005 FORMAT (' Element', I3, ' ...')
+    1010 FORMAT ('   Number of input coordinate points:', I4)
+    1020 FORMAT ('     delta(x) =', F10.5, '   Scale =', F10.5, &
+            &/'     delta(y) =', F10.5, '   Angle =', F10.5, ' deg')
+    1050 FORMAT ('    LE x,y  =', 2F10.5/'    TE x,y  =', 2F10.5)
+    1060 FORMAT (' ', A, ' x,y  =', 2F10.5)
+    2000 FORMAT ('   ', A)
+    2100 FORMAT ('   ', A, I3, A)
+END SUBROUTINE PELIST
+!*==GEPROC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! PELIST
 
 
 
 SUBROUTINE GEPROC
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: DB11SQ, DB12SQ, DB1TSQ, DB21SQ, DB22SQ, DB2TSQ, &
+            & DSBMIN, DSBSQ, DSBTOL, DUMMY
+    INTEGER :: I, IB, IB1, IB2, IEL, KB1, KB2, KEL, N
+    LOGICAL :: LYZERO
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------
     !     Processes buffer airfoil geometry to set
     !     element type, various limits and pointers.
     !----------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    LOGICAL LYZERO
     !
     !---- process all elements
     DO IEL = 1, NBEL
@@ -700,12 +748,12 @@ SUBROUTINE GEPROC
         !------ is this element entirely on the y=0 line?
         LYZERO = .TRUE.
         DO IB = IB1, IB2
-            IF(YB(IB) .NE. 0.0) LYZERO = .FALSE.
+            IF (YB(IB)/=0.0) LYZERO = .FALSE.
         ENDDO
         !
-        IF(IB1.EQ.IB2) THEN
+        IF (IB1==IB2) THEN
             !------- only one point defines element...
-            IF(LYZERO) THEN
+            IF (LYZERO) THEN
                 !-------- axisymm: point singularity on axis
                 NETYPE(IEL) = 4
             ELSE
@@ -713,12 +761,12 @@ SUBROUTINE GEPROC
                 NETYPE(IEL) = 3
             ENDIF
             !
-        ELSEIF(LYZERO) THEN
+        ELSEIF (LYZERO) THEN
             !------- line element on axis
             NETYPE(IEL) = 2
             !
             !------- check for source line element defined in buffer geometry (old scheme)
-        ELSEIF(NBTYPE(IEL).EQ.5) THEN
+        ELSEIF (NBTYPE(IEL)==5) THEN
             NETYPE(IEL) = NBTYPE(IEL)
             !
         ELSE
@@ -729,35 +777,31 @@ SUBROUTINE GEPROC
             !------- a wake element is attached to TE of some element before it
             DO KEL = 1, IEL - 1
                 !--------- check only solid boundarys (NETYPE=0) for attached wakes
-                IF(NETYPE(KEL).EQ.0) THEN
+                IF (NETYPE(KEL)==0) THEN
                     KB1 = IBFRST(KEL)
                     KB2 = IBLAST(KEL)
                     DB11SQ = (XB(IB1) - XB(KB1))**2 + (YB(IB1) - YB(KB1))**2
                     DB21SQ = (XB(IB2) - XB(KB1))**2 + (YB(IB2) - YB(KB1))**2
                     DB12SQ = (XB(IB1) - XB(KB2))**2 + (YB(IB1) - YB(KB2))**2
                     DB22SQ = (XB(IB2) - XB(KB2))**2 + (YB(IB2) - YB(KB2))**2
-                    DB1TSQ = (XB(IB1) - XBTE(KEL))**2 + (YB(IB1) - YBTE(KEL))**2
-                    DB2TSQ = (XB(IB2) - XBTE(KEL))**2 + (YB(IB2) - YBTE(KEL))**2
+                    DB1TSQ = (XB(IB1) - XBTE(KEL))**2 + (YB(IB1) - YBTE(KEL)) &
+                            & **2
+                    DB2TSQ = (XB(IB2) - XBTE(KEL))**2 + (YB(IB2) - YBTE(KEL)) &
+                            & **2
                     !
-                    DSBSQ = MIN(DB11SQ, &
-                            DB12SQ, &
-                            DB21SQ, &
-                            DB22SQ, &
-                            DB1TSQ, &
-                            DB2TSQ)
+                    DSBSQ = MIN(DB11SQ, DB12SQ, DB21SQ, DB22SQ, DB1TSQ, DB2TSQ)
                     DSBMIN = SQRT(DSBSQ)
                     !
                     !----------- this element IEL is KEL's wake if it starts at KEL's TE point
                     DSBTOL = 0.0001 * ABS(SB(KB2) - SB(KB1))
-                    IF(DSBMIN.LT.DSBTOL) THEN
+                    IF (DSBMIN<DSBTOL) THEN
                         NETYPE(IEL) = 1
                         IEWAKE(KEL) = IEL
-                        GO TO 25
+                        EXIT
                     ENDIF
                 ENDIF
             ENDDO
             !
-            25      CONTINUE
             !
         ENDIF
         !
@@ -766,107 +810,130 @@ SUBROUTINE GEPROC
     !---- set wake-termination box outline
     !c      CALL WAKEBOX
     !
-    RETURN
-END
+END SUBROUTINE GEPROC
+!*==GEPRINT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! GEPROC
 
 
 SUBROUTINE GEPRINT(LU)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IB1, IB2, IEL, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------
     !     Processes buffer airfoil geometry to set
     !     various limits and pointers.
     !----------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- print out element info
     DO IEL = 1, NBEL
-        WRITE(LU, 1001)
-        WRITE(LU, 1005) IEL
+        WRITE (LU, 1001)
+        WRITE (LU, 1005) IEL
         !
         IB1 = IBFRST(IEL)
         IB2 = IBLAST(IEL)
         I = IB1
         N = IB2 - IB1 + 1
         !
-        WRITE(LU, 1010) N
+        WRITE (LU, 1010) N
         !
-        IF(AREA2DA(IEL).GE.0.0) THEN
-            WRITE(LU, 2000) 'Counterclockwise ordering'
+        IF (AREA2DA(IEL)>=0.0) THEN
+            WRITE (LU, 2000) 'Counterclockwise ordering'
         ELSE
-            WRITE(LU, 2000) 'Clockwise ordering'
+            WRITE (LU, 2000) 'Clockwise ordering'
         ENDIF
         !
-        IF    (NETYPE(IEL).EQ.0) THEN
-            IF(LBODY(IEL)) THEN
-                IF(LXBOD(IEL)) THEN
-                    WRITE(LU, 2000) 'Closed body on axis'
-                ELSE
-                    WRITE(LU, 2000) 'Closed body'
-                ENDIF
+        IF (NETYPE(IEL)==0) THEN
+            IF (.NOT.(LBODY(IEL))) THEN
+                WRITE (LU, 2000) 'Open surface'
+            ELSEIF (LXBOD(IEL)) THEN
+                WRITE (LU, 2000) 'Closed body on axis'
             ELSE
-                WRITE(LU, 2000) 'Open surface'
+                WRITE (LU, 2000) 'Closed body'
             ENDIF
             !
-        ELSEIF(NETYPE(IEL).EQ.1) THEN
-            WRITE(LU, 2000) 'Prescribed wake surface'
+        ELSEIF (NETYPE(IEL)==1) THEN
+            WRITE (LU, 2000) 'Prescribed wake surface'
             !
-        ELSEIF(NETYPE(IEL).EQ.2) THEN
-            WRITE(LU, 2000) 'Prescribed line singularity on axis'
+        ELSEIF (NETYPE(IEL)==2) THEN
+            WRITE (LU, 2000) 'Prescribed line singularity on axis'
             !
-        ELSEIF(NETYPE(IEL).EQ.3) THEN
-            WRITE(LU, 2000) 'Prescribed ring singularity'
+        ELSEIF (NETYPE(IEL)==3) THEN
+            WRITE (LU, 2000) 'Prescribed ring singularity'
             !
-        ELSEIF(NETYPE(IEL).EQ.4) THEN
-            WRITE(LU, 2000) 'Prescribed point singularity'
+        ELSEIF (NETYPE(IEL)==4) THEN
+            WRITE (LU, 2000) 'Prescribed point singularity'
             !
         ENDIF
         !
-        IF(LTPAN(IEL)) THEN
-            WRITE(LU, 2000) 'TE-gap panel will be used'
-        ENDIF
+        IF (LTPAN(IEL)) WRITE (LU, 2000) 'TE-gap panel will be used'
         !
-        IF(IEWAKE(IEL).NE.0) THEN
-            WRITE(LU, 2100) 'Prescribed-wake element', IEWAKE(IEL), &
-                    '  is attached'
-        ENDIF
+        IF (IEWAKE(IEL)/=0) WRITE (LU, 2100)                          &
+                & 'Prescribed-wake element', &
+                & IEWAKE(IEL), '  is attached'
         !
-        IF(NETYPE(IEL).EQ.0 .OR.&
-                NETYPE(IEL).EQ.1 .OR.&
-                NETYPE(IEL).EQ.2) THEN
-            WRITE(LU, 1050) XBLE(IEL), YBLE(IEL), &
-                    XBTE(IEL), YBTE(IEL)
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)==2)  &
+                & THEN
+            WRITE (LU, 1050) XBLE(IEL), YBLE(IEL), XBTE(IEL), &
+                    & YBTE(IEL)
         ELSE
-            WRITE(LU, 1060) XB(IB1), YB(IB1)
+            WRITE (LU, 1060) XB(IB1), YB(IB1)
         ENDIF
         !
     ENDDO
     !
-    WRITE(LU, 1001)
+    WRITE (LU, 1001)
     !
     RETURN
     !
     !...............................................................
-    1001 FORMAT(/' -----------------------------------------------')
-    1005 FORMAT(' Element', I3, ' ...')
-    1010 FORMAT('   Number of input coordinate points:', I4)
-    1020 FORMAT('     delta(x) =', F10.5, '   Scale =', F10.5, &
-            /'     delta(y) =', F10.5, '   Angle =', F10.5, ' deg')
-    1050 FORMAT('    LE x,y  =', 2F10.5&
-            /'    TE x,y  =', 2F10.5)
-    1060 FORMAT('       x,y  =', 2F10.5)
-    2000 FORMAT('   ', A)
-    2100 FORMAT('   ', A, I3, A)
-END
+    1001 FORMAT (/' -----------------------------------------------')
+    1005 FORMAT (' Element', I3, ' ...')
+    1010 FORMAT ('   Number of input coordinate points:', I4)
+    1020 FORMAT ('     delta(x) =', F10.5, '   Scale =', F10.5, &
+            &/'     delta(y) =', F10.5, '   Angle =', F10.5, ' deg')
+    1050 FORMAT ('    LE x,y  =', 2F10.5/'    TE x,y  =', 2F10.5)
+    1060 FORMAT ('       x,y  =', 2F10.5)
+    2000 FORMAT ('   ', A)
+    2100 FORMAT ('   ', A, I3, A)
+END SUBROUTINE GEPRINT
+!*==ELPROC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! GEPRINT
 
 
 
 SUBROUTINE ELPROC(IEL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IEL
+    !
+    ! Local variables
+    !
+    REAL :: DSBTE, PERIM, SBLEN, SS, XTMP, YTMP
+    INTEGER :: I, IB, IB1, IB2, IBCUT, N
+    LOGICAL :: LCUT, LTMP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Processes buffer geometry element IEL.
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    LOGICAL LTMP, LCUT
     !
     IB1 = IBFRST(IEL)
     IB2 = IBLAST(IEL)
@@ -878,18 +945,18 @@ SUBROUTINE ELPROC(IEL)
     !----- check for body that crosses the axis (defined by upper and lower sides)
     LCUT = .FALSE.
     DO IB = IB1, IB2 - 1
-        IF(YB(IB).GT.0.0 .AND. YB(IB + 1).LE.0.0) THEN
+        IF (YB(IB)>0.0 .AND. YB(IB + 1)<=0.0) THEN
             LCUT = .TRUE.
             IBCUT = IB + 1
-            GO TO 50
+            EXIT
         ENDIF
-    END DO
+    ENDDO
     !
-    50   IF(LCUT) THEN
+    IF (LCUT) THEN
         !----- element crosses axis, cut it at the axis and use only upper half
-        IF(LDBG) THEN
-            WRITE(*, *) 'Cutting element ', IEL, ' at X axis '
-            WRITE(LUNDBG, *) 'Cutting element ', IEL, ' at X axis '
+        IF (LDBG) THEN
+            WRITE (*, *) 'Cutting element ', IEL, ' at X axis '
+            WRITE (LUNDBG, *) 'Cutting element ', IEL, ' at X axis '
         ENDIF
         CALL SEGSPL(XB(I), XBS(I), SB(I), N)
         CALL SEGSPL(YB(I), YBS(I), SB(I), N)
@@ -911,7 +978,7 @@ SUBROUTINE ELPROC(IEL)
     ENDIF
     !
     !
-    IF(N.EQ.1) THEN
+    IF (N==1) THEN
         !---- single point element (doublet/source point)
         LV1ZR(IEL) = .FALSE.
         LV2ZR(IEL) = .FALSE.
@@ -925,10 +992,10 @@ SUBROUTINE ELPROC(IEL)
         SBLEN = ABS(SB(IB2) - SB(IB1))
         !
         !---- are first,last points effectively on the axis?
-        LV1ZR(IEL) = ABS(YB(IB1)) .LT. SBLEN * DTEPAN
-        LV2ZR(IEL) = ABS(YB(IB2)) .LT. SBLEN * DTEPAN
+        LV1ZR(IEL) = ABS(YB(IB1))<SBLEN * DTEPAN
+        LV2ZR(IEL) = ABS(YB(IB2))<SBLEN * DTEPAN
         !
-        IF(LV1ZR(IEL)) THEN
+        IF (LV1ZR(IEL)) THEN
             !---- TE gap is really a TE disk at point IB2
             DSBTE = ABS(YB(IB2))
         ELSE
@@ -940,12 +1007,11 @@ SUBROUTINE ELPROC(IEL)
         LXBOD(IEL) = LV1ZR(IEL) .AND. LV2ZR(IEL)
         !
         !---- finite-thickness body ?
-        LBODY(IEL) = LV1ZR(IEL) .OR. LV2ZR(IEL)&
-                .OR. DSBTE .LT. ABS(SB(IB2) - SB(IB1)) * DTEBOD
+        LBODY(IEL) = LV1ZR(IEL) .OR. LV2ZR(IEL) .OR.                   &
+                & DSBTE<ABS(SB(IB2) - SB(IB1)) * DTEBOD
         !
         !---- add TE-gap panel ?
-        LTPAN(IEL) = LBODY(IEL)&
-                .AND. DSBTE .GT. ABS(SB(IB2) - SB(IB1)) * DTEPAN
+        LTPAN(IEL) = LBODY(IEL) .AND. DSBTE>ABS(SB(IB2) - SB(IB1)) * DTEPAN
         !
         !---- explicitly zero out the body normal velocity QNDOF?
         !c     LQNZR(IEL) = .TRUE.
@@ -955,29 +1021,24 @@ SUBROUTINE ELPROC(IEL)
     !
     !---- 2D buffer geometry data
     !---- set 2D area, centroid, section moduli - for area
-    CALL AECALC(N, XB(I), YB(I), ONE, 0, PERIM, &
-            AREA2DA(IEL), XBCEN2DA(IEL), YBCEN2DA(IEL), &
-            EIXX2DA(IEL), EIYY2DA(IEL), EIXY2DA(IEL))
+    CALL AECALC(N, XB(I), YB(I), ONE, 0, PERIM, AREA2DA(IEL), XBCEN2DA(IEL), &
+            & YBCEN2DA(IEL), EIXX2DA(IEL), EIYY2DA(IEL), EIXY2DA(IEL))
     !---- set 2D area, centroid, section moduli - per unit skin thickness
-    CALL AECALC(N, XB(I), YB(I), ONE, 2, PERIM, &
-            AREA2DT(IEL), XBCEN2DT(IEL), YBCEN2DT(IEL), &
-            EIXX2DT(IEL), EIYY2DT(IEL), EIXY2DT(IEL))
+    CALL AECALC(N, XB(I), YB(I), ONE, 2, PERIM, AREA2DT(IEL), XBCEN2DT(IEL), &
+            & YBCEN2DT(IEL), EIXX2DT(IEL), EIYY2DT(IEL), EIXY2DT(IEL))
     !
     !---- Axisymmetric buffer geometry data
     !---- set axisymmetric surface area, volume, centroid, radii of gyration
-    CALL AXCALC(N, XB(I), YB(I), ONE, 0, &
-            VOLUMV(IEL), ASURFV(IEL), XBCENV(IEL), YBCENV(IEL), &
-            RGYRXV(IEL), RGYRYV(IEL))
+    CALL AXCALC(N, XB(I), YB(I), ONE, 0, VOLUMV(IEL), ASURFV(IEL), &
+            & XBCENV(IEL), YBCENV(IEL), RGYRXV(IEL), RGYRYV(IEL))
     !
     !---- assume element will be used and written in input order by default
     LREVEL(IEL) = .FALSE.
     !
-    IF(LBODY(IEL) .AND. AREA2DA(IEL).LT.0.0) THEN
-        !----- area is negative (clockwise order)... mark for reversing the order
-        LREVEL(IEL) = .TRUE.
-    ENDIF
+    !----- area is negative (clockwise order)... mark for reversing the order
+    IF (LBODY(IEL) .AND. AREA2DA(IEL)<0.0) LREVEL(IEL) = .TRUE.
     !
-    IF(LREVEL(IEL)) THEN
+    IF (LREVEL(IEL)) THEN
         !---- reverse the order of the points
         DO IB = IB1, (IB2 + IB1) / 2
             XTMP = XB(IB2 - IB + IB1)
@@ -996,9 +1057,9 @@ SUBROUTINE ELPROC(IEL)
     CALL SEGSPL(XB(I), XBS(I), SB(I), N)
     CALL SEGSPL(YB(I), YBS(I), SB(I), N)
     !
-    IF(LBODY(IEL) .AND. .NOT.LXBOD(IEL)) THEN
+    IF (LBODY(IEL) .AND. .NOT.LXBOD(IEL)) THEN
         !----- body off axis
-        IF(LV2ZR(IEL)) THEN
+        IF (LV2ZR(IEL)) THEN
             SBLE(IEL) = SB(IB2)
             XBLE(IEL) = XB(IB2)
             YBLE(IEL) = YB(IB2)
@@ -1012,26 +1073,24 @@ SUBROUTINE ELPROC(IEL)
             YBTE(IEL) = 0.5 * (YB(IB1) + YB(IB2))
         ENDIF
         !
-    ELSE
         !----- other body... set LE,TE from leftmost and rightmost points
-        IF(XB(IB1).LT.XB(IB2)) THEN
-            SBLE(IEL) = SB(IB1)
-            XBLE(IEL) = XB(IB1)
-            YBLE(IEL) = YB(IB1)
-            XBTE(IEL) = XB(IB2)
-            YBTE(IEL) = YB(IB2)
-        ELSE
-            SBLE(IEL) = SB(IB2)
-            XBLE(IEL) = XB(IB2)
-            YBLE(IEL) = YB(IB2)
-            XBTE(IEL) = XB(IB1)
-            YBTE(IEL) = YB(IB1)
-        ENDIF
+    ELSEIF (XB(IB1)<XB(IB2)) THEN
+        SBLE(IEL) = SB(IB1)
+        XBLE(IEL) = XB(IB1)
+        YBLE(IEL) = YB(IB1)
+        XBTE(IEL) = XB(IB2)
+        YBTE(IEL) = YB(IB2)
+    ELSE
+        SBLE(IEL) = SB(IB2)
+        XBLE(IEL) = XB(IB2)
+        YBLE(IEL) = YB(IB2)
+        XBTE(IEL) = XB(IB1)
+        YBTE(IEL) = YB(IB1)
         !
     ENDIF
     !
     !---- set Cp-side flag
-    IF(LBODY(IEL)) THEN
+    IF (LBODY(IEL)) THEN
         !----- outer surface only (to right side of +s CCW direction)
         ISPLOT(IEL) = +1
     ELSE
@@ -1039,19 +1098,30 @@ SUBROUTINE ELPROC(IEL)
         ISPLOT(IEL) = 0
     ENDIF
     !
-    RETURN
-END
+END SUBROUTINE ELPROC
+!*==WAKEBOX.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ELPROC
 
 
 
 SUBROUTINE WAKEBOX
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: DXBOX, DYBOX
+    INTEGER :: IEL
+    LOGICAL :: LWBSET
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------
     !     Sets limits of "wake box".
     !     A wake is terminated when it leaves this box.
     !---------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    LOGICAL LWBSET
     !
     XWBOX(1) = 1.0E23
     XWBOX(2) = -1.0E23
@@ -1059,7 +1129,7 @@ SUBROUTINE WAKEBOX
     YWBOX(2) = -1.0E23
     LWBSET = .FALSE.
     DO IEL = 1, NEL
-        IF(NETYPE(IEL).EQ.0 .OR. NETYPE(IEL).EQ.7) THEN
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==7) THEN
             !------- box defined only by solid or vortex wake elements
             XWBOX(1) = MIN(XWBOX(1), XPMINE(IEL))
             XWBOX(2) = MAX(XWBOX(2), XPMAXE(IEL))
@@ -1068,7 +1138,7 @@ SUBROUTINE WAKEBOX
             LWBSET = .TRUE.
         ENDIF
     ENDDO
-    IF(.NOT.LWBSET) THEN
+    IF (.NOT.LWBSET) THEN
         !----- use default if no solid elements exist
         XWBOX(1) = XBMIN
         XWBOX(2) = XBMAX
@@ -1089,20 +1159,28 @@ SUBROUTINE WAKEBOX
     YWBOX(1) = 0.0
     YWBOX(2) = YWBOX(2) + DYBOX
     !
-    RETURN
-END
+END SUBROUTINE WAKEBOX
+!*==SETDRGOBJ.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! WAKEBOX
 
 
 SUBROUTINE SETDRGOBJ
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: ND
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Sets up drag area elements into paneled geometry
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NDOBJ.LT.1) THEN
-        RETURN
-    ENDIF
+    IF (NDOBJ<1) RETURN
     !
     NPTOT = IPLAST(NEL)
     !
@@ -1110,77 +1188,85 @@ SUBROUTINE SETDRGOBJ
     DO ND = 1, NDOBJ
         CALL ADDELEM5(XDDEF(1, ND), YDDEF(1, ND), NDDEF(ND))
         IELDRGOBJ(ND) = NEL
-    END DO
+    ENDDO
     LDRGOBJ = .TRUE.
     !
-    RETURN
-END
+END SUBROUTINE SETDRGOBJ
+!*==ROTORINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE ROTORINIT
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL, DIMENSION(IRX) :: BETAR0, BGAM0, CHR0, CLDES0, T1, &
+            & T1S, T2, T2S, T3, T3S, T4, T4S, &
+            & YRC0
+    REAL :: CLD1, CLD2, CLN1, CLN2, CLP1, CLP2, DR, DX, DY, &
+            & TG, TGAPZLT, XCB, XDW, YCB, YDW
+    INTEGER :: I, IC, IPCB, IPDW, IR, N, NRC0, NRCSAV
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Sets up rotor geometry from panel geometry
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION YRC0(IRX), BGAM0(IRX), CHR0(IRX), BETAR0(IRX)
-    DIMENSION CLDES0(IRX)
-    DIMENSION T1(IRX), T1S(IRX), &
-            T2(IRX), T2S(IRX), &
-            T3(IRX), T3S(IRX), &
-            T4(IRX), T4S(IRX)
     !
-    IF(NROTOR.EQ.0) THEN
-        WRITE(*, *) 'No actuator disk/blades defined'
+    IF (NROTOR==0) THEN
+        WRITE (*, *) 'No actuator disk/blades defined'
         RETURN
     ENDIF
     !
     NRCSAV = NRC
-    IF(NRCSAV.GT.0) THEN
-        N = 1   ! assume at least one disk defined
+    IF (NRCSAV>0) THEN
+        N = 1  ! assume at least one disk defined
         DO IR = 1, NRCSAV
             YRC0(IR) = YRC(IR, N)
             CLDES0(IR) = CLDES(IR)
-        END DO
+        ENDDO
     ENDIF
     !
     DO N = 1, NROTOR
         !
         !---- get radial location of rotor on CB and duct wall
-        IF(IPROTCB(N).EQ.0) THEN
-            WRITE(*, *) 'Error locating disk on CB wall'
+        IF (IPROTCB(N)==0) THEN
+            WRITE (*, *) 'Error locating disk on CB wall'
             STOP
         ENDIF
         IPCB = IPROTCB(N)
         XCB = XP(IPCB)
         YCB = YP(IPCB)
         RHUB(N) = YCB
-        IF(LDBG) THEN
-            WRITE(LUNDBG, *) 'Disk on CB @IP= ', IPCB
-            WRITE(LUNDBG, *) 'Xhub,Rhub on CB ', XCB, RHUB(N)
+        IF (LDBG) THEN
+            WRITE (LUNDBG, *) 'Disk on CB @IP= ', IPCB
+            WRITE (LUNDBG, *) 'Xhub,Rhub on CB ', XCB, RHUB(N)
         ENDIF
         !
-        IF(IPROTDW(N).EQ.0) THEN
-            WRITE(*, *) 'Error locating rotor on Duct wall'
+        IF (IPROTDW(N)==0) THEN
+            WRITE (*, *) 'Error locating rotor on Duct wall'
             STOP
         ENDIF
         IPDW = IPROTDW(N)
         XDW = XP(IPDW)
         YDW = YP(IPDW)
         RTIP(N) = YDW
-        IF(LDBG) THEN
-            WRITE(LUNDBG, *) 'Disk on Duct @IP= ', IPDW
-            WRITE(LUNDBG, *) 'Xtip,Rtip on Duct wall ', XDW, RTIP(N)
+        IF (LDBG) THEN
+            WRITE (LUNDBG, *) 'Disk on Duct @IP= ', IPDW
+            WRITE (LUNDBG, *) 'Xtip,Rtip on Duct wall ', XDW, RTIP(N)
         ENDIF
         !
         !---- Update swept disk area
         ADISK(N) = PI * (RTIP(N)**2 - RHUB(N)**2)
         ATIP(N) = PI * (RTIP(N)**2)
-        IF(LDBG) THEN
-            WRITE(*, *) 'Disk # ', N, ' swept area ', ADISK(N)
-        ENDIF
+        IF (LDBG) WRITE (*, *) 'Disk # ', N, ' swept area ', &
+                & ADISK(N)
         !
         !
-        IF(IRTYPE(N).NE.0) THEN   ! disk defined
+        IF (IRTYPE(N)/=0) THEN ! disk defined
             !---- Save old blade and circulation distribution for interpolation to new pts
             NRC0 = NRCSAV
             DO IR = 1, NRC0
@@ -1189,7 +1275,7 @@ SUBROUTINE ROTORINIT
                 CHR0(IR) = CHR(IR, N)
                 BETAR0(IR) = BETAR(IR, N)
                 !          IF(N.EQ.1) CLDES0(IR) = CLDES(IR)
-            END DO
+            ENDDO
         ENDIF
         !
         !---- Set discrete points on rotor line using linear interpolation hub-tip
@@ -1200,7 +1286,7 @@ SUBROUTINE ROTORINIT
             XRP(IR, N) = XCB + FLOAT(IR - 1) * DX
             YRP(IR, N) = YCB + FLOAT(IR - 1) * DY
             !c        write(*,*) 'rotorpts ',i,xrp(i,n),yrp(i,n)
-        END DO
+        ENDDO
         !
         !
         ! *** In what follows, condition on LLOFT is to allow paneling to geometric
@@ -1209,21 +1295,21 @@ SUBROUTINE ROTORINIT
         !---- If effective tip gap is specified add two points to last interval
         !     at tip gap from duct wall, shift original rotor points inwards
         !
-        IF(LLOFT) THEN
+        IF (LLOFT) THEN
             TGAPZLT = 0.0
         ELSE
             TGAPZLT = TGAPZL
         ENDIF
         !
         TG = MAX(0.0, TGAP - TGAPZLT)
-        IF(TG.GT.0.0) THEN
+        IF (TG>0.0) THEN
             DX = XDW - XCB
             DR = RTIP(N) - RHUB(N)
             DO IR = 1, NRP
                 YRP(IR, N) = YRP(IR, N) - 2.0 * TG * (YRP(IR, N) - RHUB(N)) / DR
                 XRP(IR, N) = XRP(IR, N) - DX * (RTIP(N) - YRP(IR, N)) / DR
                 !c          write(*,*) 'rotorpts ',i,xrp(i,n),yrp(i,n)
-            END DO
+            ENDDO
             !--- Add two points, one at RTIP-TGAP, one at shroud wall at RTIP
             NRP = NRP + 1
             YRP(NRP, N) = RTIP(N) - TG
@@ -1240,43 +1326,46 @@ SUBROUTINE ROTORINIT
             YRC(IR, N) = 0.5 * (YRP(IR, N) + YRP(IR + 1, N))
             BGAM(IR, N) = 0.0
             !c        write(*,*) 'rotorcpts ',ir,xrc(ir,n),yrc(ir,n)
-        END DO
+        ENDDO
         !
         !=====================================================================
         !
-        IF(IRTYPE(N).EQ.0) THEN   ! disk undefined
+        IF (IRTYPE(N)==0) THEN ! disk undefined
             !
             !---- If actuator disk has been input interpolate BGAM to rotor center points
-            IF(IRTYPDEF(N).EQ.1 .AND. NRDEF(N).GE.2) THEN
+            IF (IRTYPDEF(N)==1 .AND. NRDEF(N)>=2) THEN
                 DO I = 1, NRDEF(N)
                     T1(I) = BGAMDEF(I, N)
-                END DO
+                ENDDO
                 !---- Spline rotor definition arrays
                 CALL SEGSPL(T1, T1S, YRDEF(1, N), NRDEF(N))
                 !---- Set BGAM for points on rotor line
                 DO IR = 1, NRC
-                    BGAM(IR, N) = SEVAL(YRC(IR, N), T1, T1S, YRDEF(1, N), NRDEF(N))
-                END DO
-                IF(TGAP.GT.0.0) BGAM(NRC, N) = 0.0
+                    BGAM(IR, N) = SEVAL(YRC(IR, N), T1, T1S, YRDEF(1, N), &
+                            & NRDEF(N))
+                ENDDO
+                IF (TGAP>0.0) BGAM(NRC, N) = 0.0
                 IRTYPE(N) = 1
                 LBLDEF = .FALSE.
                 LVMAV = .FALSE.
             ENDIF
             !---- If a rotor has been input (Y,CH,BETA) interpolate CH,BETA to rotor
             !     center points
-            IF(IRTYPDEF(N).EQ.2 .AND. NRDEF(N).GE.2) THEN
+            IF (IRTYPDEF(N)==2 .AND. NRDEF(N)>=2) THEN
                 DO I = 1, NRDEF(N)
                     T1(I) = CHRDEF(I, N)
                     T2(I) = BETADEF(I, N)
-                END DO
+                ENDDO
                 !---- Spline rotor definition arrays
                 CALL SEGSPL(T1, T1S, YRDEF(1, N), NRDEF(N))
                 CALL SEGSPL(T2, T2S, YRDEF(1, N), NRDEF(N))
                 !---- Set CH,BETA for points on rotor line
                 DO IR = 1, NRC
-                    CHR(IR, N) = SEVAL(YRC(IR, N), T1, T1S, YRDEF(1, N), NRDEF(N))
-                    BETAR(IR, N) = SEVAL(YRC(IR, N), T2, T2S, YRDEF(1, N), NRDEF(N))
-                END DO
+                    CHR(IR, N) = SEVAL(YRC(IR, N), T1, T1S, YRDEF(1, N), NRDEF(N)&
+                            &)
+                    BETAR(IR, N) = SEVAL(YRC(IR, N), T2, T2S, YRDEF(1, N), &
+                            & NRDEF(N))
+                ENDDO
                 IRTYPE(N) = 2
                 LBLDEF = .TRUE.
                 LVMAV = .FALSE.
@@ -1290,7 +1379,7 @@ SUBROUTINE ROTORINIT
                 T1(I) = CHR0(I)
                 T2(I) = BETAR0(I)
                 T3(I) = BGAM0(I)
-            END DO
+            ENDDO
             !---- Spline rotor definition arrays
             CALL SEGSPL(T1, T1S, YRC0, NRC0)
             CALL SEGSPL(T2, T2S, YRC0, NRC0)
@@ -1300,17 +1389,18 @@ SUBROUTINE ROTORINIT
                 CHR(IR, N) = SEVAL(YRC(IR, N), T1, T1S, YRC0, NRC0)
                 BETAR(IR, N) = SEVAL(YRC(IR, N), T2, T2S, YRC0, NRC0)
                 BGAM(IR, N) = SEVAL(YRC(IR, N), T3, T3S, YRC0, NRC0)
-            END DO
+            ENDDO
             !cc        IF(TGAP.GT.0.0) BGAM(NRC,N) = 0.0
             CALL SETIAERO
             !
         ENDIF
         !
-    END DO ! end NROTOR loop
+    ENDDO
+    ! end NROTOR loop
     !
     !---- Move design CLs and BB data to new radial stations
     !
-    IF(NRCSAV.GT.0) THEN
+    IF (NRCSAV>0) THEN
         CLP1 = CLPOS(1)
         CLP2 = CLPOS(NRCSAV)
         CLN1 = CLNEG(1)
@@ -1325,7 +1415,7 @@ SUBROUTINE ROTORINIT
         ENDDO
         !
         DO N = 1, NROTOR
-            IF(LBBLOFT(N)) THEN
+            IF (LBBLOFT(N)) THEN
                 DO IC = 1, NRCSAV
                     T4(IC) = BBVFAC(IC, N)
                 ENDDO
@@ -1362,21 +1452,28 @@ SUBROUTINE ROTORINIT
     !        END DO
     !      ENDIF
     !
-    RETURN
-END
+END SUBROUTINE ROTORINIT
+!*==SETROTWAK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ROTORINIT
 
 
 
 SUBROUTINE SETROTWAK
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: IEL, IG, IG1, IP, IP1, IP2, IR, N, NR
+    REAL, DIMENSION(IRX) :: T1, T1S, T2, T2S, T3, T3S, Y1
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Sets up rotor source line and wake elements from wake grid
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION Y1(IRX)
-    DIMENSION T1(IRX), T1S(IRX), &
-            T2(IRX), T2S(IRX), &
-            T3(IRX), T3S(IRX)
     !
     !---- Add rotor source element after elements now in panel geometry
     !     (foils, drag area objects)
@@ -1389,7 +1486,7 @@ SUBROUTINE SETROTWAK
         DO IR = 1, NRP
             XRP(IR, NR) = XG(IG, IR)
             YRP(IR, NR) = YG(IG, IR)
-        END DO
+        ENDDO
         CALL ADDELEM6(XRP(1, NR), YRP(1, NR), NRP)
         IELROTOR(NR) = NEL
         !
@@ -1400,12 +1497,12 @@ SUBROUTINE SETROTWAK
             T1(IR) = CHR(IR, NR)
             T2(IR) = BETAR(IR, NR)
             T3(IR) = BGAM(IR, NR)
-        END DO
+        ENDDO
         !---- Redefine rotor center points
         DO IR = 1, NRC
             XRC(IR, NR) = 0.5 * (XRP(IR, NR) + XRP(IR + 1, NR))
             YRC(IR, NR) = 0.5 * (YRP(IR, NR) + YRP(IR + 1, NR))
-        END DO
+        ENDDO
         !---- Spline rotor definition arrays
         CALL SEGSPL(T1, T1S, Y1, NRC)
         CALL SEGSPL(T2, T2S, Y1, NRC)
@@ -1415,11 +1512,11 @@ SUBROUTINE SETROTWAK
             CHR(IR, NR) = SEVAL(YRC(IR, NR), T1, T1S, Y1, NRC)
             BETAR(IR, NR) = SEVAL(YRC(IR, NR), T2, T2S, Y1, NRC)
             BGAM(IR, NR) = SEVAL(YRC(IR, NR), T3, T3S, Y1, NRC)
-        END DO
+        ENDDO
         !cc        IF(TGAP.GT.0.0) BGAM(NRC,NR) = 0.0
         CALL SETIAERO
         !
-    END DO
+    ENDDO
     !
     !---- Add vortex wake elements to panel geometry
     !
@@ -1440,7 +1537,7 @@ SUBROUTINE SETROTWAK
     IP2 = IPLAST(NEL)
     DO IP = IP1, IP2
         IP2IG(IP) = IG1 + IP - IP1
-    END DO
+    ENDDO
     !
     !----- set up intermediate rotor wakes (from rotor line)
     DO IR = 2, NRP - 1
@@ -1457,8 +1554,8 @@ SUBROUTINE SETROTWAK
         IP2 = IPLAST(NEL)
         DO IP = IP1, IP2
             IP2IG(IP) = IG1 + IP - IP1
-        END DO
-    END DO
+        ENDDO
+    ENDDO
 
     !----- and wake from duct TE (element 2)
     IR = NRP
@@ -1477,7 +1574,7 @@ SUBROUTINE SETROTWAK
     IP2 = IPLAST(NEL)
     DO IP = IP1, IP2
         IP2IG(IP) = IG1 + IP - IP1
-    END DO
+    ENDDO
     !
     !----------------------------------------------------------------
     !---- invalidate any existing solution
@@ -1492,32 +1589,44 @@ SUBROUTINE SETROTWAK
     LSIGP = .FALSE.
     LSIGM = .FALSE.
     !
-    RETURN
-END
+END SUBROUTINE SETROTWAK
+!*==ADDWAKE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SETROTWAK
 
 
 SUBROUTINE ADDWAKE(X, Y, N)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N
+    REAL, DIMENSION(*) :: X, Y
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IEL, IP, IP1, IP2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Add wake specified by N points X,Y to panel geometry
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION X(*), Y(*)
     !
     !---- add wake to panel geometry
     IP1 = IPLAST(NEL) + 1
     IP2 = IP1 - 1 + N
     IEL = NEL + 1
-    IF(LDBG) THEN
-        WRITE(LUNDBG, 10) IEL, N, IP1, IP2
-    ENDIF
+    IF (LDBG) WRITE (LUNDBG, 10) IEL, N, IP1, IP2
     !---- add wake points
     DO IP = IP1, IP2
         I = IP - IP1 + 1
         XP(IP) = X(I)
         YP(IP) = Y(I)
-        IF(LDBG) WRITE(LUNDBG, *) IP, XP(IP), YP(IP)
-    END DO
+        IF (LDBG) WRITE (LUNDBG, *) IP, XP(IP), YP(IP)
+    ENDDO
     !---- centroid location
     XPCENT(IEL) = 0.5 * (XP(IP1) + XP(IP2))
     YPCENT(IEL) = 0.5 * (YP(IP1) + YP(IP2))
@@ -1539,25 +1648,33 @@ SUBROUTINE ADDWAKE(X, Y, N)
     NEL = IEL
     NPTOT = IP2
     !
-    IF(LDBG) THEN
-        WRITE(*, 10) IEL, N, IP1, IP2
-    ENDIF
+    IF (LDBG) WRITE (*, 10) IEL, N, IP1, IP2
     !
-    10   FORMAT('Vortex wake element ', I4, ' added with #pts ', I5, &
-            ' IP1 ', I5, ' IP2 ', I5)
+    10   FORMAT ('Vortex wake element ', I4, ' added with #pts ', I5, ' IP1 ', &
+            & I5, ' IP2 ', I5)
     !
-    RETURN
-END
+END SUBROUTINE ADDWAKE
+!*==UPDROTWAK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ADDWAKE
 
 
 
 SUBROUTINE UPDROTWAK
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, I1, IEL, IP, IP1, IP2, IR, N, NIP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Updates up rotor wake element geometry from wake grid
     !     Assumes that points have moved but indices remain the same
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !c      write(*,*) 'UPDROTWAK entered NEL ',NEL
     !
@@ -1569,8 +1686,9 @@ SUBROUTINE UPDROTWAK
     I1 = IGTECB
     N = II - I1 + 1
     NIP = IP2 - IP1 + 1
-    IF(N.NE.NIP) THEN
-        WRITE(*, *) 'UPDROTWAK wake grid mismatch on IR ', IR, N, NIP
+    IF (N/=NIP) THEN
+        WRITE (*, *) 'UPDROTWAK wake grid mismatch on IR ', IR, N, &
+                & NIP
         STOP
     ENDIF
     I = I1
@@ -1578,7 +1696,7 @@ SUBROUTINE UPDROTWAK
         XP(IP) = XG(I, IR)
         YP(IP) = YG(I, IR)
         I = I + 1
-    END DO
+    ENDDO
     !
     !----- set up intermediate rotor wakes (from rotor line)
     DO IR = 2, NRP - 1
@@ -1588,8 +1706,9 @@ SUBROUTINE UPDROTWAK
         I1 = 1
         N = II
         NIP = IP2 - IP1 + 1
-        IF(N.NE.NIP) THEN
-            WRITE(*, *) 'UPDROTWAK wake grid mismatch on IR ', IR, N, NIP
+        IF (N/=NIP) THEN
+            WRITE (*, *) 'UPDROTWAK wake grid mismatch on IR ', IR, N, &
+                    & NIP
             STOP
         ENDIF
         I = I1
@@ -1597,8 +1716,8 @@ SUBROUTINE UPDROTWAK
             XP(IP) = XG(I, IR)
             YP(IP) = YG(I, IR)
             I = I + 1
-        END DO
-    END DO
+        ENDDO
+    ENDDO
 
     !----- and wake from duct TE (element 2)
     IR = NRP
@@ -1608,8 +1727,9 @@ SUBROUTINE UPDROTWAK
     I1 = IGTEDW
     N = II - I1 + 1
     NIP = IP2 - IP1 + 1
-    IF(N.NE.NIP) THEN
-        WRITE(*, *) 'UPDROTWAK wake grid mismatch on IR ', IR, N, NIP
+    IF (N/=NIP) THEN
+        WRITE (*, *) 'UPDROTWAK wake grid mismatch on IR ', IR, N, &
+                & NIP
         STOP
     ENDIF
     I = I1
@@ -1617,7 +1737,7 @@ SUBROUTINE UPDROTWAK
         XP(IP) = XG(I, IR)
         YP(IP) = YG(I, IR)
         I = I + 1
-    END DO
+    ENDDO
     !
     !----------------------------------------------------------------
     !---- invalidate any existing solution
@@ -1629,28 +1749,39 @@ SUBROUTINE UPDROTWAK
     LGAMU = .FALSE.
     LGAMA = .FALSE.
     !
-    RETURN
-END
+END SUBROUTINE UPDROTWAK
+!*==ROTPINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! UPDROTWAK
 
 
 SUBROUTINE ROTPINIT
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: IC, IC1, IC2, IEL, IG1, IG2, IP, IP1, IP2, &
+            & IPCB, IPDW, IR, N, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Sets up pointers for panel points on rotor wakes
     !     and pointers from panel centers to streamline grid
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- Clear pointers to streamline rows from body and wake points
     !     Used for additional gamma from vortex wakes
     DO IP = 1, IPX
         IP2IR(IP) = 0
-    END DO
+    ENDDO
     !
     !---- Clear pointers to grid centers from body and wake centers
     DO IC = 1, ICX
         IC2IG(IC) = 0
-    END DO
+    ENDDO
     !
     NR = 1
     !---- Pointers for vortex wake on centerbody
@@ -1663,7 +1794,7 @@ SUBROUTINE ROTPINIT
     DO IP = IPCB, IP1, -1
         IP2IR(IP) = IR
         !c      IF(LDBG) WRITE(22,*) IP,IR
-    END DO
+    ENDDO
     !---- set pointers from panel center to grid center
     IC1 = ICFRST(IEL)
     IC2 = ICLAST(IEL)
@@ -1672,20 +1803,20 @@ SUBROUTINE ROTPINIT
         IG2 = IP2IG(IPCP(IC))
         IC2IG(IC) = MIN(IG1, IG2)
         !c        IF(IC2IG(IC).NE.0) WRITE(22,*) IC,IC2IG(IC)
-    END DO
+    ENDDO
     !
     !---- Set pointers for vortex wake elements
     DO IR = 1, NRP
         IEL = IR2IEL(IR)
-        IF(IEL.LE.0) THEN
-            WRITE(*, *) 'IR2IEL out of range in ROTPINIT ', IEL
+        IF (IEL<=0) THEN
+            WRITE (*, *) 'IR2IEL out of range in ROTPINIT ', IEL
             STOP
         ENDIF
         IP1 = IPFRST(IEL)
         IP2 = IPLAST(IEL)
         DO IP = IP1, IP2
             IP2IR(IP) = IR
-        END DO
+        ENDDO
         !---- set pointers from panel center to grid center
         IC1 = ICFRST(IEL)
         IC2 = ICLAST(IEL)
@@ -1694,8 +1825,8 @@ SUBROUTINE ROTPINIT
             IG2 = IP2IG(IPCP(IC))
             IC2IG(IC) = MIN(IG1, IG2)
             !c          IF(IC2IG(IC).NE.0) WRITE(22,*) IC,IC2IG(IC)
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
     !---- Pointers for vortex wake on duct
     IR = NRP
@@ -1708,7 +1839,7 @@ SUBROUTINE ROTPINIT
     DO IP = IPDW, IP2
         IP2IR(IP) = IR
         !c      IF(LDBG) WRITE(22,*) IP,IR
-    END DO
+    ENDDO
     !---- set pointers from panel center to grid center
     IC1 = ICFRST(IEL)
     IC2 = ICLAST(IEL)
@@ -1717,25 +1848,41 @@ SUBROUTINE ROTPINIT
         IG2 = IP2IG(IPCP(IC))
         IC2IG(IC) = MIN(IG1, IG2)
         !c        IF(IC2IG(IC).NE.0) WRITE(22,*) IC,IC2IG(IC)
-    END DO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE ROTPINIT
+!*==ADDELEM5_2PT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ROTPINIT
 
 
 
 SUBROUTINE ADDELEM5_2PT(X1, Y1, X2, Y2, NPTS)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: NPTS
+    REAL :: X1, X2, Y1, Y2
+    !
+    ! Local variables
+    !
+    REAL :: DX, DY, FNPT1
+    INTEGER :: I, IEL, IP, IP1, IP2, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Add line source element (NETYPE=5) to paneled geometry
     !     Specified by X1,Y1 start and X2,Y2 end coordinates and
     !     # of points.  Intermediate ponts are linearly interpolated
     !     between endpoints.
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NPTS.LE.1) THEN
-        WRITE(*, *) 'Error in ADDELEM12 NPTS<2'
+    IF (NPTS<=1) THEN
+        WRITE (*, *) 'Error in ADDELEM12 NPTS<2'
         STOP
     ENDIF
     !
@@ -1752,7 +1899,7 @@ SUBROUTINE ADDELEM5_2PT(X1, Y1, X2, Y2, NPTS)
         IP = IP + 1
         XP(IP) = X1 + DX * FLOAT(I - 1) / FNPT1
         YP(IP) = Y1 + DY * FLOAT(I - 1) / FNPT1
-    END DO
+    ENDDO
     !---- centroid location
     XPCENT(IEL) = 0.5 * (XP(IP1) + XP(IP2))
     YPCENT(IEL) = 0.5 * (YP(IP1) + YP(IP2))
@@ -1768,38 +1915,52 @@ SUBROUTINE ADDELEM5_2PT(X1, Y1, X2, Y2, NPTS)
     LTPAN(IEL) = .FALSE.
     CALL XYPSPL(IEL)
     !
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *) ' '
-        WRITE(LUNDBG, *) 'Adding line source element ', IEL
-        WRITE(LUNDBG, 100) 'Start ', IP1, X1, Y1
-        WRITE(LUNDBG, 100) 'End   ', IP2, X2, Y2
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) ' '
+        WRITE (LUNDBG, *) 'Adding line source element ', IEL
+        WRITE (LUNDBG, 100) 'Start ', IP1, X1, Y1
+        WRITE (LUNDBG, 100) 'End   ', IP2, X2, Y2
         !
-        WRITE(*, 10) IEL, NPTS, IP1, IP2
+        WRITE (*, 10) IEL, NPTS, IP1, IP2
     ENDIF
     !
-    10   FORMAT('Line source element ', I4, ' added with #pts ', I5, &
-            ' IP1 ', I5, ' IP2 ', I5)
-    100  FORMAT(A, I5, 4(1X, G13.5))
+    10   FORMAT ('Line source element ', I4, ' added with #pts ', I5, ' IP1 ', &
+            & I5, ' IP2 ', I5)
+    100  FORMAT (A, I5, 4(1X, G13.5))
     !
     NEL = IEL
     NPTOT = IP2
     !
-    RETURN
-END
+END SUBROUTINE ADDELEM5_2PT
+!*==ADDELEM5.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ADDELEM5_2PT
 
 
 
 SUBROUTINE ADDELEM5(X, Y, N)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N
+    REAL, DIMENSION(*) :: X, Y
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IEL, IP, IP1, IP2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Add line source element (NETYPE=5) to paneled geometry
     !     Specified by X,Y coordinates and # of points
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION X(*), Y(*)
     !
-    IF(N.LE.1) THEN
-        WRITE(*, *) 'Error in ADDELEM5 NPTS<2'
+    IF (N<=1) THEN
+        WRITE (*, *) 'Error in ADDELEM5 NPTS<2'
         STOP
     ENDIF
     !
@@ -1807,17 +1968,15 @@ SUBROUTINE ADDELEM5(X, Y, N)
     IP1 = IPLAST(NEL) + 1
     IP2 = IP1 - 1 + N
     IEL = NEL + 1
-    IF(LDBG) THEN
-        WRITE(LUNDBG, 10) IEL, N, IP1, IP2
-    ENDIF
+    IF (LDBG) WRITE (LUNDBG, 10) IEL, N, IP1, IP2
     !
     !---- add points to panel arrays
     DO IP = IP1, IP2
         I = IP - IP1 + 1
         XP(IP) = X(I)
         YP(IP) = Y(I)
-        IF(LDBG) WRITE(LUNDBG, *) IP, XP(IP), YP(IP)
-    END DO
+        IF (LDBG) WRITE (LUNDBG, *) IP, XP(IP), YP(IP)
+    ENDDO
     !---- centroid location
     XPCENT(IEL) = 0.5 * (XP(IP1) + XP(IP2))
     YPCENT(IEL) = 0.5 * (YP(IP1) + YP(IP2))
@@ -1832,43 +1991,55 @@ SUBROUTINE ADDELEM5(X, Y, N)
     LTPAN(IEL) = .FALSE.
     CALL XYPSPL(IEL)
     !
-    10   FORMAT(/'Line source element ', I4, ' added with #pts ', I5, &
-            ' IP1 ', I5, ' IP2 ', I5)
-    100  FORMAT(A, I5, 4(1X, G13.5))
+    10   FORMAT (/'Line source element ', I4, ' added with #pts ', I5, ' IP1 ', &
+            & I5, ' IP2 ', I5)
+    100  FORMAT (A, I5, 4(1X, G13.5))
     !
     NEL = IEL
     NPTOT = IP2
     !
-    RETURN
-END
+END SUBROUTINE ADDELEM5
+!*==ADDELEM6.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ADDELEM5
 
 
 
 SUBROUTINE ADDELEM6(X, Y, N)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N
+    REAL, DIMENSION(*) :: X, Y
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IEL, IP, IP1, IP2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Add element for rotor source line to panel geometry.
     !     Specified by N points X,Y.
     !     Defined as TYPE=6 element
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION X(*), Y(*)
     !
     !---- add wake to panel geometry
     IP1 = IPLAST(NEL) + 1
     IP2 = IP1 - 1 + N
     IEL = NEL + 1
-    IF(LDBG) THEN
-        WRITE(LUNDBG, 10) IEL, N, IP1, IP2
-    ENDIF
+    IF (LDBG) WRITE (LUNDBG, 10) IEL, N, IP1, IP2
     !
     !---- add points to panel arrays
     DO IP = IP1, IP2
         I = IP - IP1 + 1
         XP(IP) = X(I)
         YP(IP) = Y(I)
-        IF(LDBG) WRITE(LUNDBG, *) IP, XP(IP), YP(IP)
-    END DO
+        IF (LDBG) WRITE (LUNDBG, *) IP, XP(IP), YP(IP)
+    ENDDO
     !---- centroid location
     XPCENT(IEL) = 0.5 * (XP(IP1) + XP(IP2))
     YPCENT(IEL) = 0.5 * (YP(IP1) + YP(IP2))
@@ -1887,17 +2058,48 @@ SUBROUTINE ADDELEM6(X, Y, N)
     NEL = IEL
     NPTOT = IP2
     !
-    10   FORMAT('Rotor source line element ', I4, ' added with #pts ', I5, &
-            ' IP1 ', I5, ' IP2 ', I5)
+    10   FORMAT ('Rotor source line element ', I4, ' added with #pts ', I5, &
+            &' IP1 ', I5, ' IP2 ', I5)
     !
-    RETURN
-END
+END SUBROUTINE ADDELEM6
+!*==DFLOAD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ADDELEM6
 
 
 
 
 SUBROUTINE DFLOAD(FNAMIN, FERROR)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! PARAMETER definitions
+    !
+    INTEGER, PARAMETER :: ITX = 300
+    !
+    ! Dummy arguments
+    !
+    LOGICAL :: FERROR
+    CHARACTER(*) :: FNAMIN
+    !
+    ! Local variables
+    !
+    REAL :: A0, A0DEG, CDMIN, CLDMIN, CLMAX, CLMIN, CMCON, &
+            & DCDCL2, DCDCL2S, DCLDA, DCLDA_STALL, DCL_STALL, &
+            & FILEVERS, MCRIT, REREF, REXP, RPM1, RPM2, TOC, &
+            & XISECT
+    LOGICAL :: ERROR, LOPEN
+    CHARACTER(128) :: FNAME, LINE
+    INTEGER :: I, IB, IBNEXT, ICNT, ID, IEL, IFTYPE, IR, &
+            & IRPN, IT, IV, K, LU, N, NBIN, ND1, NF, &
+            & NINPUT, NR, NRPNIN, NRPNRD, NTEL
+    INTEGER, DIMENSION(NEX) :: NT
+    REAL, DIMENSION(10) :: RINPUT
+    REAL, DIMENSION(ITX, NEX) :: XT, YT
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Reads previously saved duct case data and geometry
     !     from file FNAMIN in DFDC version 0.5 format.  This
@@ -1905,19 +2107,9 @@ SUBROUTINE DFLOAD(FNAMIN, FERROR)
     !     Once read the geometry is processed from buffer to
     !     paneled geometry.
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    CHARACTER*(*)   FNAMIN
-    CHARACTER*128   FNAME
-    CHARACTER*128   IFILE, LINE, FILECB, FILEDCT
-    LOGICAL LOPEN, LREPANEL
-    DIMENSION RINPUT(10)
     !
     !---- local arrays for calling AREAD
-    PARAMETER (ITX = 300)
-    DIMENSION XT(ITX, NEX), YT(ITX, NEX)
-    DIMENSION NT(NEX)
     !
-    LOGICAL ERROR, FERROR
     !
     !---- reset some flags for new dataset
     FERROR = .FALSE.
@@ -1930,7 +2122,7 @@ SUBROUTINE DFLOAD(FNAMIN, FERROR)
         IRTYPE(N) = 0
         NRDEF(N) = 0
         IRTYPDEF(N) = 0
-    END DO
+    ENDDO
     !
     LRSPCDEF = .FALSE.
     LRSPCUSR = .FALSE.
@@ -1941,8 +2133,8 @@ SUBROUTINE DFLOAD(FNAMIN, FERROR)
     LU = 1
     FNAME = FNAMIN
     CALL STRIP(FNAME, NF)
-    IF(FNAME.NE.' ') THEN
-        OPEN(LU, FILE = FNAME, STATUS = 'OLD', ERR = 98)
+    IF (FNAME/=' ') THEN
+        OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 98)
         LOPEN = .TRUE.
     ELSE
         RETURN
@@ -1952,636 +2144,636 @@ SUBROUTINE DFLOAD(FNAMIN, FERROR)
     !
     !---- Read header line and version from DFDC input file
     CALL RDLINE(LU, LINE, ICNT)
-    IF(LINE.EQ.'END' .OR. LINE.EQ.'ERR') GO TO 210
+    IF (LINE=='END' .OR. LINE=='ERR') GOTO 210
     !
-    IF(LINE(1:4).NE.'DFDC') THEN
-        WRITE(*, *) 'Not DFDC input file...may be duct geometry file'
-        CLOSE(LU)
+    IF (LINE(1:4)/='DFDC') THEN
+        WRITE (*, *) 'Not DFDC input file...may be duct geometry file'
+        CLOSE (LU)
         !c        CALL LOADG(FNAME)
         RETURN
     ENDIF
     IV = INDEX(LINE, 'Version')
-    READ(LINE(IV + 8:LEN(LINE)), *) FILEVERS
-    WRITE(*, 1005) FILEVERS
+    READ (LINE(IV + 8:LEN(LINE)), *) FILEVERS
+    WRITE (*, 1005) FILEVERS
     !
-    1000 FORMAT(A)
-    1005 FORMAT(/, ' Reading file from DFDC Version ', E8.2)
-    1010 FORMAT(' File  ', A, ' not found'/)
-    1020 FORMAT(' File  ', A, ' has incompatible format'/&
-            ' Loading not completed'/)
-    1025 FORMAT(' Case Name: ', A)
+    1000 FORMAT (A)
+    1005 FORMAT (/, ' Reading file from DFDC Version ', E8.2)
+    1010 FORMAT (' File  ', A, ' not found'/)
+    1020 FORMAT (' File  ', A, &
+            &' has incompatible format'/' Loading not completed'/)
+    1025 FORMAT (' Case Name: ', A)
     !
     !
     !--- Get Case title from line #2
     CALL RDLINE(LU, LINE, ICNT)
-    IF(LINE.EQ.'END' .OR. LINE.EQ.'ERR') GO TO 210
+    IF (LINE=='END' .OR. LINE=='ERR') GOTO 210
     NAME = LINE
     CALL STRIP(NAME, NNAME)
     !
-    WRITE(*, 1025) NAME
-    !
-    !-----------------------------------------------------
-    !--- Main loop to find keywords and start read actions
-    !    for data groups
-    10   CALL RDLINE(LU, LINE, ICNT)
-    IF(LINE.EQ.'END') THEN
-        GO TO 110
-    ELSEIF(LINE.EQ.'ERR') THEN
-        GO TO 210
+    WRITE (*, 1025) NAME
+    DO
         !
-        !
-        !---- OPER data
-    ELSEIF(INDEX(LINE, 'OPER').NE.0) THEN
+        !-----------------------------------------------------
+        !--- Main loop to find keywords and start read actions
+        !    for data groups
         CALL RDLINE(LU, LINE, ICNT)
-        !c        READ(LINE,*,ERR=210) QINF,QREF,RPM
-        NINPUT = 4
-        CALL GETFLT(LINE, RINPUT, NINPUT, ERROR)
-        IF(NINPUT.GE.4) THEN
-            QINF = RINPUT(1)
-            QREF = RINPUT(2)
-            RPM1 = RINPUT(3)
-            RPM2 = RINPUT(4)
-        ELSEIF(NINPUT.GE.3) THEN
-            QINF = RINPUT(1)
-            QREF = RINPUT(2)
-            RPM1 = RINPUT(3)
-            RPM2 = 0.0
-        ELSEIF(NINPUT.GE.2) THEN
-            QINF = RINPUT(1)
-            QREF = RINPUT(2)
-            RPM1 = 0.0
-            RPM2 = 0.0
-        ENDIF
-        !
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) RHO, VSO, RMU, ALTH
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) XDWKLEN, NWAKE
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) LWRLX
-        CALL RDLINE(LU, LINE, ICNT)
-        IF(INDEX(LINE, 'ENDOPER').NE.0) THEN
-            WRITE(*, 1030)QINF, QREF, RPM1, RPM2, RHO, VSO, RMU, ALTH, &
-                    XDWKLEN, NWAKE
-        ELSE
-            WRITE(*, *) 'No ENDOPER to OPER section'
-            STOP
-        ENDIF
-        !
-        1030   FORMAT(' OPER data read from file', /, &
-                '  Qinf   = ', F9.3, 5X, 'Qref   = ', F9.3, /, &
-                '  RPM1   = ', F9.1, 5X, 'RPM2   = ', F9.1, /, &
-                '  Rho    = ', F9.5, 5X, 'VSound = ', F9.3, /, &
-                '  rMU    = ', E9.3, 5X, 'Alt    = ', F9.5, /, &
-                '  Xdwake = ', F9.5, 5X, 'Nwake  = ', I6)
-        !
-        !---- Input RPM's set speed of disks
-        OMEGA(1) = PI * RPM1 / 30.0
-        OMEGA(2) = PI * RPM2 / 30.0
-        IF(RHO.EQ.0.0 .OR. VSO.EQ.0.0 .OR. RMU.EQ.0.0) THEN
-            DELTAT = 0.0
-            CALL ATMO(ALTH, DELTAT, VSO, RHO, RMU)
-        ENDIF
-        !
-        !
-        !---- AERO data
-    ELSEIF(INDEX(LINE, 'AERO').NE.0) THEN
-        !--- Read aero section definitions
-        NR = NROTOR + 1
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) NAERO(NR)
-        DO N = 1, NAERO(NR)
+        IF (LINE=='END') THEN
+            !
+            !------------------------------------------------------------------------
+            NBEL = NTEL
+            !
+            !---- Process airfoil inputs for CB and duct
+            !---- put element-indexed coordinates XT,YT into linear bufffer airfoil
+            !     geometry arrays XB,YB
+            IBNEXT = 1
+            DO IEL = 1, NBEL
+                !------ first point in element IEL
+                IBFRST(IEL) = IBNEXT
+                !------ initalize accumulation counter
+                IB = IBFRST(IEL) - 1
+                !------ go over all points on element IEL
+                IF (LDBG) WRITE (LUNDBG, *) 'Airfoil element'
+                DO IT = 1, NT(IEL)
+                    IB = IB + 1
+                    IF (IB>IBX) STOP 'LOAD: Array overflow on IBX'
+                    XB(IB) = XT(IT, IEL)
+                    YB(IB) = YT(IT, IEL)
+                    IF (LDBG) WRITE (LUNDBG, *) IT, XT(IT, IEL), &
+                            & YT(IT, IEL)
+                ENDDO
+                !---- set buffer airfoils to NBTYPE=0
+                NBTYPE(IEL) = 0
+                IBLAST(IEL) = IB
+                IBNEXT = IB + 1
+            ENDDO
+            !---- set total number of points in buffer geometry
+            NBTOT = IBLAST(NBEL)
+            !
+            !
+            !=======================================================================
+            !---- If panel spacing data is not in case file try reading explicitly
+            !     from xxx.pan paneling input file
+            IF (.NOT.LRSPCDEF) THEN
+                !---- get file prefix (if it has a .xxx suffix)
+                K = INDEX(FNAME, '.') - 1
+                IF (K<=0) THEN
+                    !----- no "." prefix/suffix separator
+                    !      just tack on ".pan" to full filename
+                    CALL STRIP(FNAME, NF)
+                    K = NF
+                ENDIF
+                PREFIX = FNAME(1:K)
+                NPREFIX = K
+                PFILE = PREFIX(1:NPREFIX) // '.pan'
+                CALL PANGET(PFILE, ERROR)
+                !
+                IF (ERROR) THEN
+                    WRITE (*, 2100) PFILE(1:K + 4)
+                ELSE
+                    WRITE (*, 2110) PFILE(1:K + 4)
+                ENDIF
+            ENDIF
+            !
+            2100       FORMAT (' No repaneling parameters from file ', A)
+            2110       FORMAT (' Repaneling parameters from file ', A)
+
+            !
+            !=======================================================================
+            !---- process current buffer geometry to identify element types and
+            !     set element parameters
+            CALL GEPROC
+            IF (LDBG) CALL GEPRINT(LUNDBG)
+            !
+            !---- process buffer foil geometry and set up paneled geometry and grid
+            !c    CALL GENGEOM
+            !
+            !---- take note of new case
+            LLOAD = .TRUE.
+            DO I = 1, NROTOR
+                LBBLOFT(I) = .FALSE.
+            ENDDO
+            GOTO 300
+        ELSEIF (LINE=='ERR') THEN
+            GOTO 210
+            !
+            !
+            !---- OPER data
+        ELSEIF (INDEX(LINE, 'OPER')/=0) THEN
             CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) XISECT
-            CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) A0DEG, DCLDA, CLMAX, CLMIN
-            CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) DCLDA_STALL, DCL_STALL, CMCON, MCRIT
-            CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) CDMIN, CLDMIN, DCDCL2
-            CALL RDLINE(LU, LINE, ICNT)
-            !c          READ(LINE,*,ERR=210) REREF,REXP
+            !c        READ(LINE,*,ERR=210) QINF,QREF,RPM
             NINPUT = 4
             CALL GETFLT(LINE, RINPUT, NINPUT, ERROR)
-            IF(NINPUT.GE.4) THEN
-                REREF = RINPUT(1)
-                REXP = RINPUT(2)
-                TOC = RINPUT(3)
-                DCDCL2S = RINPUT(4)
-            ELSEIF(NINPUT.GE.3) THEN
-                REREF = RINPUT(1)
-
-                REXP = RINPUT(2)
-                TOC = RINPUT(3)
-                DCDCL2S = 0.020
-            ELSEIF(NINPUT.GE.2) THEN
-                REREF = RINPUT(1)
-                REXP = RINPUT(2)
-                TOC = 0.1
-                DCDCL2S = 0.020
+            IF (NINPUT>=4) THEN
+                QINF = RINPUT(1)
+                QREF = RINPUT(2)
+                RPM1 = RINPUT(3)
+                RPM2 = RINPUT(4)
+            ELSEIF (NINPUT>=3) THEN
+                QINF = RINPUT(1)
+                QREF = RINPUT(2)
+                RPM1 = RINPUT(3)
+                RPM2 = 0.0
+            ELSEIF (NINPUT>=2) THEN
+                QINF = RINPUT(1)
+                QREF = RINPUT(2)
+                RPM1 = 0.0
+                RPM2 = 0.0
             ENDIF
-            A0 = A0DEG * DTR
-            CALL PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
-                    DCLDA, DCLDA_STALL, DCL_STALL, &
-                    CDMIN, CLDMIN, DCDCL2, DCDCL2S, &
-                    CMCON, MCRIT, TOC, REREF, REXP)
-        END DO
-        CALL RDLINE(LU, LINE, ICNT)
-        IF(INDEX(LINE, 'ENDAERO').NE.0) THEN
-            WRITE(*, 2010) NR, NAERO(NR)
-        ELSE
-            WRITE(*, *) 'No ENDAERO to AERO section'
-            STOP
-        ENDIF
-        !
-        2010 FORMAT(/, ' AERO data read for Disk', I2, ': ', I3, ' sections')
-        !
-        !
-        !---- ROTOR data
-    ELSEIF(INDEX(LINE, 'ROTOR').NE.0) THEN
-        NR = NROTOR + 1
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) XDISK(NR), NRBLD(NR), NRSTA
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) NRDEF(NR)
-        !--- Get rotor definition data
-        DO IR = 1, NRDEF(NR)
-            CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, END = 210, ERR = 210) YRDEF(IR, NR), CHRDEF(IR, NR), &
-                    BETADEF(IR, NR)
-        END DO
-        !
-        13     CALL RDLINE(LU, LINE, ICNT)
-        IF(INDEX(LINE, 'ENDROTOR').NE.0) THEN
-            WRITE(*, 2020) XDISK(NR), NRBLD(NR), NRSTA
-            IF(NRDEF(NR).GE.2) THEN
-                WRITE(*, 2030) NRDEF(NR)
-                DO IR = 1, NRDEF(NR)
-                    WRITE(*, 15) YRDEF(IR, NR), CHRDEF(IR, NR), BETADEF(IR, NR)
-                    BETADEF(IR, NR) = BETADEF(IR, NR) * DTR
-                END DO
-                15        FORMAT(1X, F12.6, 2X, F12.6, 4X, F12.6)
-                IRTYPDEF(NR) = 2
-                NROTOR = NR
-            ELSE
-                WRITE(*, *) 'Rotor blade defined by too few stations'
-            ENDIF
-        ELSE
-            WRITE(*, *) 'No ENDROTOR found'
-            STOP
-        ENDIF
-        !
-        2020 FORMAT(/, &
-                ' ROTOR data read from file', /, &
-                '  XDisk: ', F5.3, '   Blades:', I2, '   Rotor pnts:', I3)
-        2030 FORMAT(&
-                '  Rotor blade defined with', I3, ' points', /, &
-                '         R            CH            Beta')
-        !
-        !
-        !---- ACTDISK data
-    ELSEIF(INDEX(LINE, 'ACTDISK').NE.0) THEN
-        NR = NROTOR + 1
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) XDISK(NR), NRSTA
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) NRDEF(NR)
-        !--- Get actuator disk definition data
-        DO IR = 1, NRDEF(NR)
-            CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, END = 210, ERR = 210) YRDEF(IR, NR), BGAMDEF(IR, NR)
-        END DO
-        !
-        18     CALL RDLINE(LU, LINE, ICNT)
-        IF(INDEX(LINE, 'ENDACTDISK').NE.0) THEN
-            WRITE(*, 2040) XDISK(NR), NRSTA
-            IF(NRDEF(NR).GE.2) THEN
-                WRITE(*, 2050) NRDEF(NR)
-                DO IR = 1, NRDEF(NR)
-                    WRITE(*, 15) YRDEF(IR, NR), BGAMDEF(IR, NR)
-                END DO
-                IRTYPDEF(NR) = 1
-                NROTOR = NR
-            ELSE
-                WRITE(*, *) 'Actuator disk defined by too few stations'
-            ENDIF
-        ELSE
-            WRITE(*, *) 'No ENDACTDISK found'
-            STOP
-        ENDIF
-        !
-        2040 FORMAT(/, &
-                ' ACTDISK data read from file', /, &
-                '  XDisk: ', F5.3, '   Rotor points:', I3)
-        2050 FORMAT(&
-                '  Actuator Disk defined with', I3, ' points', /, &
-                '         R           BGAM')
-        !
-        !
-        !---- DRAGOBJ data
-    ELSEIF(INDEX(LINE, 'DRAGOBJ').NE.0) THEN
-        ND1 = NDOBJ + 1
-        IF(ND1.GT.NDRGX) THEN
-            WRITE(*, *) 'Number of drag objects exceeds dimension NDGX'
-        ELSE
-            CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) NDDEF(ND1)
-            !--- Get drag object definition data
-            DO ID = 1, NDDEF(ND1)
-                CALL RDLINE(LU, LINE, ICNT)
-                READ(LINE, *, END = 210, ERR = 210) XDDEF(ID, ND1), YDDEF(ID, ND1), &
-                        CDADEF(ID, ND1)
-            END DO
             !
-            19      CALL RDLINE(LU, LINE, ICNT)
-            IF(INDEX(LINE, 'ENDDRAGOBJ').NE.0) THEN
-                NDOBJ = ND1
-                WRITE(*, 2060) ND1
-                IF(NDDEF(ND1).GE.2) THEN
-                    WRITE(*, 2070) NDDEF(ND1)
-                    DO ID = 1, NDDEF(ND1)
-                        WRITE(*, 15) XDDEF(ID, ND1), YDDEF(ID, ND1), CDADEF(ID, ND1)
-                    END DO
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) RHO, VSO, RMU, ALTH
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) XDWKLEN, NWAKE
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) LWRLX
+            CALL RDLINE(LU, LINE, ICNT)
+            IF (INDEX(LINE, 'ENDOPER')/=0) THEN
+                WRITE (*, 1030) QINF, QREF, RPM1, RPM2, RHO, VSO, &
+                        & RMU, ALTH, XDWKLEN, NWAKE
+            ELSE
+                WRITE (*, *) 'No ENDOPER to OPER section'
+                STOP
+            ENDIF
+            !
+            1030       FORMAT (' OPER data read from file', /, '  Qinf   = ', F9.3, 5X, &
+                    &'Qref   = ', F9.3, /, '  RPM1   = ', F9.1, 5X, &
+                    & 'RPM2   = ', F9.1, /, '  Rho    = ', F9.5, 5X, &
+                    & 'VSound = ', F9.3, /, '  rMU    = ', E9.3, 5X, &
+                    & 'Alt    = ', F9.5, /, '  Xdwake = ', F9.5, 5X, &
+                    & 'Nwake  = ', I6)
+            !
+            !---- Input RPM's set speed of disks
+            OMEGA(1) = PI * RPM1 / 30.0
+            OMEGA(2) = PI * RPM2 / 30.0
+            IF (RHO==0.0 .OR. VSO==0.0 .OR. RMU==0.0) THEN
+                DELTAT = 0.0
+                CALL ATMO(ALTH, DELTAT, VSO, RHO, RMU)
+            ENDIF
+            !
+            !
+            !---- AERO data
+        ELSEIF (INDEX(LINE, 'AERO')/=0) THEN
+            !--- Read aero section definitions
+            NR = NROTOR + 1
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) NAERO(NR)
+            DO N = 1, NAERO(NR)
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) XISECT
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) A0DEG, DCLDA, CLMAX, CLMIN
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) DCLDA_STALL, DCL_STALL, CMCON, &
+                        & MCRIT
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) CDMIN, CLDMIN, DCDCL2
+                CALL RDLINE(LU, LINE, ICNT)
+                !c          READ(LINE,*,ERR=210) REREF,REXP
+                NINPUT = 4
+                CALL GETFLT(LINE, RINPUT, NINPUT, ERROR)
+                IF (NINPUT>=4) THEN
+                    REREF = RINPUT(1)
+                    REXP = RINPUT(2)
+                    TOC = RINPUT(3)
+                    DCDCL2S = RINPUT(4)
+                ELSEIF (NINPUT>=3) THEN
+                    REREF = RINPUT(1)
+
+                    REXP = RINPUT(2)
+                    TOC = RINPUT(3)
+                    DCDCL2S = 0.020
+                ELSEIF (NINPUT>=2) THEN
+                    REREF = RINPUT(1)
+                    REXP = RINPUT(2)
+                    TOC = 0.1
+                    DCDCL2S = 0.020
+                ENDIF
+                A0 = A0DEG * DTR
+                CALL PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, &
+                        & DCLDA_STALL, DCL_STALL, CDMIN, CLDMIN, DCDCL2, &
+                        & DCDCL2S, CMCON, MCRIT, TOC, REREF, REXP)
+            ENDDO
+            CALL RDLINE(LU, LINE, ICNT)
+            IF (INDEX(LINE, 'ENDAERO')/=0) THEN
+                WRITE (*, 2010) NR, NAERO(NR)
+            ELSE
+                WRITE (*, *) 'No ENDAERO to AERO section'
+                STOP
+            ENDIF
+            !
+            2010       FORMAT (/, ' AERO data read for Disk', I2, ': ', I3, ' sections')
+            !
+            !
+            !---- ROTOR data
+        ELSEIF (INDEX(LINE, 'ROTOR')/=0) THEN
+            NR = NROTOR + 1
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) XDISK(NR), NRBLD(NR), NRSTA
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) NRDEF(NR)
+            !--- Get rotor definition data
+            DO IR = 1, NRDEF(NR)
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, END = 210, ERR = 210) YRDEF(IR, NR), &
+                        & CHRDEF(IR, NR), BETADEF(IR, NR)
+            ENDDO
+            !
+            CALL RDLINE(LU, LINE, ICNT)
+            IF (INDEX(LINE, 'ENDROTOR')/=0) THEN
+                WRITE (*, 2020) XDISK(NR), NRBLD(NR), NRSTA
+                IF (NRDEF(NR)>=2) THEN
+                    WRITE (*, 2030) NRDEF(NR)
+                    DO IR = 1, NRDEF(NR)
+                        WRITE (*, 15) YRDEF(IR, NR), CHRDEF(IR, NR), &
+                                & BETADEF(IR, NR)
+                        BETADEF(IR, NR) = BETADEF(IR, NR) * DTR
+                    ENDDO
+                    15               FORMAT (1X, F12.6, 2X, F12.6, 4X, F12.6)
+                    IRTYPDEF(NR) = 2
+                    NROTOR = NR
                 ELSE
-                    WRITE(*, *) 'Drag object defined by too few stations'
+                    WRITE (*, *) 'Rotor blade defined by too few stations'
                 ENDIF
             ELSE
-                WRITE(*, *) 'No ENDDRAGOBJ found'
+                WRITE (*, *) 'No ENDROTOR found'
                 STOP
-            ENDIF ! ENDDRAGOBJ check
+            ENDIF
             !
-        ENDIF ! NDRGX check
-        !
-        2060 FORMAT(/, ' DRAGOBJ ', I2, '  read from file')
-        2070 FORMAT(&
-                '  Drag object defined with', I3, ' points', /, &
-                '         X             R              CDA')
-        !
-        !
-        !---- GEOM data (CB and duct coordinates in a single XFOIL multi-element file)
-    ELSEIF(INDEX(LINE, 'GEOM').NE.0) THEN
-        !
-        !---- Read the combined CB and duct airfoil file
-        !
-        CALL AREADNR(LU, ITX, NEX, XT, YT, &
-                NT, NTEL, &
-                ANAME, ISPARS, IFTYPE)
-        IF(IFTYPE.EQ.0 .OR. NTEL.NE.2) THEN
-            !----- read error occurred for two elements
-            WRITE(*, 2080) NTEL
-            STOP
-        ENDIF
-        !
-        2080 FORMAT(&
-                ' Error reading GEOM data', /, &
-                ' Coordinates read for', I2, ' foils')
-        !
-        !---- User-defined respacing specs
-        !---- PANE data (respacing data for surface points
-    ELSEIF(INDEX(LINE, 'PANE').NE.0) THEN
-        CALL RDLINE(LU, LINE, ICNT)
-        READ(LINE, *, ERR = 210) NBIN, NRPNIN
-        NRPNRD = MIN(NRPNIN, NRPNX)
-        DO IEL = 1, NBIN
+            2020       FORMAT (/, ' ROTOR data read from file', /, '  XDisk: ', F5.3, &
+                    &'   Blades:', I2, '   Rotor pnts:', I3)
+            2030       FORMAT ('  Rotor blade defined with', I3, ' points', /, &
+                    &'         R            CH            Beta')
+            !
+            !
+            !---- ACTDISK data
+        ELSEIF (INDEX(LINE, 'ACTDISK')/=0) THEN
+            NR = NROTOR + 1
             CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) NPAN(IEL)
+            READ (LINE, *, ERR = 210) XDISK(NR), NRSTA
             CALL RDLINE(LU, LINE, ICNT)
-            READ(LINE, *, ERR = 210) CVEX(IEL), SMOF(IEL), &
-                    FSLE(IEL), FSTE(IEL)
-            DO IRPN = 1, NRPNRD
+            READ (LINE, *, ERR = 210) NRDEF(NR)
+            !--- Get actuator disk definition data
+            DO IR = 1, NRDEF(NR)
                 CALL RDLINE(LU, LINE, ICNT)
-                READ(LINE, *, ERR = 210) SRPN1(IRPN, IEL), &
-                        SRPN2(IRPN, IEL), &
-                        CRRAT(IRPN, IEL)
+                READ (LINE, *, END = 210, ERR = 210) YRDEF(IR, NR), &
+                        & BGAMDEF(IR, NR)
             ENDDO
-        ENDDO
-        CALL RDLINE(LU, LINE, ICNT)
-        IF(INDEX(LINE, 'ENDPANE').NE.0) THEN
-            WRITE(*, 2090) NBIN
-            LRSPCDEF = .TRUE.
-            LRSPCUSR = .TRUE.
+            !
+            CALL RDLINE(LU, LINE, ICNT)
+            IF (INDEX(LINE, 'ENDACTDISK')/=0) THEN
+                WRITE (*, 2040) XDISK(NR), NRSTA
+                IF (NRDEF(NR)>=2) THEN
+                    WRITE (*, 2050) NRDEF(NR)
+                    DO IR = 1, NRDEF(NR)
+                        WRITE (*, 15) YRDEF(IR, NR), BGAMDEF(IR, NR)
+                    ENDDO
+                    IRTYPDEF(NR) = 1
+                    NROTOR = NR
+                ELSE
+                    WRITE (*, *)                                           &
+                            &'Actuator disk defined by too few stations'
+                ENDIF
+            ELSE
+                WRITE (*, *) 'No ENDACTDISK found'
+                STOP
+            ENDIF
+            !
+            2040       FORMAT (/, ' ACTDISK data read from file', /, '  XDisk: ', F5.3, &
+                    &'   Rotor points:', I3)
+            2050       FORMAT ('  Actuator Disk defined with', I3, ' points', /, &
+                    &'         R           BGAM')
+            !
+            !
+            !---- DRAGOBJ data
+        ELSEIF (INDEX(LINE, 'DRAGOBJ')/=0) THEN
+            ND1 = NDOBJ + 1
+            IF (ND1>NDRGX) THEN
+                WRITE (*, *)                                              &
+                        &'Number of drag objects exceeds dimension NDGX'
+            ELSE
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) NDDEF(ND1)
+                !--- Get drag object definition data
+                DO ID = 1, NDDEF(ND1)
+                    CALL RDLINE(LU, LINE, ICNT)
+                    READ (LINE, *, END = 210, ERR = 210) XDDEF(ID, ND1), &
+                            & YDDEF(ID, ND1), CDADEF(ID, ND1)
+                ENDDO
+                !
+                CALL RDLINE(LU, LINE, ICNT)
+                IF (INDEX(LINE, 'ENDDRAGOBJ')/=0) THEN
+                    NDOBJ = ND1
+                    WRITE (*, 2060) ND1
+                    IF (NDDEF(ND1)>=2) THEN
+                        WRITE (*, 2070) NDDEF(ND1)
+                        DO ID = 1, NDDEF(ND1)
+                            WRITE (*, 15) XDDEF(ID, ND1), YDDEF(ID, ND1), &
+                                    & CDADEF(ID, ND1)
+                        ENDDO
+                    ELSE
+                        WRITE (*, *)                                        &
+                                &'Drag object defined by too few stations'
+                    ENDIF
+                ELSE
+                    WRITE (*, *) 'No ENDDRAGOBJ found'
+                    STOP
+                ENDIF
+                ! ENDDRAGOBJ check
+                !
+            ENDIF
+            ! NDRGX check
+            !
+            2060       FORMAT (/, ' DRAGOBJ ', I2, '  read from file')
+            2070       FORMAT ('  Drag object defined with', I3, ' points', /, &
+                    &'         X             R              CDA')
+            !
+            !
+            !---- GEOM data (CB and duct coordinates in a single XFOIL multi-element file)
+        ELSEIF (INDEX(LINE, 'GEOM')/=0) THEN
+            !
+            !---- Read the combined CB and duct airfoil file
+            !
+            CALL AREADNR(LU, ITX, NEX, XT, YT, NT, NTEL, ANAME, ISPARS, IFTYPE)
+            IF (IFTYPE==0 .OR. NTEL/=2) THEN
+                !----- read error occurred for two elements
+                WRITE (*, 2080) NTEL
+                STOP
+            ENDIF
+            !
+            2080       FORMAT (' Error reading GEOM data', /, &
+                    & ' Coordinates read for', I2, ' foils')
+            !
+            !---- User-defined respacing specs
+            !---- PANE data (respacing data for surface points
+        ELSEIF (INDEX(LINE, 'PANE')/=0) THEN
+            CALL RDLINE(LU, LINE, ICNT)
+            READ (LINE, *, ERR = 210) NBIN, NRPNIN
+            NRPNRD = MIN(NRPNIN, NRPNX)
+            DO IEL = 1, NBIN
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) NPAN(IEL)
+                CALL RDLINE(LU, LINE, ICNT)
+                READ (LINE, *, ERR = 210) CVEX(IEL), SMOF(IEL), FSLE(IEL), &
+                        & FSTE(IEL)
+                DO IRPN = 1, NRPNRD
+                    CALL RDLINE(LU, LINE, ICNT)
+                    READ (LINE, *, ERR = 210) SRPN1(IRPN, IEL), &
+                            & SRPN2(IRPN, IEL), &
+                            & CRRAT(IRPN, IEL)
+                ENDDO
+            ENDDO
+            CALL RDLINE(LU, LINE, ICNT)
+            IF (INDEX(LINE, 'ENDPANE')/=0) THEN
+                WRITE (*, 2090) NBIN
+                LRSPCDEF = .TRUE.
+                LRSPCUSR = .TRUE.
+            ENDIF
+            !
         ENDIF
         !
-    ENDIF
-    GO TO 10
-    !
-    2090 FORMAT(' PANELING for', I2, ' elements read from file')
-    !
-    !------------------------------------------------------------------------
-    110  CONTINUE
-    NBEL = NTEL
-    !
-    !---- Process airfoil inputs for CB and duct
-    !---- put element-indexed coordinates XT,YT into linear bufffer airfoil
-    !     geometry arrays XB,YB
-    IBNEXT = 1
-    DO IEL = 1, NBEL
-        !------ first point in element IEL
-        IBFRST(IEL) = IBNEXT
-        !------ initalize accumulation counter
-        IB = IBFRST(IEL) - 1
-        !------ go over all points on element IEL
-        IF(LDBG) WRITE(LUNDBG, *) 'Airfoil element'
-        DO IT = 1, NT(IEL)
-            IB = IB + 1
-            IF(IB.GT.IBX) STOP 'LOAD: Array overflow on IBX'
-            XB(IB) = XT(IT, IEL)
-            YB(IB) = YT(IT, IEL)
-            IF(LDBG) WRITE(LUNDBG, *) IT, XT(IT, IEL), YT(IT, IEL)
-        ENDDO
-        !---- set buffer airfoils to NBTYPE=0
-        NBTYPE(IEL) = 0
-        IBLAST(IEL) = IB
-        IBNEXT = IB + 1
-    END DO
-    !---- set total number of points in buffer geometry
-    NBTOT = IBLAST(NBEL)
-    !
-    !
-    !=======================================================================
-    !---- If panel spacing data is not in case file try reading explicitly
-    !     from xxx.pan paneling input file
-    IF(.NOT.LRSPCDEF) THEN
-        !---- get file prefix (if it has a .xxx suffix)
-        K = INDEX(FNAME, '.') - 1
-        IF(K.LE.0) THEN
-            !----- no "." prefix/suffix separator
-            !      just tack on ".pan" to full filename
-            CALL STRIP(FNAME, NF)
-            K = NF
-        ENDIF
-        PREFIX = FNAME(1:K)
-        NPREFIX = K
-        PFILE = PREFIX(1:NPREFIX) // '.pan'
-        CALL PANGET(PFILE, ERROR)
-        !
-        IF(ERROR) THEN
-            WRITE(*, 2100) PFILE(1:K + 4)
-        ELSE
-            WRITE(*, 2110) PFILE(1:K + 4)
-        ENDIF
-    ENDIF
-    !
-    2100 FORMAT(' No repaneling parameters from file ', A)
-    2110 FORMAT(' Repaneling parameters from file ', A)
-
-    !
-    !=======================================================================
-    !---- process current buffer geometry to identify element types and
-    !     set element parameters
-    CALL GEPROC
-    IF(LDBG) THEN
-        CALL GEPRINT(LUNDBG)
-    ENDIF
-    !
-    !---- process buffer foil geometry and set up paneled geometry and grid
-    !c    CALL GENGEOM
-    !
-    !---- take note of new case
-    LLOAD = .TRUE.
-    DO I = 1, NROTOR
-        LBBLOFT(I) = .FALSE.
+        2090    FORMAT (' PANELING for', I2, ' elements read from file')
     ENDDO
-    GO TO 300
     !...............................................................
-    98 CONTINUE
-    WRITE(*, 1050) FNAME(1:NF)
+    98   WRITE (*, 1050) FNAME(1:NF)
     FERROR = .TRUE.
-    GO TO 300
+    GOTO 300
     !
-    99 CONTINUE
-    WRITE(*, 1100) FNAME(1:NF)
+    WRITE (*, 1100) FNAME(1:NF)
     FERROR = .TRUE.
-    GO TO 300
+    GOTO 300
     !
-    210  CONTINUE
-    WRITE(*, 1150) ICNT, FNAME(1:NF)
+    210  WRITE (*, 1150) ICNT, FNAME(1:NF)
     FERROR = .TRUE.
     !
-    1050 FORMAT(/' File OPEN error:  ', A)
-    1100 FORMAT(/' File READ error:  ', A)
-    1150 FORMAT(/' File READ error on line ', I3, ':  ', A)
+    1050 FORMAT (/' File OPEN error:  ', A)
+    1100 FORMAT (/' File READ error:  ', A)
+    1150 FORMAT (/' File READ error on line ', I3, ':  ', A)
     !
     !---- close file
-    300  IF(LOPEN) CLOSE(LU)
-    RETURN
-END
+    300  IF (LOPEN) CLOSE (LU)
+END SUBROUTINE DFLOAD
+!*==DFSAVE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! DFLOAD
 
 
 
 SUBROUTINE DFSAVE(FNAMEIN)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    CHARACTER(*) :: FNAMEIN
+    !
+    ! Local variables
+    !
+    REAL :: A0, A0DEG, BETADEG, CDMIN, CLDMIN, CLMAX, CLMIN, &
+            & CMCON, DCDCL2, DCDCL2S, DCLDA, DCLDA_STALL, &
+            & DCL_STALL, MCRIT, REREF, REXP, RPM1, RPM2, TOC, &
+            & XISECT
+    CHARACTER(1) :: ANS
+    CHARACTER(80) :: FBLNK
+    CHARACTER(128) :: FNAME
+    INTEGER :: I, IEL, IFTYPE, IRPN, LU, N, NELSAV, NF, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------------------------------
     !     Save rotor and operating state in DFDC Version 0.5 format
     !     This format saves data in groups delimited by keywords
     !     to separate data
     !--------------------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    CHARACTER*(*) FNAMEIN
-    CHARACTER ANS*1, FNAME*128, FBLNK*80
     !
     LU = 2
     FNAME = FNAMEIN
     CALL STRIP(FNAME, NF)
     !
-    IF(FNAME(1:1) .EQ. ' ') THEN
-        CALL ASKS('Enter filename^', FNAME)
-    ENDIF
-    OPEN(LU, FILE = FNAME, STATUS = 'OLD', ERR = 5)
-    WRITE(*, *)
-    WRITE(*, *) 'Output file exists.  Overwrite?  Y'
+    IF (FNAME(1:1)==' ') CALL ASKS('Enter filename^', FNAME)
+    OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 5)
+    WRITE (*, *)
+    WRITE (*, *) 'Output file exists.  Overwrite?  Y'
     READ (*, 1000) ANS
-    IF(INDEX('Nn', ANS).EQ.0) GO TO 6
+    IF (INDEX('Nn', ANS)==0) GOTO 6
     !
-    CLOSE(LU)
-    WRITE(*, *) 'Current duct case not saved.'
+    CLOSE (LU)
+    WRITE (*, *) 'Current duct case not saved.'
     RETURN
     !
-    5    OPEN(LU, FILE = FNAME, STATUS = 'NEW', ERR = 90)
-    6    REWIND(LU)
+    5    OPEN (LU, FILE = FNAME, STATUS = 'NEW', ERR = 90)
+    6    REWIND (LU)
     !
     !
     !--- Version header and case name
-    IF(NAME.EQ.' ') NAME = 'Saved ducted fan'
-    WRITE(LU, 1100) VERSION, NAME
+    IF (NAME==' ') NAME = 'Saved ducted fan'
+    WRITE (LU, 1100) VERSION, NAME
     !
     !--- OPER data
     !
-    IF(NROTOR.LT.2) OMEGA(2) = 0.
+    IF (NROTOR<2) OMEGA(2) = 0.
     !
     !--- Velocity, reference velocity and RPM
-    WRITE(LU, 1102)
+    WRITE (LU, 1102)
     RPM1 = 30.0 * OMEGA(1) / PI
     RPM2 = 30.0 * OMEGA(2) / PI
-    WRITE(LU, 1200) QINF, QREF, RPM1, RPM2
+    WRITE (LU, 1200) QINF, QREF, RPM1, RPM2
     !--- Altitude and atmospheric data
-    WRITE(LU, 1103)
-    WRITE(LU, 1200) RHO, VSO, RMU, ALTH
+    WRITE (LU, 1103)
+    WRITE (LU, 1200) RHO, VSO, RMU, ALTH
     !--- XDwake, #wake points
-    WRITE(LU, 1104)
-    WRITE(LU, 1202) XDWKLEN, NWAKE
+    WRITE (LU, 1104)
+    WRITE (LU, 1202) XDWKLEN, NWAKE
     !--- Wake relaxation flag
-    WRITE(LU, 1105)
-    WRITE(LU, 1204) LWRLX
-    WRITE(LU, 1106)
+    WRITE (LU, 1105)
+    WRITE (LU, 1204) LWRLX
+    WRITE (LU, 1106)
     !
     !--- Save data for each disk (act disk or bladed)
     DO NR = 1, NROTOR
         !
         !--- AERO data
         !--- Save aero data for defined aero sections
-        WRITE(LU, 1108) NAERO(NR)
+        WRITE (LU, 1108) NAERO(NR)
         DO N = 1, NAERO(NR)
-            CALL GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
-                    DCLDA, DCLDA_STALL, DCL_STALL, &
-                    CDMIN, CLDMIN, DCDCL2, DCDCL2S, &
-                    CMCON, MCRIT, TOC, REREF, REXP)
-            WRITE(LU, 1200) XISECT
+            CALL GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
+                    & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
+                    & MCRIT, TOC, REREF, REXP)
+            WRITE (LU, 1200) XISECT
             A0DEG = A0 * 180.0 / PI
-            WRITE(LU, 1109)
-            WRITE(LU, 1200) A0DEG, DCLDA, CLMAX, CLMIN
-            WRITE(LU, 1110)
-            WRITE(LU, 1200) DCLDA_STALL, DCL_STALL, CMCON, MCRIT
-            WRITE(LU, 1111)
-            WRITE(LU, 1200) CDMIN, CLDMIN, DCDCL2
-            WRITE(LU, 1112)
-            WRITE(LU, 1200) REREF, REXP, TOC, DCDCL2S
-        END DO
-        WRITE(LU, 1113)
+            WRITE (LU, 1109)
+            WRITE (LU, 1200) A0DEG, DCLDA, CLMAX, CLMIN
+            WRITE (LU, 1110)
+            WRITE (LU, 1200) DCLDA_STALL, DCL_STALL, CMCON, MCRIT
+            WRITE (LU, 1111)
+            WRITE (LU, 1200) CDMIN, CLDMIN, DCDCL2
+            WRITE (LU, 1112)
+            WRITE (LU, 1200) REREF, REXP, TOC, DCDCL2S
+        ENDDO
+        WRITE (LU, 1113)
         !
         !--- Save rotor blade if defined
-        IF(IRTYPE(NR).EQ.2) THEN
-            WRITE(LU, 1130)
+        IF (IRTYPE(NR)==2) THEN
+            WRITE (LU, 1130)
             !--- Rotor axial location, #blades, #radial stations
-            WRITE(LU, 1202) XDISK(NR), NRBLD(NR), NRSTA
+            WRITE (LU, 1202) XDISK(NR), NRBLD(NR), NRSTA
             !--- Save blade definition with chord,twist and body velocity
-            WRITE(LU, 1132) NRC
+            WRITE (LU, 1132) NRC
             DO I = 1, NRC
                 BETADEG = BETAR(I, NR) / DTR
-                WRITE(LU, 1200) YRC(I, NR), CHR(I, NR), BETADEG
-            END DO
-            WRITE(LU, 1134)
+                WRITE (LU, 1200) YRC(I, NR), CHR(I, NR), BETADEG
+            ENDDO
+            WRITE (LU, 1134)
         ENDIF
         !
         !--- Save actuator disk if defined
-        IF(IRTYPE(NR).EQ.1) THEN
-            WRITE(LU, 1122)
+        IF (IRTYPE(NR)==1) THEN
+            WRITE (LU, 1122)
             !--- Rotor axial location, #radial stations
-            WRITE(LU, 1202) XDISK(NR), NRSTA
+            WRITE (LU, 1202) XDISK(NR), NRSTA
             !--- Save actuator disk circulation
-            WRITE(LU, 1124) NRC
+            WRITE (LU, 1124) NRC
             DO I = 1, NRC
-                WRITE(LU, 1200) YRC(I, NR), BGAM(I, NR)
-            END DO
-            WRITE(LU, 1126)
+                WRITE (LU, 1200) YRC(I, NR), BGAM(I, NR)
+            ENDDO
+            WRITE (LU, 1126)
         ENDIF
         !
-    END DO
+    ENDDO
     !
     !--- Save drag object(s) if defined
-    IF(NDOBJ.GT.0) THEN
+    IF (NDOBJ>0) THEN
         DO N = 1, NDOBJ
-            IF(NDDEF(N).GT.2) THEN
-                WRITE(LU, 1136) NDDEF(N)
+            IF (NDDEF(N)>2) THEN
+                WRITE (LU, 1136) NDDEF(N)
                 !--- Save drag object points and CDA values
                 DO I = 1, NDDEF(N)
-                    WRITE(LU, 1200) XDDEF(I, N), YDDEF(I, N), CDADEF(I, N)
-                END DO
-                WRITE(LU, 1137)
+                    WRITE (LU, 1200) XDDEF(I, N), YDDEF(I, N), CDADEF(I, N)
+                ENDDO
+                WRITE (LU, 1137)
             ENDIF
-        END DO
+        ENDDO
     ENDIF
     !
     !--- CB and duct geometry
-    WRITE(LU, 1140)
+    WRITE (LU, 1140)
     !---- save only 2 elements in buffer geometry into opened file
     NELSAV = 2
     IFTYPE = 2
     FBLNK = ' '
-    CALL AWRITE(FBLNK, LU, &
-            NELSAV, IPFRST, IPLAST, XP, YP, &
-            ANAME, ISPARS, IFTYPE)
-    WRITE(LU, 1142)
+    CALL AWRITE(FBLNK, LU, NELSAV, IPFRST, IPLAST, XP, YP, ANAME, ISPARS, &
+            & IFTYPE)
+    WRITE (LU, 1142)
     !
     !--- Save user-defined paneling specs
-    IF(LRSPCUSR) THEN
-        WRITE(LU, 1150) NBEL, NRPNX
+    IF (LRSPCUSR) THEN
+        WRITE (LU, 1150) NBEL, NRPNX
         DO IEL = 1, NBEL
-            WRITE(LU, 1152) NPAN(IEL), &
-                    CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL)
-            WRITE(LU, 1154)
+            WRITE (LU, 1152) NPAN(IEL), CVEX(IEL), SMOF(IEL), &
+                    & FSLE(IEL), FSTE(IEL)
+            WRITE (LU, 1154)
             DO IRPN = 1, NRPNX
-                WRITE(LU, 1200) SRPN1(IRPN, IEL), &
-                        SRPN2(IRPN, IEL), &
-                        CRRAT(IRPN, IEL)
+                WRITE (LU, 1200) SRPN1(IRPN, IEL), SRPN2(IRPN, IEL), &
+                        & CRRAT(IRPN, IEL)
             ENDDO
         ENDDO
-        WRITE(LU, 1156)
+        WRITE (LU, 1156)
     ENDIF
     !
-    CLOSE(LU)
+    CLOSE (LU)
     RETURN
     !
-    90   WRITE(*, *) 'Bad filename.'
-    WRITE(*, *) 'Current duct case not saved.'
+    90   WRITE (*, *) 'Bad filename.'
+    WRITE (*, *) 'Current duct case not saved.'
     RETURN
     !
     !...................................................................
-    1000 FORMAT(A)
-    1100 FORMAT('DFDC Version ', E8.2, ' '/A32)
+    1000 FORMAT (A)
+    1100 FORMAT ('DFDC Version ', E8.2, ' '/A32)
     !
-    1102 FORMAT(/'OPER', &
-            /'!   Vinf         Vref         RPM1         RPM2')
-    1103 FORMAT('!   Rho          Vso          Rmu          Alt')
-    1104 FORMAT('!  XDwake             Nwake')
-    1105 FORMAT('!        Lwkrlx')
-    1106 FORMAT('ENDOPER')
+    1102 FORMAT (/'OPER', /'!   Vinf         Vref         RPM1         RPM2'&
+            &)
+    1103 FORMAT ('!   Rho          Vso          Rmu          Alt')
+    1104 FORMAT ('!  XDwake             Nwake')
+    1105 FORMAT ('!        Lwkrlx')
+    1106 FORMAT ('ENDOPER')
     !
-    1108 FORMAT(/'AERO', &
-            /'!  #sections'/1(1X, I5), &
-            /'!  Xisection')
-    1109 FORMAT('!  A0deg        dCLdA        CLmax        CLmin')
-    1110 FORMAT('! dCLdAstall   dCLstall      Cmconst      Mcrit')
-    1111 FORMAT('!   CDmin      CLCDmin       dCDdCL^2')
-    1112 FORMAT('!   REref        REexp        TOC         dCDdCL^2')
-    1113 FORMAT('ENDAERO')
+    1108 FORMAT (/'AERO', /'!  #sections'/1(1X, I5), /'!  Xisection')
+    1109 FORMAT ('!  A0deg        dCLdA        CLmax        CLmin')
+    1110 FORMAT ('! dCLdAstall   dCLstall      Cmconst      Mcrit')
+    1111 FORMAT ('!   CDmin      CLCDmin       dCDdCL^2')
+    1112 FORMAT ('!   REref        REexp        TOC         dCDdCL^2')
+    1113 FORMAT ('ENDAERO')
     !
-    1122 FORMAT(/'ACTDISK', &
-            /'!  Xdisk       NRsta')
-    1124 FORMAT('!  #stations'/1(1X, I5), &
-            /'!           r         BGam')
-    1126 FORMAT('ENDACTDISK')
+    1122 FORMAT (/'ACTDISK', /'!  Xdisk       NRsta')
+    1124 FORMAT ('!  #stations'/1(1X, I5), /'!           r         BGam')
+    1126 FORMAT ('ENDACTDISK')
     !
-    1130 FORMAT(/'ROTOR', &
-            /'!  Xdisk               Nblds       NRsta')
-    1132 FORMAT('!  #stations'/1(1X, I5), &
-            /'!     r        Chord         Beta')
-    1134 FORMAT('ENDROTOR')
+    1130 FORMAT (/'ROTOR', /'!  Xdisk               Nblds       NRsta')
+    1132 FORMAT ('!  #stations'/1(1X, I5), &
+            &/'!     r        Chord         Beta')
+    1134 FORMAT ('ENDROTOR')
     !
-    1136 FORMAT(/'DRAGOBJ', &
-            /'!  #pts'/1(1X, I5), &
-            /'!     x            r            CDA')
-    1137 FORMAT('ENDDRAGOBJ')
+    1136 FORMAT (/'DRAGOBJ', /'!  #pts'/1(1X, I5), &
+            &/'!     x            r            CDA')
+    1137 FORMAT ('ENDDRAGOBJ')
     !
-    1140 FORMAT(/'GEOM')
-    1142 FORMAT('ENDGEOM')
+    1140 FORMAT (/'GEOM')
+    1142 FORMAT ('ENDGEOM')
     !
-    1150 FORMAT(/'PANELING', &
-            /'!  #elements   #refinement zones'/(2(1X, I5)))
-    1152 FORMAT('!  #panel nodes'/1(1X, I5)&
-            /'!  curv_expon  curv_smooth   dsL/dsAvg    dsR/dsAvg', &
-            /4(1X, G12.5))
-    1154 FORMAT('!  s1/smax      s2/smax     ds/dsAvg')
-    1156 FORMAT('ENDPANELING')
+    1150 FORMAT (/'PANELING', /'!  #elements   #refinement zones'/(2(1X, I5))&
+            &)
+    1152 FORMAT ('!  #panel nodes'/1(1X, I5)                                &
+            &/'!  curv_expon  curv_smooth   dsL/dsAvg    dsR/dsAvg', &
+            & /4(1X, G12.5))
+    1154 FORMAT ('!  s1/smax      s2/smax     ds/dsAvg')
+    1156 FORMAT ('ENDPANELING')
     !
-    1200 FORMAT(5(1X, G12.5))
-    1202 FORMAT(1(1X, G12.5), 2(8X, I5))
-    1204 FORMAT(12X, L1)
+    1200 FORMAT (5(1X, G12.5))
+    1202 FORMAT (1(1X, G12.5), 2(8X, I5))
+    1204 FORMAT (12X, L1)
     !
     !x123456789012x123456789012x123456789012x123456789012x123456789012
     !!         Rho          Vso          Rmu           Alt')
     !
-END
-! DFSAVE
-
-
+END SUBROUTINE DFSAVE

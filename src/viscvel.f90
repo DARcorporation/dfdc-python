@@ -1,131 +1,176 @@
+!*==GETVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+
+
+
 SUBROUTINE GETVEL(FNAME1)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    CHARACTER(*) :: FNAME1
+    !
+    ! Local variables
+    !
+    CHARACTER(128) :: FNAME
+    INTEGER :: I, LU, LUTEMP
+    REAL, SAVE :: UWT, VWT
+    REAL, DIMENSION(IRX) :: W1, W2, W3
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------
     !     Reads in incoming velocity profile to be superimposed
     !     on freestream and rotational components.
     !----------------------------------------------------------
-    INCLUDE 'DFDC.INC'
     !
-    DIMENSION W1(IRX), W2(IRX), W3(IRX)
-    CHARACTER*128 FNAME
-    CHARACTER*(*) FNAME1
     !
-    DATA UWT, VWT / 1.0, 1.0 /
+    DATA UWT, VWT/1.0, 1.0/
     !
     LUTEMP = 3
     LU = LUTEMP
     !
     FNAME = FNAME1
-    IF(FNAME(1:1) .EQ. ' ') CALL ASKS('Enter input filename^', FNAME)
+    IF (FNAME(1:1)==' ') CALL ASKS('Enter input filename^', FNAME)
     !
-    OPEN(LU, FILE = FNAME, STATUS = 'OLD', ERR = 95)
-    DO 10 I = 1, IRX
-        READ(LU, *, END = 11, ERR = 95) W1(I), W2(I), W3(I)
-    10   CONTINUE
+    OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 95)
+    DO I = 1, IRX
+        READ (LU, *, END = 11, ERR = 95) W1(I), W2(I), W3(I)
+    ENDDO
     I = IRX + 1
     !
-    11   IF(I.LT.3) GO TO 96
-    IF(NINFL.GE.2) THEN
-        WRITE(*, *)
-        WRITE(*, *) '*** Current slipstream profiles overwritten'
+    11   IF (I<3) GOTO 96
+    IF (NINFL>=2) THEN
+        WRITE (*, *)
+        WRITE (*, *) '*** Current slipstream profiles overwritten'
     ENDIF
     NINFL = I - 1
-    CLOSE(LU)
+    CLOSE (LU)
     !
-    DO 20 I = 1, NINFL
+    DO I = 1, NINFL
         RINFL(I) = W1(I)
         VAINFL(I) = W2(I)
         VTINFL(I) = W3(I)
-    20   CONTINUE
+    ENDDO
     !
     CALL ASKR('Enter axial velocity weight (0 ===> 1)^', UWT)
     CALL ASKR('Enter tang. velocity weight (0 , +/-1)^', VWT)
-    DO 30 I = 1, NINFL
+    DO I = 1, NINFL
         VAINFL(I) = UWT * VAINFL(I)
         VTINFL(I) = VWT * VTINFL(I)
-    30   CONTINUE
+    ENDDO
     !
     CALL SPLINE(VAINFL, VAINFLR, RINFL, NINFL)
     CALL SPLINE(VTINFL, VTINFLR, RINFL, NINFL)
     !
-    WRITE(*, 1200)
-    WRITE(*, 1250) (RINFL(I), VAINFL(I), VTINFL(I), I = 1, NINFL)
+    WRITE (*, 1200)
+    WRITE (*, 1250) (RINFL(I), VAINFL(I), VTINFL(I), I = 1, NINFL)
     RETURN
     !
-    95   WRITE(*, *) 'File read error'
-    96   WRITE(*, *) 'New wake velocities not read'
+    95   WRITE (*, *) 'File read error'
+    96   WRITE (*, *) 'New wake velocities not read'
 
     !....................................................
-    1200 FORMAT(/' External slipstream velocity profiles:'&
-            /'      r (m)     Vaxi (m/s)  Vrot (m/s)')
+    1200 FORMAT (/' External slipstream velocity profiles:'/               &
+            &'      r (m)     Vaxi (m/s)  Vrot (m/s)')
     !CC                 0.12341     0.12324    -0.08922
-    1250 FORMAT(1X, 3F12.5)
-END
+    1250 FORMAT (1X, 3F12.5)
+END SUBROUTINE GETVEL
+!*==SAVVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE SAVVEL(FNAME1)
-    INCLUDE 'DFDC.inc'
-    CHARACTER*128 FNAME
-    CHARACTER*(*) FNAME1
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    CHARACTER(*) :: FNAME1
+    !
+    ! Local variables
+    !
+    CHARACTER(1) :: ANS
+    CHARACTER(128) :: FNAME
+    INTEGER :: I, LU, LUTEMP, NR
+    REAL :: RDIM, UDIM, VDIM
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------
     !     Writes out induced velocities for current
     !     rotor and operating state.
     !--------------------------------------------------
-    CHARACTER*1 ANS
     !
     LUTEMP = 3
     LU = LUTEMP
     !
-    IF(.NOT.LCONV) THEN
-        WRITE(*, *) 'Must define operating point first.'
+    IF (.NOT.LCONV) THEN
+        WRITE (*, *) 'Must define operating point first.'
         RETURN
     ENDIF
     !
     FNAME = FNAME1
-    IF(FNAME(1:1) .EQ. ' ') CALL ASKS('Enter output filename^', FNAME)
+    IF (FNAME(1:1)==' ') CALL ASKS('Enter output filename^', FNAME)
     !
-    OPEN(LU, FILE = FNAME, STATUS = 'OLD', ERR = 5)
-    WRITE(*, *)
-    WRITE(*, *) 'Output file exists.  Overwrite?  Y'
+    OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 5)
+    WRITE (*, *)
+    WRITE (*, *) 'Output file exists.  Overwrite?  Y'
     READ (*, 1000) ANS
-    1000 FORMAT(A)
-    IF(INDEX('Nn', ANS).EQ.0) GO TO 6
+    1000 FORMAT (A)
+    IF (INDEX('Nn', ANS)==0) GOTO 6
     !
-    CLOSE(LU)
-    WRITE(*, *) 'Velocities not saved.'
+    CLOSE (LU)
+    WRITE (*, *) 'Velocities not saved.'
     RETURN
     !
-    5    OPEN(LU, FILE = FNAME, STATUS = 'NEW', ERR = 90)
-    6    REWIND(LU)
+    5    OPEN (LU, FILE = FNAME, STATUS = 'NEW', ERR = 90)
+    6    REWIND (LU)
     !
     NR = 1
-    DO 10 I = 1, NRC
+    DO I = 1, NRC
         RDIM = YRC(I, NR)
         UDIM = VIND(1, I, NR)
         VDIM = VIND(3, I, NR)
-        WRITE(LU, *) RDIM, UDIM, VDIM
-    10   CONTINUE
-    CLOSE(LU)
+        WRITE (LU, *) RDIM, UDIM, VDIM
+    ENDDO
+    CLOSE (LU)
     RETURN
     !
-    90   WRITE(*, *) 'Bad filename.'
-    WRITE(*, *) 'Velocities not saved.'
-    RETURN
-END
+    90   WRITE (*, *) 'Bad filename.'
+    WRITE (*, *) 'Velocities not saved.'
+END SUBROUTINE SAVVEL
+!*==UVINFL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE UVINFL(RR, WWA, WWT)
-    INCLUDE 'DFDC.inc'
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: RR, WWA, WWT
+    !
+    ! Local variables
+    !
+    REAL :: RDIM
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !
     WWA = 0.0
     WWT = 0.0
-    IF(NINFL.LE.1) RETURN
+    IF (NINFL<=1) RETURN
     !
     RDIM = RR
-    IF(RDIM.GE.RINFL(1) .AND. RDIM.LE.RINFL(NINFL)) THEN
+    IF (RDIM>=RINFL(1) .AND. RDIM<=RINFL(NINFL)) THEN
         WWA = SEVAL(RDIM, VAINFL, VAINFLR, RINFL, NINFL)
         WWT = SEVAL(RDIM, VTINFL, VTINFLR, RINFL, NINFL)
     ENDIF
     !
-    RETURN
-END
-
+END SUBROUTINE UVINFL

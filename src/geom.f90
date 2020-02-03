@@ -1,24 +1,26 @@
+!*==XYPSPL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+! BAKSUB
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -29,7 +31,21 @@
 !=========================================================================
 
 SUBROUTINE XYPSPL(IEL)
-    INCLUDE 'DFDC.INC'
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IEL
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IP1, IP2, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------
     !     Splines panel-node coordinates
     !     and sets other element-related stuff.
@@ -39,15 +55,15 @@ SUBROUTINE XYPSPL(IEL)
     !
     I = IP1
     N = IP2 - IP1 + 1
-    IF(N.GT.1) THEN
+    IF (N>1) THEN
         CALL SCALC(XP(I), YP(I), SP(I), N)
         CALL SEGSPL(XP(I), XPS(I), SP(I), N)
         CALL SEGSPL(YP(I), YPS(I), SP(I), N)
     ENDIF
     !
-    IF(LXBOD(IEL)) THEN
+    IF (LXBOD(IEL)) THEN
         !----- axisymmetric body on axis
-        IF(XP(IP1).LT.XP(IP2)) THEN
+        IF (XP(IP1)<XP(IP2)) THEN
             SPLE(IEL) = SP(IP1)
             XPLE(IEL) = XP(IP1)
             YPLE(IEL) = YP(IP1)
@@ -61,9 +77,9 @@ SUBROUTINE XYPSPL(IEL)
             YPTE(IEL) = YP(IP1)
         ENDIF
         !
-    ELSEIF(LBODY(IEL) .AND. (LV1ZR(IEL) .OR. LV2ZR(IEL))) THEN
+    ELSEIF (LBODY(IEL) .AND. (LV1ZR(IEL) .OR. LV2ZR(IEL))) THEN
         !----- axisymmetric body not closed on axis
-        IF(XP(IP1).LT.XP(IP2)) THEN
+        IF (XP(IP1)<XP(IP2)) THEN
             SPLE(IEL) = SP(IP1)
             XPLE(IEL) = XP(IP1)
             YPLE(IEL) = YP(IP1)
@@ -77,7 +93,7 @@ SUBROUTINE XYPSPL(IEL)
             YPTE(IEL) = YP(IP1)
         ENDIF
         !
-    ELSEIF(LBODY(IEL) .AND. .NOT.LXBOD(IEL)) THEN
+    ELSEIF (LBODY(IEL) .AND. .NOT.LXBOD(IEL)) THEN
         !----- body off axis
         CALL LEFIND(SPLE(IEL), XP(I), XPS(I), YP(I), YPS(I), SP(I), N)
         XPLE(IEL) = SEVAL(SPLE(IEL), XP(I), XPS(I), SP(I), N)
@@ -95,9 +111,7 @@ SUBROUTINE XYPSPL(IEL)
     ENDIF
     !
     !---- set location for plotted element index
-    IF(NETYPE(IEL).EQ.0 .OR.&
-            NETYPE(IEL).EQ.1 .OR.&
-            NETYPE(IEL).EQ.2) THEN
+    IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)==2) THEN
         !----- surface or axis line... set plot location at skin centroid
         XELNUM(IEL) = XPCENT(IEL)
         YELNUM(IEL) = YPCENT(IEL)
@@ -108,21 +122,32 @@ SUBROUTINE XYPSPL(IEL)
         YELNUM(IEL) = YP(IP1)
     ENDIF
     !
-    RETURN
-END
+END SUBROUTINE XYPSPL
+!*==CVPGEN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! XYPSPL
 
 
 
 
 SUBROUTINE CVPGEN
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: DSP, DXP, DYP
+    INTEGER :: IC, IEL, IP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Sets control-point locations on paneled airfoil.
     !     Sets locations of point sources.
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(LDBG) WRITE(*, *) 'Setting control points for elements'
+    IF (LDBG) WRITE (*, *) 'Setting control points for elements'
     !
     DO IEL = 1, NEX
         ICFRST(IEL) = 0
@@ -138,9 +163,8 @@ SUBROUTINE CVPGEN
     !---- initialize counters for pointer accumulation
     IC = 0
     !
-    DO 100 IEL = 1, NEL
-        IF(NETYPE(IEL).EQ.3 .OR.&
-                NETYPE(IEL).EQ.4) THEN
+    DO IEL = 1, NEL
+        IF (NETYPE(IEL)==3 .OR. NETYPE(IEL)==4) THEN
             !------- ring or point singularity... no control points
             IP = IPFRST(IEL)
             !
@@ -148,33 +172,33 @@ SUBROUTINE CVPGEN
             ICFRST(IEL) = 0
             ICLAST(IEL) = -1
             !
-            GO TO 100
+            CYCLE
         ENDIF
         !
         !------ first control point in element IEL
         ICFRST(IEL) = IC + 1
         !
         !------ go over all panels on element IEL
-        DO 50 IP = IPFRST(IEL), IPLAST(IEL) - 1
+        DO IP = IPFRST(IEL), IPLAST(IEL) - 1
             IC = IC + 1
-            IF(IC.GT.NCX) STOP 'CVPGEN: Array overflow on NCX'
+            IF (IC>NCX) STOP 'CVPGEN: Array overflow on NCX'
             !
             DXP = XP(IP + 1) - XP(IP)
             DYP = YP(IP + 1) - YP(IP)
             DSP = SQRT(DXP**2 + DYP**2)
             !
-            IF(DSP.EQ.0.0) THEN
+            IF (DSP==0.0) THEN
                 !--------- zero-length panel gets dummy control point
                 ICTYPE(IC) = -1
                 !
             ELSE
                 !--------- ordinary panel
                 ICTYPE(IC) = 0
-                IF(IEL2IR(IEL).EQ.1) THEN
+                IF (IEL2IR(IEL)==1) THEN
                     ICTYPE(IC) = 0
-                ELSEIF(IEL2IR(IEL).GT.1 .AND. IEL2IR(IEL).LT.NRP) THEN
+                ELSEIF (IEL2IR(IEL)>1 .AND. IEL2IR(IEL)<NRP) THEN
                     !c             ICTYPE(IC) = -2
-                ELSEIF(IEL2IR(IEL).EQ.NRP) THEN
+                ELSEIF (IEL2IR(IEL)==NRP) THEN
                     ICTYPE(IC) = 0
                 ENDIF
                 !
@@ -183,12 +207,12 @@ SUBROUTINE CVPGEN
             !-------- panel nodes defining sheet strength at IC
             IPCO(IC) = IP
             IPCP(IC) = IP + 1
-        50     CONTINUE
+        ENDDO
         !
         !------ last control point in element IEL
         ICLAST(IEL) = IC
         !
-    100  CONTINUE
+    ENDDO
     !
     !---- total number of control points
     NCTOT = IC
@@ -196,12 +220,9 @@ SUBROUTINE CVPGEN
     !---- compute normal vectors at vortex nodes, compute geometric quantities
     DO IEL = 1, NEL
         !------ don't do point singularities
-        IF(NETYPE(IEL).EQ.0 .OR.&
-                NETYPE(IEL).EQ.1 .OR.&
-                NETYPE(IEL).EQ.2 .OR.&
-                NETYPE(IEL).EQ.5 .OR.&
-                NETYPE(IEL).EQ.6 .OR.&
-                NETYPE(IEL).EQ.7)  THEN
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)       &
+                & ==2 .OR. NETYPE(IEL)==5 .OR. NETYPE(IEL)==6 .OR.          &
+                & NETYPE(IEL)==7) THEN
             CALL XYCSET(IEL)
             CALL ANPSET(IEL)
         ENDIF
@@ -216,21 +237,37 @@ SUBROUTINE CVPGEN
     !
     LNCVP = .TRUE.
     !
-    RETURN
-END
+END SUBROUTINE CVPGEN
+!*==XYCSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! CVPGEN
 
 
 
 SUBROUTINE XYCSET(IEL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IEL
+    !
+    ! Local variables
+    !
+    REAL, SAVE :: DCFRAC
+    REAL :: DSCA, DSP, DSPINV, DXP, DYP, STAN, XTAN, YTAN
+    INTEGER :: IC, IC1, IC2, ICE, IP, IP1, IP2, IPO, IPP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Sets control points and their unit normal vectors
     !     for element IEL.
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !c    DATA DCFRAC / 0.1 /
-    DATA DCFRAC / 0.05 /
+    DATA DCFRAC/0.05/
     !c    DATA DCFRAC / 0.02 /
     !
     DO IC = ICFRST(IEL), ICLAST(IEL)
@@ -241,7 +278,7 @@ SUBROUTINE XYCSET(IEL)
         DYP = YP(IPP) - YP(IPO)
         DSP = SQRT(DXP**2 + DYP**2)
         !
-        IF(DSP.EQ.0.0) THEN
+        IF (DSP==0.0) THEN
             !------- zero-length panel
             DSPINV = 0.0
         ELSE
@@ -269,12 +306,12 @@ SUBROUTINE XYCSET(IEL)
     !
     !
     !------ set up extra QNDOF control points for each body element
-    IF(.NOT.LBODY(IEL)) THEN
+    IF (.NOT.LBODY(IEL)) THEN
         ICE = NCX + IEL
         XC(ICE) = 0.
         YC(ICE) = 0.
         !
-    ELSEIF(LXBOD(IEL)) THEN
+    ELSEIF (LXBOD(IEL)) THEN
         IC = ICLAST(IEL)
         IP = IPLAST(IEL)
         !
@@ -305,23 +342,40 @@ SUBROUTINE XYCSET(IEL)
         !
     ENDIF
     !
-    RETURN
-END
+END SUBROUTINE XYCSET
+!*==ANPSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! XYCSET
 
 
 
 SUBROUTINE ANPSET(IEL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IEL
+    !
+    ! Local variables
+    !
+    REAL :: DS, DSQ, DSQM, DSQP, DX, DXM, DXP, DX_DXM, &
+            & DX_DXP, DX_DYM, DX_DYP, DY, DYM, DYP, DY_DXM, &
+            & DY_DXP, DY_DYM, DY_DYP, TMP1, TMP2
+    INTEGER :: IP, IPM, IPP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Sets unit normal vectors on vortex node locations
     !     for element IEL.
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- don't process single-point elements
-    IF(IPFRST(IEL).EQ.IPLAST(IEL)) RETURN
+    IF (IPFRST(IEL)==IPLAST(IEL)) RETURN
     !
-    DO 10 IP = IPFRST(IEL), IPLAST(IEL)
+    DO IP = IPFRST(IEL), IPLAST(IEL)
         !
         !------ examine the two panels IPM..IP, IP..IPP adjoining vortex node IP
         IPM = MAX(IP - 1, IPFRST(IEL))
@@ -336,7 +390,7 @@ SUBROUTINE ANPSET(IEL)
         DSQM = DXM * DXM + DYM * DYM
         DSQP = DXP * DXP + DYP * DYP
         !
-        IF    (DSQM.EQ.0.0) THEN
+        IF (DSQM==0.0) THEN
             !------- first point on element, or panel IPM..IP has zero length
             DX = DXP
             DY = DYP
@@ -348,7 +402,7 @@ SUBROUTINE ANPSET(IEL)
             DY_DYM = 0.
             DY_DXP = 0.
             DY_DYP = 1.0
-        ELSEIF(DSQP.EQ.0.0) THEN
+        ELSEIF (DSQP==0.0) THEN
             !------- last point on element, or panel IP..IPP has zero length
             DX = DXM
             DY = DYM
@@ -365,19 +419,20 @@ SUBROUTINE ANPSET(IEL)
             DX = DXM * DSQP + DXP * DSQM
             DY = DYM * DSQP + DYP * DSQM
             DX_DXM = DSQP + DXP * 2.0 * DXM
-            DX_DYM = + DXP * 2.0 * DYM
+            DX_DYM = +DXP * 2.0 * DYM
             DX_DXP = DSQM + DXM * 2.0 * DXP
-            DX_DYP = + DXM * 2.0 * DYP
-            DY_DXM = + DYP * 2.0 * DXM
+            DX_DYP = +DXM * 2.0 * DYP
+            DY_DXM = +DYP * 2.0 * DXM
             DY_DYM = DSQP + DYP * 2.0 * DYM
-            DY_DXP = + DYM * 2.0 * DXP
+            DY_DXP = +DYM * 2.0 * DXP
             DY_DYP = DSQM + DYM * 2.0 * DYP
         ENDIF
         !
         DSQ = DX * DX + DY * DY
-        IF(DSQ.EQ.0.0) THEN
+        IF (DSQ==0.0) THEN
             !------- internal error
-            WRITE(*, *) '? ANPSET: zero avg panel length. IEL IP =', IEL, IP
+            WRITE (*, *) '? ANPSET: zero avg panel length. IEL IP =', &
+                    & IEL, IP
             RETURN
         ENDIF
         !
@@ -387,13 +442,13 @@ SUBROUTINE ANPSET(IEL)
         ANP(2, IP) = -DX / DS
         !
         TMP1 = -ANP(1, IP) / DSQ
-        ANP_XYM(1, 1, IP) = - DY_DXM / DS - TMP1 * (DX * DX_DXM + DY * DY_DXM)
-        ANP_XYM(1, 2, IP) = - DY_DYM / DS - TMP1 * (DX * DX_DYM + DY * DY_DYM)
+        ANP_XYM(1, 1, IP) = -DY_DXM / DS - TMP1 * (DX * DX_DXM + DY * DY_DXM)
+        ANP_XYM(1, 2, IP) = -DY_DYM / DS - TMP1 * (DX * DX_DYM + DY * DY_DYM)
         !
-        ANP_XYO(1, 1, IP) = DY_DXM / DS + TMP1 * (DX * DX_DXM + DY * DY_DXM)&
-                - DY_DXP / DS - TMP1 * (DX * DX_DXP + DY * DY_DXP)
-        ANP_XYO(1, 2, IP) = DY_DYM / DS + TMP1 * (DX * DX_DYM + DY * DY_DYM)&
-                - DY_DYP / DS - TMP1 * (DX * DX_DYP + DY * DY_DYP)
+        ANP_XYO(1, 1, IP) = DY_DXM / DS + TMP1 * (DX * DX_DXM + DY * DY_DXM)       &
+                & - DY_DXP / DS - TMP1 * (DX * DX_DXP + DY * DY_DXP)
+        ANP_XYO(1, 2, IP) = DY_DYM / DS + TMP1 * (DX * DX_DYM + DY * DY_DYM)       &
+                & - DY_DYP / DS - TMP1 * (DX * DX_DYP + DY * DY_DYP)
         !
         ANP_XYP(1, 1, IP) = DY_DXP / DS + TMP1 * (DX * DX_DXP + DY * DY_DXP)
         ANP_XYP(1, 2, IP) = DY_DYP / DS + TMP1 * (DX * DX_DYP + DY * DY_DYP)
@@ -402,25 +457,39 @@ SUBROUTINE ANPSET(IEL)
         ANP_XYM(2, 1, IP) = DX_DXM / DS - TMP2 * (DX * DX_DXM + DY * DY_DXM)
         ANP_XYM(2, 2, IP) = DX_DYM / DS - TMP2 * (DX * DX_DYM + DY * DY_DYM)
         !
-        ANP_XYO(2, 1, IP) = - DX_DXM / DS + TMP2 * (DX * DX_DXM + DY * DY_DXM)&
-                + DX_DXP / DS - TMP2 * (DX * DX_DXP + DY * DY_DXP)
-        ANP_XYO(2, 2, IP) = - DX_DYM / DS + TMP2 * (DX * DX_DYM + DY * DY_DYM)&
-                + DX_DYP / DS - TMP2 * (DX * DX_DYP + DY * DY_DYP)
+        ANP_XYO(2, 1, IP) = -DX_DXM / DS + TMP2 * (DX * DX_DXM + DY * DY_DXM)      &
+                & + DX_DXP / DS - TMP2 * (DX * DX_DXP + DY * DY_DXP)
+        ANP_XYO(2, 2, IP) = -DX_DYM / DS + TMP2 * (DX * DX_DYM + DY * DY_DYM)      &
+                & + DX_DYP / DS - TMP2 * (DX * DX_DYP + DY * DY_DYP)
         !
-        ANP_XYP(2, 1, IP) = - DX_DXP / DS + TMP2 * (DX * DX_DXP + DY * DY_DXP)
-        ANP_XYP(2, 2, IP) = - DX_DYP / DS + TMP2 * (DX * DX_DYP + DY * DY_DYP)
-    10   CONTINUE
+        ANP_XYP(2, 1, IP) = -DX_DXP / DS + TMP2 * (DX * DX_DXP + DY * DY_DXP)
+        ANP_XYP(2, 2, IP) = -DX_DYP / DS + TMP2 * (DX * DX_DYP + DY * DY_DYP)
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE ANPSET
+!*==ITPSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ANPSET
 
 
 SUBROUTINE ITPSET(IEL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IEL
+    !
+    ! Local variables
+    !
+    INTEGER :: IP1, IP2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------
     !     Sets TE panel endpoint indices
     !--------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     IP1 = IPFRST(IEL)
     IP2 = IPLAST(IEL)
@@ -430,22 +499,20 @@ SUBROUTINE ITPSET(IEL)
     IPTE2(IEL) = -999
     !
     !---- no TE panel on closed axis body or non-solid body
-    IF(LXBOD(IEL) .OR. NETYPE(IEL).NE.0) RETURN
+    IF (LXBOD(IEL) .OR. NETYPE(IEL)/=0) RETURN
     !
     !---- TE panel must be chosen...
-    IF(LTPAN(IEL)) THEN
+    IF (LTPAN(IEL)) THEN
         !----- usual TE panel closing off body
         IPTE1(IEL) = IP1
         IPTE2(IEL) = IP2
-        IF    (YP(IP1).EQ.0.0 .AND. YP(IP2).GT.0.0) THEN
+        IF (YP(IP1)==0.0 .AND. YP(IP2)>0.0) THEN
             IPTE1(IEL) = 0
             IPTE2(IEL) = IP2
-        ELSEIF(YP(IP2).EQ.0.0 .AND. YP(IP1).GT.0.0) THEN
+        ELSEIF (YP(IP2)==0.0 .AND. YP(IP1)>0.0) THEN
             IPTE1(IEL) = IP1
             IPTE2(IEL) = 0
         ENDIF
     ENDIF
     !
-    RETURN
-END
-! ITPSET
+END SUBROUTINE ITPSET

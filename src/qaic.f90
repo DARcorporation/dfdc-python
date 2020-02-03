@@ -1,24 +1,26 @@
+!*==QAIC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+! PANGET
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -29,34 +31,70 @@
 !=========================================================================
 
 SUBROUTINE QAIC(LXYJAC)
-    INCLUDE 'DFDC.INC'
-    LOGICAL LXYJAC
+    USE I_DFDC
+    IMPLICIT NONE
     !
-    IF(LDBG) THEN
-        IF(LXYJAC) THEN
-            WRITE(*, *) 'Generating dq/d(gam,sig,x,y) Jacobian matrices...'
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    LOGICAL :: LXYJAC
+    !
+    ! Local variables
+    !
+    INTEGER :: ICE, KEL
+    !
+    !*** End of declarations rewritten by SPAG
+    !
+    !
+    IF (LDBG) THEN
+        IF (LXYJAC) THEN
+            WRITE (*, *)                                                 &
+                    &'Generating dq/d(gam,sig,x,y) Jacobian matrices...'
         ELSE
-            WRITE(*, *) 'Generating dq/d(gam,sig) Jacobian matrices...'
+            WRITE (*, *) 'Generating dq/d(gam,sig) Jacobian matrices...'
         ENDIF
     ENDIF
     !
     CALL QAIC1(LXYJAC, 1, NCTOT, 1, NEL)
     DO KEL = 1, NEL
         ICE = NCX + KEL
-        IF(LBODY(KEL)) CALL QAIC1(LXYJAC, ICE, ICE, 1, NEL)
+        IF (LBODY(KEL)) CALL QAIC1(LXYJAC, ICE, ICE, 1, NEL)
     ENDDO
     !
     LQCNT = .TRUE.
     LQAIC = .TRUE.
     LQGIC = LXYJAC
     !
-    RETURN
-END
+END SUBROUTINE QAIC
+!*==QAIC1.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! QAIC
 
 
 
 SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IC1, IC2, IEL1, IEL2
+    LOGICAL :: LXYJAC
+    !
+    ! Local variables
+    !
+    REAL :: DSPT, DXPT, DYPT, SPLEN
+    INTEGER :: IC, IEL, IP, IP1, IP2, IPO, IPP, J, JPM, &
+            & JPO, K, KC, KP, NUMIC
+    REAL, DIMENSION(2, 2, ICX) :: QC_GAMTE, QC_SIGTE, QC_XPT, &
+            & QC_YPT
+    REAL, DIMENSION(IPX) :: RCORE
+    REAL, SAVE :: TFRAC
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------------
     !     Computes velocities and Jacobians at control points IC1...IC2
     !     w.r.t aero quantities at nodes on elements IEL1..IEL2
@@ -85,16 +123,11 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
     !     Note:   TE panel information and strengths are set by
     !             this routine
     !---------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    LOGICAL LXYJAC
     !
-    DIMENSION QC_GAMTE(2, 2, ICX), QC_SIGTE(2, 2, ICX)
-    DIMENSION QC_XPT(2, 2, ICX), QC_YPT (2, 2, ICX)
     !
-    DIMENSION RCORE(IPX)
     !
     !---- maximum TE gap (relative to perimeter) to give closed airfoil a TE panel
-    DATA TFRAC / 0.00001 /
+    DATA TFRAC/0.00001/
     !
     !---- clear control-point velocities for accumulation in PANAIC and PNTAIC
     DO IC = IC1, IC2
@@ -106,10 +139,10 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                 QC_GAM(2, IP, IC) = 0.
                 QC_SIG(1, IP, IC) = 0.
                 QC_SIG(2, IP, IC) = 0.
-                QC_XP (1, IP, IC) = 0.
-                QC_XP (2, IP, IC) = 0.
-                QC_YP (1, IP, IC) = 0.
-                QC_YP (2, IP, IC) = 0.
+                QC_XP(1, IP, IC) = 0.
+                QC_XP(2, IP, IC) = 0.
+                QC_YP(1, IP, IC) = 0.
+                QC_YP(2, IP, IC) = 0.
                 QC_GTH(1, IP, IC) = 0.
                 QC_GTH(2, IP, IC) = 0.
             ENDDO
@@ -127,25 +160,21 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
     NUMIC = IC2 - IC1 + 1
     !
     !---- Set AIC matrix for all singularity types
-    DO 20 IEL = IEL1, IEL2
-        IF(NETYPE(IEL).EQ.0&
-                .OR. NETYPE(IEL).EQ.1&
-                .OR. NETYPE(IEL).EQ.5&
-                .OR. NETYPE(IEL).EQ.6&
-                .OR. NETYPE(IEL).EQ.7) THEN
+    DO IEL = IEL1, IEL2
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)       &
+                & ==5 .OR. NETYPE(IEL)==6 .OR. NETYPE(IEL)==7) THEN
             !-------- wall,wake,source-only line and vortex wake sheets
-            IF(LXYJAC) THEN
+            IF (LXYJAC) THEN
                 !--------- linearize QC w.r.t GAM,SIG,XP,YP,XC,YC
-                CALL PANAICD(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                        NUMIC, XC(KC), YC(KC), IPCO(KC), IPCP(KC), ICTYPE(KC), &
-                        GAM, SIG, &
-                        IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC), &
-                        QC_XP (1, 1, KC), QC_YP (1, 1, KC), &
-                        QC_XC (1, KC), QC_YC (1, KC))
+                CALL PANAICD(IPFRST(IEL), IPLAST(IEL), XP, YP, NUMIC, XC(KC), &
+                        & YC(KC), IPCO(KC), IPCP(KC), ICTYPE(KC), GAM, SIG, &
+                        & IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC), &
+                        & QC_XP(1, 1, KC), QC_YP(1, 1, KC), QC_XC(1, KC), &
+                        & QC_YC(1, KC))
                 DO IC = IC1, IC2
                     IPO = IPCO(IC)
                     IPP = IPCP(IC)
-                    IF(IPO.NE.0 .AND. IPP.NE.0) THEN
+                    IF (IPO/=0 .AND. IPP/=0) THEN
                         QC_XP(1, IPO, IC) = QC_XP(1, IPO, IC) + QC_XC(1, IC) * 0.5
                         QC_XP(2, IPO, IC) = QC_XP(2, IPO, IC) + QC_XC(2, IC) * 0.5
                         QC_XP(1, IPP, IC) = QC_XP(1, IPP, IC) + QC_XC(1, IC) * 0.5
@@ -158,44 +187,40 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                 ENDDO
             ELSE
                 !--------- linearize QC w.r.t GAM,SIG only
-                CALL PANAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                        NUMIC, XC(KC), YC(KC), IPCO(KC), IPCP(KC), ICTYPE(KC), &
-                        GAM, SIG, &
-                        IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC))
+                CALL PANAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NUMIC, XC(KC), &
+                        & YC(KC), IPCO(KC), IPCP(KC), ICTYPE(KC), GAM, SIG, &
+                        & IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC))
             ENDIF
             !
-        ELSEIF(NETYPE(IEL).EQ.2) THEN
+        ELSEIF (NETYPE(IEL)==2) THEN
             !------- line on axis
             DO IP = IPFRST(IEL), IPLAST(IEL)
                 RCORE(IP) = 0.01
             ENDDO
-            CALL AXLAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NUMIC, XC(KC), YC(KC), IPCO(KC), IPCP(KC), ICTYPE(KC), &
-                    GAM, SIG, RCORE, &
-                    IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC))
+            CALL AXLAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NUMIC, XC(KC), &
+                    & YC(KC), IPCO(KC), IPCP(KC), ICTYPE(KC), GAM, SIG, &
+                    & RCORE, IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC)&
+                    &)
             !
-        ELSEIF(NETYPE(IEL).EQ.3) THEN
+        ELSEIF (NETYPE(IEL)==3) THEN
             !------- ring
-            CALL LINAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NUMIC, XC(KC), YC(KC), &
-                    GAM, SIG, &
-                    IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC))
+            CALL LINAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NUMIC, XC(KC), &
+                    & YC(KC), GAM, SIG, IPX, QC(1, KC), QC_GAM(1, 1, KC), &
+                    & QC_SIG(1, 1, KC))
             !
-        ELSEIF(NETYPE(IEL).EQ.4) THEN
+        ELSEIF (NETYPE(IEL)==4) THEN
             !------- point
-            CALL PNTAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NUMIC, XC(KC), YC(KC), &
-                    GAM, SIG, &
-                    IPX, QC(1, KC), QC_GAM(1, 1, KC), QC_SIG(1, 1, KC))
+            CALL PNTAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NUMIC, XC(KC), &
+                    & YC(KC), GAM, SIG, IPX, QC(1, KC), QC_GAM(1, 1, KC), &
+                    & QC_SIG(1, 1, KC))
         ENDIF
         !
-    20   CONTINUE
+    ENDDO
     !
     !---- Accumulate velocity from wake vorticity, GTH
     !---- Save velocity AIC matrix (w/o TE panel influences) for wake vorticity
     DO IEL = IEL1, IEL2
-        IF(NETYPE(IEL).EQ.0&
-                .OR. NETYPE(IEL).EQ.7) THEN
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==7) THEN
             !
             IP1 = IPFRST(IEL)
             IP2 = IPLAST(IEL)
@@ -205,16 +230,16 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                     QC_GTH(2, IP, IC) = QC_GAM(2, IP, IC)
                     QC(1, IC) = QC(1, IC) + QC_GTH(1, IP, IC) * GTH(IP)
                     QC(2, IC) = QC(2, IC) + QC_GTH(2, IP, IC) * GTH(IP)
-                END DO
-            END DO
+                ENDDO
+            ENDDO
             !
         ENDIF
-    END DO
+    ENDDO
     !
     !---- Add contributions of TE panels...
-    DO 30 IEL = IEL1, IEL2
-        IF(.NOT. (LTPAN(IEL) .AND.&
-                (NETYPE(IEL).EQ.0 .OR. NETYPE(IEL).EQ.7))) THEN
+    DO IEL = IEL1, IEL2
+        IF (.NOT.(LTPAN(IEL) .AND. (NETYPE(IEL)==0 .OR. NETYPE(IEL)==7&
+                &))) THEN
             !------- no TE panel... zero out panel strengths
             DO K = 1, 2
                 XPT(K, IEL) = 0.
@@ -228,7 +253,7 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                     SIGT_SIG(K, J, IEL) = 0.
                 ENDDO
             ENDDO
-            GO TO 30
+            CYCLE
         ENDIF
         !---- clear accumulating control-point velocities for each TE panel
         DO IC = IC1, IC2
@@ -237,10 +262,10 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                 QC_GAMTE(2, KP, IC) = 0.
                 QC_SIGTE(1, KP, IC) = 0.
                 QC_SIGTE(2, KP, IC) = 0.
-                QC_XPT (1, KP, IC) = 0.
-                QC_XPT (2, KP, IC) = 0.
-                QC_YPT (1, KP, IC) = 0.
-                QC_YPT (2, KP, IC) = 0.
+                QC_XPT(1, KP, IC) = 0.
+                QC_XPT(2, KP, IC) = 0.
+                QC_YPT(1, KP, IC) = 0.
+                QC_YPT(2, KP, IC) = 0.
             ENDDO
             QC_XC(1, IC) = 0.
             QC_XC(2, IC) = 0.
@@ -253,15 +278,13 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
         IP2 = IPTE2(IEL)
         !
         !------ set panel coordinates, strengths, and all Jacobians
-        CALL TPANSET(IP1, IP2, GAM, SIG, XP, YP, &
-                XPT(1, IEL), XPT_XP(1, 1, IEL), &
-                YPT(1, IEL), YPT_YP(1, 1, IEL), &
-                GAMT(1, IEL), GAMT_GAM(1, 1, IEL), GAMT_SIG(1, 1, IEL), &
-                GAMT_XP (1, 1, IEL), GAMT_YP (1, 1, IEL), &
-                GAMT_DX (1, IEL), GAMT_DY (1, IEL), &
-                SIGT(1, IEL), SIGT_GAM(1, 1, IEL), SIGT_SIG(1, 1, IEL), &
-                SIGT_XP (1, 1, IEL), SIGT_YP (1, 1, IEL), &
-                SIGT_DX (1, IEL), SIGT_DY (1, IEL))
+        CALL TPANSET(IP1, IP2, GAM, SIG, XP, YP, XPT(1, IEL), XPT_XP(1, 1, IEL), &
+                & YPT(1, IEL), YPT_YP(1, 1, IEL), GAMT(1, IEL), &
+                & GAMT_GAM(1, 1, IEL), GAMT_SIG(1, 1, IEL), &
+                & GAMT_XP(1, 1, IEL), GAMT_YP(1, 1, IEL), GAMT_DX(1, IEL), &
+                & GAMT_DY(1, IEL), SIGT(1, IEL), SIGT_GAM(1, 1, IEL), &
+                & SIGT_SIG(1, 1, IEL), SIGT_XP(1, 1, IEL), &
+                & SIGT_YP(1, 1, IEL), SIGT_DX(1, IEL), SIGT_DY(1, IEL))
         !
         !------ skip influence computation if TE panel has negligible length
         DXPT = XPT(2, IEL) - XPT(1, IEL)
@@ -269,24 +292,23 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
         DSPT = SQRT(DXPT**2 + DYPT**2)
         !
         SPLEN = ABS(SP(IPLAST(IEL)) - SP(IPFRST(IEL)))
-        IF(DSPT.LT.TFRAC * SPLEN) THEN
-            WRITE(*, *) 'Negligible TE panel ignored for element', IEL
-            GO TO 30
+        IF (DSPT<TFRAC * SPLEN) THEN
+            WRITE (*, *) 'Negligible TE panel ignored for element', IEL
+            CYCLE
         ENDIF
         !
         !
-        IF(LXYJAC) THEN
+        IF (LXYJAC) THEN
             !-------- linearize QC w.r.t GAM,SIG,XP,YP,XC,YC
-            CALL PANAICD(1, 2, XPT(1, IEL), YPT(1, IEL), &
-                    NUMIC, XC(KC), YC(KC), IZERO, IZERO, ICTYPE(KC), &
-                    GAMT(1, IEL), SIGT(1, IEL), &
-                    2, QC(1, KC), QC_GAMTE(1, 1, KC), QC_SIGTE(1, 1, KC), &
-                    QC_XPT (1, 1, KC), QC_YPT (1, 1, KC), &
-                    QC_XC  (1, KC), QC_YC  (1, KC))
+            CALL PANAICD(1, 2, XPT(1, IEL), YPT(1, IEL), NUMIC, XC(KC), YC(KC), &
+                    & IZERO, IZERO, ICTYPE(KC), GAMT(1, IEL), SIGT(1, IEL), &
+                    & 2, QC(1, KC), QC_GAMTE(1, 1, KC), QC_SIGTE(1, 1, KC), &
+                    & QC_XPT(1, 1, KC), QC_YPT(1, 1, KC), QC_XC(1, KC), &
+                    & QC_YC(1, KC))
             DO IC = IC1, IC2
                 IPO = IPCO(IC)
                 IPP = IPCP(IC)
-                IF(IPO.NE.0 .AND. IPP.NE.0) THEN
+                IF (IPO/=0 .AND. IPP/=0) THEN
                     QC_XP(1, IPO, IC) = QC_XP(1, IPO, IC) + QC_XC(1, IC) * 0.5
                     QC_XP(2, IPO, IC) = QC_XP(2, IPO, IC) + QC_XC(2, IC) * 0.5
                     QC_XP(1, IPP, IC) = QC_XP(1, IPP, IC) + QC_XC(1, IC) * 0.5
@@ -300,10 +322,9 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
             !
         ELSE
             !-------- linearize QC w.r.t GAM,SIG only
-            CALL PANAIC(1, 2, XPT(1, IEL), YPT(1, IEL), &
-                    NUMIC, XC(KC), YC(KC), IZERO, IZERO, ICTYPE(KC), &
-                    GAMT(1, IEL), SIGT(1, IEL), &
-                    2, QC(1, KC), QC_GAMTE(1, 1, KC), QC_SIGTE(1, 1, KC))
+            CALL PANAIC(1, 2, XPT(1, IEL), YPT(1, IEL), NUMIC, XC(KC), YC(KC), &
+                    & IZERO, IZERO, ICTYPE(KC), GAMT(1, IEL), SIGT(1, IEL), &
+                    & 2, QC(1, KC), QC_GAMTE(1, 1, KC), QC_SIGTE(1, 1, KC))
         ENDIF
         !
         !HHY- Uncomment to save TE panel influences separately
@@ -319,7 +340,7 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
         !
         DO IC = IC1, IC2
             DO KP = 1, 2
-                IF(KP.EQ.1) THEN
+                IF (KP==1) THEN
                     IP = IP1
                     JPO = IP1 + 1
                     JPM = IP1
@@ -328,54 +349,62 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                     JPO = IP2
                     JPM = IP2 - 1
                 ENDIF
-                IF(IP.GT.0) THEN
+                IF (IP>0) THEN
                     DO K = 1, 2
-                        QC_GAM(K, IP, IC) = QC_GAM(K, IP, IC)&
-                                + QC_GAMTE(K, 1, IC) * GAMT_GAM(1, KP, IEL)&
-                                + QC_GAMTE(K, 2, IC) * GAMT_GAM(2, KP, IEL)&
-                                + QC_SIGTE(K, 1, IC) * SIGT_GAM(1, KP, IEL)&
-                                + QC_SIGTE(K, 2, IC) * SIGT_GAM(2, KP, IEL)
-                        QC_SIG(K, IP, IC) = QC_SIG(K, IP, IC)&
-                                + QC_GAMTE(K, 1, IC) * GAMT_SIG(1, KP, IEL)&
-                                + QC_GAMTE(K, 2, IC) * GAMT_SIG(2, KP, IEL)&
-                                + QC_SIGTE(K, 1, IC) * SIGT_SIG(1, KP, IEL)&
-                                + QC_SIGTE(K, 2, IC) * SIGT_SIG(2, KP, IEL)
+                        QC_GAM(K, IP, IC) = QC_GAM(K, IP, IC)                  &
+                                & + QC_GAMTE(K, 1, IC)               &
+                                        & * GAMT_GAM(1, KP, IEL)              &
+                                & + QC_GAMTE(K, 2, IC)               &
+                                        & * GAMT_GAM(2, KP, IEL)              &
+                                & + QC_SIGTE(K, 1, IC)               &
+                                        & * SIGT_GAM(1, KP, IEL)              &
+                                & + QC_SIGTE(K, 2, IC)               &
+                                        & * SIGT_GAM(2, KP, IEL)
+                        QC_SIG(K, IP, IC) = QC_SIG(K, IP, IC)                  &
+                                & + QC_GAMTE(K, 1, IC)               &
+                                        & * GAMT_SIG(1, KP, IEL)              &
+                                & + QC_GAMTE(K, 2, IC)               &
+                                        & * GAMT_SIG(2, KP, IEL)              &
+                                & + QC_SIGTE(K, 1, IC)               &
+                                        & * SIGT_SIG(1, KP, IEL)              &
+                                & + QC_SIGTE(K, 2, IC)               &
+                                        & * SIGT_SIG(2, KP, IEL)
                         !
-                        IF(LXYJAC) THEN
-                            QC_XP(K, IP, IC) = QC_XP(K, IP, IC)&
-                                    + QC_XPT (K, 1, IC) * XPT_XP(1, KP, IEL)&
-                                    + QC_XPT (K, 2, IC) * XPT_XP(2, KP, IEL)&
-                                    + QC_GAMTE(K, 1, IC) * GAMT_XP(1, KP, IEL)&
-                                    + QC_GAMTE(K, 2, IC) * GAMT_XP(2, KP, IEL)&
-                                    + QC_SIGTE(K, 1, IC) * SIGT_XP(1, KP, IEL)&
-                                    + QC_SIGTE(K, 2, IC) * SIGT_XP(2, KP, IEL)
-                            QC_YP(K, IP, IC) = QC_YP(K, IP, IC)&
-                                    + QC_YPT (K, 1, IC) * YPT_YP(1, KP, IEL)&
-                                    + QC_YPT (K, 2, IC) * YPT_YP(2, KP, IEL)&
-                                    + QC_GAMTE(K, 1, IC) * GAMT_YP(1, KP, IEL)&
-                                    + QC_GAMTE(K, 2, IC) * GAMT_YP(2, KP, IEL)&
-                                    + QC_SIGTE(K, 1, IC) * SIGT_YP(1, KP, IEL)&
-                                    + QC_SIGTE(K, 2, IC) * SIGT_YP(2, KP, IEL)
-                            QC_XP(K, JPO, IC) = QC_XP(K, JPO, IC)&
-                                    + QC_GAMTE(K, KP, IC) * GAMT_DX(KP, IEL)&
-                                    + QC_SIGTE(K, KP, IC) * SIGT_DX(KP, IEL)
-                            QC_YP(K, JPO, IC) = QC_YP(K, JPO, IC)&
-                                    + QC_GAMTE(K, KP, IC) * GAMT_DY(KP, IEL)&
-                                    + QC_SIGTE(K, KP, IC) * SIGT_DY(KP, IEL)
-                            QC_XP(K, JPM, IC) = QC_XP(K, JPM, IC)&
-                                    - QC_GAMTE(K, KP, IC) * GAMT_DX(KP, IEL)&
-                                    - QC_SIGTE(K, KP, IC) * SIGT_DX(KP, IEL)
-                            QC_YP(K, JPM, IC) = QC_YP(K, JPM, IC)&
-                                    - QC_GAMTE(K, KP, IC) * GAMT_DY(KP, IEL)&
-                                    - QC_SIGTE(K, KP, IC) * SIGT_DY(KP, IEL)
+                        IF (LXYJAC) THEN
+                            QC_XP(K, IP, IC) = QC_XP(K, IP, IC) + QC_XPT(K, 1, IC)&
+                                    & * XPT_XP(1, KP, IEL) + QC_XPT(K, 2, IC)           &
+                                    & * XPT_XP(2, KP, IEL) + QC_GAMTE(K, 1, IC)         &
+                                    & * GAMT_XP(1, KP, IEL) + QC_GAMTE(K, 2, IC)        &
+                                    & * GAMT_XP(2, KP, IEL) + QC_SIGTE(K, 1, IC)        &
+                                    & * SIGT_XP(1, KP, IEL) + QC_SIGTE(K, 2, IC)        &
+                                    & * SIGT_XP(2, KP, IEL)
+                            QC_YP(K, IP, IC) = QC_YP(K, IP, IC) + QC_YPT(K, 1, IC)&
+                                    & * YPT_YP(1, KP, IEL) + QC_YPT(K, 2, IC)           &
+                                    & * YPT_YP(2, KP, IEL) + QC_GAMTE(K, 1, IC)         &
+                                    & * GAMT_YP(1, KP, IEL) + QC_GAMTE(K, 2, IC)        &
+                                    & * GAMT_YP(2, KP, IEL) + QC_SIGTE(K, 1, IC)        &
+                                    & * SIGT_YP(1, KP, IEL) + QC_SIGTE(K, 2, IC)        &
+                                    & * SIGT_YP(2, KP, IEL)
+                            QC_XP(K, JPO, IC) = QC_XP(K, JPO, IC)               &
+                                    & + QC_GAMTE(K, KP, IC) * GAMT_DX(KP, IEL)          &
+                                    & + QC_SIGTE(K, KP, IC) * SIGT_DX(KP, IEL)
+                            QC_YP(K, JPO, IC) = QC_YP(K, JPO, IC)               &
+                                    & + QC_GAMTE(K, KP, IC) * GAMT_DY(KP, IEL)          &
+                                    & + QC_SIGTE(K, KP, IC) * SIGT_DY(KP, IEL)
+                            QC_XP(K, JPM, IC) = QC_XP(K, JPM, IC)               &
+                                    & - QC_GAMTE(K, KP, IC) * GAMT_DX(KP, IEL)          &
+                                    & - QC_SIGTE(K, KP, IC) * SIGT_DX(KP, IEL)
+                            QC_YP(K, JPM, IC) = QC_YP(K, JPM, IC)               &
+                                    & - QC_GAMTE(K, KP, IC) * GAMT_DY(KP, IEL)          &
+                                    & - QC_SIGTE(K, KP, IC) * SIGT_DY(KP, IEL)
                         ENDIF
-                    ENDDO ! K loop
+                    ENDDO   ! K loop
                 ENDIF
-            END DO ! KP loop
-        END DO ! IC loop
+            ENDDO  ! KP loop
+        ENDDO ! IC loop
         !
         !---- Special treatment for vortex wake last GTH point to include TE panel
-        IF(LTPAN(IEL) .AND. NETYPE(IEL).EQ.7) THEN
+        IF (LTPAN(IEL) .AND. NETYPE(IEL)==7) THEN
             IP = IPLAST(IEL)
             DO IC = IC1, IC2
                 !---- Remove velocity w/o TE panel
@@ -387,52 +416,61 @@ SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
                 !---- Add back in velocity with TE panel
                 QC(1, IC) = QC(1, IC) + QC_GTH(1, IP, IC) * GTH(IP)
                 QC(2, IC) = QC(2, IC) + QC_GTH(2, IP, IC) * GTH(IP)
-            END DO
+            ENDDO
         ENDIF
         !
-    30   CONTINUE
+    ENDDO
     !
     !---- add on freestream
     DO IC = IC1, IC2
         QC(1, IC) = QC(1, IC) + QINF
     ENDDO
     !
-    RETURN
-END
+END SUBROUTINE QAIC1
+!*==TPANSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! QAIC1
 
 
 
-SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
-        XPT, XPT_XP, &
-        YPT, YPT_YP, &
-        GAMT, GAMT_GAM, GAMT_SIG, &
-        GAMT_XP, GAMT_YP, &
-        GAMT_DX, GAMT_DY, &
-        SIGT, SIGT_GAM, SIGT_SIG, &
-        SIGT_XP, SIGT_YP, &
-        SIGT_DX, SIGT_DY)
+SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, XPT, XPT_XP, YPT, &
+        & YPT_YP, GAMT, GAMT_GAM, GAMT_SIG, GAMT_XP, GAMT_YP, &
+        & GAMT_DX, GAMT_DY, SIGT, SIGT_GAM, SIGT_SIG, SIGT_XP, &
+        & SIGT_YP, SIGT_DX, SIGT_DY)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IPTE1, IPTE2
+    REAL, DIMENSION(*) :: GAM, SIG, XP, YP
+    REAL, DIMENSION(2) :: GAMT, GAMT_DX, GAMT_DY, SIGT, &
+            & SIGT_DX, SIGT_DY, XPT, YPT
+    REAL, DIMENSION(2, 2) :: GAMT_GAM, GAMT_SIG, GAMT_XP, &
+            & GAMT_YP, SIGT_GAM, SIGT_SIG, &
+            & SIGT_XP, SIGT_YP, XPT_XP, YPT_YP
+    !
+    ! Local variables
+    !
+    REAL, DIMENSION(2) :: ANX, ANXT_XP, ANXT_YP, ANX_DX, &
+            & ANX_DY, ANY, ANYT_XP, ANYT_YP, &
+            & ANY_DX, ANY_DY, CRS, CRS_DX, CRS_DY, &
+            & DOT, DOT_DX, DOT_DY
+    REAL :: ANXT, ANXT_DXT, ANXT_DYT, ANYAXI, ANYT, ANYT_DXT, &
+            & ANYT_DYT, DS, DSTI, DSTSQ, DX, DXT, DY, DYT
+    REAL, DIMENSION(2, 2) :: CRS_XP, CRS_YP, DOT_XP, DOT_YP
+    INTEGER :: IP, IP1, IP2, IPOPP, J, JPM, JPO, K, KOPP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------
     !     Sets geometry, strengths, and associated Jacobians
     !     of TE panel on element IEL
     !----------------------------------------------------------
-    DIMENSION GAM(*), SIG(*), XP(*), YP(*)
     !
-    DIMENSION XPT(2), XPT_XP(2, 2), &
-            YPT(2), YPT_YP(2, 2)
-    DIMENSION GAMT(2), GAMT_GAM(2, 2), GAMT_SIG(2, 2), &
-            SIGT(2), SIGT_GAM(2, 2), SIGT_SIG(2, 2)
-    DIMENSION GAMT_XP(2, 2), GAMT_YP(2, 2), GAMT_DX(2), GAMT_DY(2), &
-            SIGT_XP(2, 2), SIGT_YP(2, 2), SIGT_DX(2), SIGT_DY(2)
     !
     !---- local setup arrays
-    DIMENSION ANX(2), ANX_DX(2), ANX_DY(2), &
-            ANY(2), ANY_DX(2), ANY_DY(2)
-    DIMENSION ANXT_XP(2), ANXT_YP(2), &
-            ANYT_XP(2), ANYT_YP(2)
     !
-    DIMENSION DOT(2), DOT_XP(2, 2), DOT_YP(2, 2), DOT_DX(2), DOT_DY(2), &
-            CRS(2), CRS_XP(2, 2), CRS_YP(2, 2), CRS_DX(2), CRS_DY(2)
     !
     DO K = 1, 2
         DO J = 1, 2
@@ -461,7 +499,7 @@ SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
     !---- set node x,y of TE panel, and dx,dy of adjacent panels
     !
     DO K = 1, 2
-        IF(K.EQ.1) THEN
+        IF (K==1) THEN
             IP = IP1
             IPOPP = IP2
             KOPP = 2
@@ -477,7 +515,7 @@ SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
             ANYAXI = -1.0
         ENDIF
         !
-        IF(IP.GT.0) THEN
+        IF (IP>0) THEN
             !------- usual TE panel
             XPT(K) = XP(IP)
             YPT(K) = YP(IP)
@@ -506,7 +544,7 @@ SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
     DXT = XPT(1) - XPT(2)
     DYT = YPT(1) - YPT(2)
     DSTSQ = DXT**2 + DYT**2
-    IF(DSTSQ.EQ.0.0) THEN
+    IF (DSTSQ==0.0) THEN
         DSTI = 1.0
     ELSE
         DSTI = 1.0 / SQRT(DSTSQ)
@@ -545,7 +583,7 @@ SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
     !
     !
     DO K = 1, 2
-        IF(K.EQ.1) THEN
+        IF (K==1) THEN
             IP = IP1
             IPOPP = IP2
             KOPP = 2
@@ -555,7 +593,7 @@ SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
             KOPP = 1
         ENDIF
         !
-        IF(IP.GT.0) THEN
+        IF (IP>0) THEN
             GAMT(K) = DOT(K) * GAM(IP) - CRS(K) * SIG(IP)
             SIGT(K) = CRS(K) * GAM(IP) + DOT(K) * SIG(IP)
             GAMT_SIG(K, K) = -CRS(K)
@@ -580,19 +618,42 @@ SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, &
             SIGT_DX(K) = CRS_DX(K) * GAM(IPOPP) + DOT_DX(K) * SIG(IPOPP)
             SIGT_DY(K) = CRS_DY(K) * GAM(IPOPP) + DOT_DY(K) * SIG(IPOPP)
             DO J = 1, 2
-                SIGT_XP(K, J) = CRS_XP(K, J) * GAM(IPOPP) + DOT_XP(K, J) * SIG(IPOPP)
-                SIGT_YP(K, J) = CRS_YP(K, J) * GAM(IPOPP) + DOT_YP(K, J) * SIG(IPOPP)
+                SIGT_XP(K, J) = CRS_XP(K, J) * GAM(IPOPP) + DOT_XP(K, J)      &
+                        & * SIG(IPOPP)
+                SIGT_YP(K, J) = CRS_YP(K, J) * GAM(IPOPP) + DOT_YP(K, J)      &
+                        & * SIG(IPOPP)
             ENDDO
         ENDIF
     ENDDO
     !
-    RETURN
-END
+END SUBROUTINE TPANSET
+!*==QFCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! TPANSET
 
 
-SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
-        QF, QF_GAM, QF_SIG, QF_GTH)
+SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, &
+        & QF_GTH)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IF1, IF2
+    INTEGER, DIMENSION(*) :: IFTYPE, IPFO, IPFP
+    REAL, DIMENSION(2, *) :: QF
+    REAL, DIMENSION(2, IPX, *) :: QF_GAM, QF_GTH, QF_SIG
+    REAL, DIMENSION(*) :: XF, YF
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IEL, IF, IP, IP1, IP2, K, KF, KP, N, NF
+    REAL, DIMENSION(2, 2, IPX) :: QF_GAMTE, QF_SIGTE
+    REAL, DIMENSION(IPX) :: RCORE
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------------
     !     Calculates velocity components QF(.) at field points
     !     IF1...IF2 in coordinate arrays XF,YF w.r.t aero quantities
@@ -625,14 +686,7 @@ SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
     !c     &                  QF,QF_GAM,QF_SIG, QF_GAMT,QF_SIGT)
     !c      DIMENSION          QF_GAMT(2,2,NEX,*), QF_SIGT(2,2,NEX,*)
     !--------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION XF(*), YF(*)
-    DIMENSION IPFO(*), IPFP(*), IFTYPE(*)
-    DIMENSION QF(2, *), QF_GAM (2, IPX, *), QF_SIG (2, IPX, *)
-    DIMENSION          QF_GTH (2, IPX, *)
     !
-    DIMENSION QF_GAMTE(2, 2, IPX), QF_SIGTE(2, 2, IPX)
-    DIMENSION RCORE(IPX)
     !
     DO K = 1, 2
         DO IF = IF1, IF2
@@ -654,53 +708,45 @@ SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
     KF = IF1
     !
     !---- Set contribution of all vortex/source lines, rings, and points
-    DO 20 IEL = 1, NEL
-        IF(NETYPE(IEL).EQ.0&
-                .OR. NETYPE(IEL).EQ.1&
-                .OR. NETYPE(IEL).EQ.5&
-                .OR. NETYPE(IEL).EQ.6&
-                .OR. NETYPE(IEL).EQ.7) THEN
+    DO IEL = 1, NEL
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)       &
+                & ==5 .OR. NETYPE(IEL)==6 .OR. NETYPE(IEL)==7) THEN
             !------- sheets
-            CALL PANAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NF, XF(KF), YF(KF), IPFO(KF), IPFP(KF), IFTYPE(KF), &
-                    GAM, SIG, &
-                    IPX, QF(1, KF), QF_GAM(1, 1, KF), QF_SIG(1, 1, KF))
+            CALL PANAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NF, XF(KF), YF(KF), &
+                    & IPFO(KF), IPFP(KF), IFTYPE(KF), GAM, SIG, IPX, &
+                    & QF(1, KF), QF_GAM(1, 1, KF), QF_SIG(1, 1, KF))
             !
-        ELSEIF(NETYPE(IEL).EQ.2) THEN
+        ELSEIF (NETYPE(IEL)==2) THEN
             !------- line on axis
             DO IP = IPFRST(IEL), IPLAST(IEL)
                 RCORE(IP) = 0.01
             ENDDO
-            CALL AXLAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NF, XF(KF), YF(KF), IPFO(KF), IPFP(KF), IFTYPE(KF), &
-                    GAM, SIG, RCORE, &
-                    IPX, QF(1, KF), QF_GAM(1, 1, KF), QF_SIG(1, 1, KF))
+            CALL AXLAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NF, XF(KF), YF(KF), &
+                    & IPFO(KF), IPFP(KF), IFTYPE(KF), GAM, SIG, RCORE, IPX, &
+                    & QF(1, KF), QF_GAM(1, 1, KF), QF_SIG(1, 1, KF))
             !
-        ELSEIF(NETYPE(IEL).EQ.3) THEN
+        ELSEIF (NETYPE(IEL)==3) THEN
             !------- lines, rings
-            CALL LINAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NF, XF(KF), YF(KF), &
-                    GAM, SIG, &
-                    IPX, QF(1, KF), QF_GAM(1, 1, KF), QF_SIG(1, 1, KF))
+            CALL LINAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NF, XF(KF), YF(KF), &
+                    & GAM, SIG, IPX, QF(1, KF), QF_GAM(1, 1, KF), &
+                    & QF_SIG(1, 1, KF))
             !
-        ELSEIF(NETYPE(IEL).EQ.4) THEN
+        ELSEIF (NETYPE(IEL)==4) THEN
             !------- point
             I = IPFRST(IEL)
             N = 1
-            CALL PNTAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, &
-                    NF, XF(KF), YF(KF), &
-                    GAM, SIG, &
-                    IPX, QF(1, KF), QF_GAM(1, 1, KF), QF_SIG(1, 1, KF))
+            CALL PNTAIC(IPFRST(IEL), IPLAST(IEL), XP, YP, NF, XF(KF), YF(KF), &
+                    & GAM, SIG, IPX, QF(1, KF), QF_GAM(1, 1, KF), &
+                    & QF_SIG(1, 1, KF))
         ENDIF
-    20   CONTINUE
+    ENDDO
     !
     !
     !
     !---- Accumulate velocity from wake vorticity, GTH
     !---- Save velocity AIC matrix (w/o TE panel influences) for wake vorticity
     DO IEL = 1, NEL
-        IF(NETYPE(IEL).EQ.0&
-                .OR. NETYPE(IEL).EQ.7) THEN
+        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==7) THEN
             !
             IP1 = IPFRST(IEL)
             IP2 = IPLAST(IEL)
@@ -710,17 +756,17 @@ SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
                     QF_GTH(2, IP, IF) = QF_GAM(2, IP, IF)
                     QF(1, IF) = QF(1, IF) + QF_GTH(1, IP, IF) * GTH(IP)
                     QF(2, IF) = QF(2, IF) + QF_GTH(2, IP, IF) * GTH(IP)
-                END DO
-            END DO
+                ENDDO
+            ENDDO
             !
         ENDIF
-    END DO
+    ENDDO
 
     !
     !---- Add contribution of all TE panels
-    DO 30 IEL = 1, NEL
-        IF(LTPAN(IEL) .AND.&
-                (NETYPE(IEL).EQ.0 .OR. NETYPE(IEL).EQ.7)) THEN
+    DO IEL = 1, NEL
+        IF (LTPAN(IEL) .AND. (NETYPE(IEL)==0 .OR. NETYPE(IEL)==7))   &
+                & THEN
             !---- clear field-point velocities for each TE panel
             DO IF = IF1, IF2
                 DO KP = 1, 2
@@ -731,10 +777,9 @@ SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
                 ENDDO
             ENDDO
             !
-            CALL PANAIC(1, 2, XPT(1, IEL), YPT(1, IEL), &
-                    NF, XF(KF), YF(KF), IZERO, IZERO, IFTYPE(KF), &
-                    GAMT(1, IEL), SIGT(1, IEL), &
-                    2, QF(1, KF), QF_GAMTE(1, 1, KF), QF_SIGTE(1, 1, KF))
+            CALL PANAIC(1, 2, XPT(1, IEL), YPT(1, IEL), NF, XF(KF), YF(KF), &
+                    & IZERO, IZERO, IFTYPE(KF), GAMT(1, IEL), SIGT(1, IEL), &
+                    & 2, QF(1, KF), QF_GAMTE(1, 1, KF), QF_SIGTE(1, 1, KF))
             !
             !HHY- Uncomment to save TE panel influences separately
             !---- Save TE velocity influences
@@ -750,32 +795,32 @@ SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
             !---- Add TE influences to panel nodes (assumes TPANSET has been called)
             DO IF = IF1, IF2
                 DO KP = 1, 2
-                    IF(KP.EQ.1) THEN
+                    IF (KP==1) THEN
                         IP = IPTE1(IEL)
                     ELSE
                         IP = IPTE2(IEL)
                     ENDIF
-                    IF(IP.GT.0) THEN
+                    IF (IP>0) THEN
                         DO K = 1, 2
-                            QF_GAM(K, IP, IF) = QF_GAM(K, IP, IF)&
-                                    + QF_GAMTE(K, 1, IF) * GAMT_GAM(1, KP, IEL)&
-                                    + QF_GAMTE(K, 2, IF) * GAMT_GAM(2, KP, IEL)&
-                                    + QF_SIGTE(K, 1, IF) * SIGT_GAM(1, KP, IEL)&
-                                    + QF_SIGTE(K, 2, IF) * SIGT_GAM(2, KP, IEL)
-                            QF_SIG(K, IP, IF) = QF_SIG(K, IP, IF)&
-                                    + QF_GAMTE(K, 1, IF) * GAMT_SIG(1, KP, IEL)&
-                                    + QF_GAMTE(K, 2, IF) * GAMT_SIG(2, KP, IEL)&
-                                    + QF_SIGTE(K, 1, IF) * SIGT_SIG(1, KP, IEL)&
-                                    + QF_SIGTE(K, 2, IF) * SIGT_SIG(2, KP, IEL)
-                        ENDDO ! K loop
+                            QF_GAM(K, IP, IF) = QF_GAM(K, IP, IF)               &
+                                    & + QF_GAMTE(K, 1, IF) * GAMT_GAM(1, KP, IEL)        &
+                                    & + QF_GAMTE(K, 2, IF) * GAMT_GAM(2, KP, IEL)        &
+                                    & + QF_SIGTE(K, 1, IF) * SIGT_GAM(1, KP, IEL)        &
+                                    & + QF_SIGTE(K, 2, IF) * SIGT_GAM(2, KP, IEL)
+                            QF_SIG(K, IP, IF) = QF_SIG(K, IP, IF)               &
+                                    & + QF_GAMTE(K, 1, IF) * GAMT_SIG(1, KP, IEL)        &
+                                    & + QF_GAMTE(K, 2, IF) * GAMT_SIG(2, KP, IEL)        &
+                                    & + QF_SIGTE(K, 1, IF) * SIGT_SIG(1, KP, IEL)        &
+                                    & + QF_SIGTE(K, 2, IF) * SIGT_SIG(2, KP, IEL)
+                        ENDDO    ! K loop
                     ENDIF
-                END DO ! KP loop
-            END DO ! IF loop
+                ENDDO   ! KP loop
+            ENDDO  ! IF loop
             !
         ENDIF
         !
         !---- Special treatment for vortex wake last GTH point to include TE panel
-        IF(LTPAN(IEL) .AND. NETYPE(IEL).EQ.7) THEN
+        IF (LTPAN(IEL) .AND. NETYPE(IEL)==7) THEN
             IP = IPLAST(IEL)
             DO IF = IF1, IF2
                 !---- Remove velocity w/o TE panel
@@ -787,16 +832,14 @@ SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, &
                 !---- Add back in velocity with TE panel
                 !c            QF(1,IF) = QF(1,IF) + QF_GTH(1,IP,IF)*GTH(IP)
                 !c            QF(2,IF) = QF(2,IF) + QF_GTH(2,IP,IF)*GTH(IP)
-            END DO
+            ENDDO
         ENDIF
 
-    30   ENDDO
+    ENDDO
     !
     !---- Add freestream
     !      DO IF = 1, NF
     !        QF(1,IF) = QF(1,IF) + QINF
     !      ENDDO
     !
-    RETURN
-END
-! QFCALC
+END SUBROUTINE QFCALC

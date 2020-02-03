@@ -1,24 +1,26 @@
+!*==WAKERESET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -29,6 +31,18 @@
 !=========================================================================
 
 SUBROUTINE WAKERESET
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: DX, DX0, DY, DY0
+    INTEGER :: IEL, IELO, IP, IP1, IP1O, IP2O, IPM, IPTE
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------------
     !     Realigns the upper and lower wakes bounding the duct
     !     vortex wake grid with the current flow.
@@ -37,14 +51,13 @@ SUBROUTINE WAKERESET
     !     the grid.  All wake elements are re-initialized with the new
     !     geometry.
     !-------------------------------------------------------------
-    INCLUDE 'DFDC.INC'
     !
     !---- CB wake
     IEL = IR2IEL(1)
     CALL WAKMOV(IEL, ISPLOT(IEL))
     !
     !---- duct wake (check for tip gap...)
-    IF(TGAP.LE.0.0) THEN
+    IF (TGAP<=0.0) THEN
         IEL = IR2IEL(NRP)
         CALL WAKMOV(IEL, ISPLOT(IEL))
     ELSE
@@ -66,7 +79,7 @@ SUBROUTINE WAKERESET
             DY = YP(IP) - YP(IPM)
             !c          write(*,*) 'WAKERESET ip,dx,dy ',ip,dx,dy
             YP(IP) = YP(IP) - (DY - DY0)
-        END DO
+        ENDDO
     ENDIF
     !
     !---- change grid boundaries, relax grid and update vortex wakes
@@ -82,14 +95,30 @@ SUBROUTINE WAKERESET
     LGAMU = .FALSE.
     LGAMA = .FALSE.
     !
-    RETURN
-END
+END SUBROUTINE WAKERESET
+!*==WAKMOV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! WAKERESET
 
 
 
 
 SUBROUTINE WAKMOV(IELA, ISQ)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IELA, ISQ
+    !
+    ! Local variables
+    !
+    INTEGER :: IEL, IP, IP1, IP2, IR
+    REAL :: XP2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------------
     !     Moves existing wake (element IELA) by
     !     aligning panels with current velocities.
@@ -102,11 +131,11 @@ SUBROUTINE WAKMOV(IELA, ISQ)
     !     while aligning the panels with the current velocity
     !     vectors on the panel.
     !-------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NETYPE(IELA).EQ.0) THEN
+    IF (NETYPE(IELA)==0) THEN
         !----- this element is a body panel
-        WRITE(*, *) 'WAKMOV: Element', IELA, ' is body, cannot be moved!'
+        WRITE (*, *) 'WAKMOV: Element', IELA, &
+                &' is body, cannot be moved!'
         RETURN
     ENDIF
     !
@@ -151,21 +180,36 @@ SUBROUTINE WAKMOV(IELA, ISQ)
         IUVWK(IR) = 0
     ENDDO
     !
-    RETURN
-END
+END SUBROUTINE WAKMOV
+!*==WAKMOVR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! WAKMOV
 
 
 
 SUBROUTINE WAKMOVR(IEL, XPNEW, YPNEW, ISQ)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IEL, ISQ
+    REAL, DIMENSION(*) :: XPNEW, YPNEW
+    !
+    ! Local variables
+    !
+    REAL, DIMENSION(IPX) :: DSP
+    REAL :: DXP, DYP, QMAG, QSTAG, QX, QY, UN, VN
+    INTEGER :: IC, IC1, IC2, IP, IP1, IP2, IPO, IPP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------
     !---- Routine to move points on element to new positions
     !     to align with velocity vector on side ISQ (0/1/2)
     !----------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION XPNEW(*), YPNEW(*)
     !
-    DIMENSION DSP(IPX)
     !
     !---- speed below this is treated as stagnation
     QSTAG = 0.0001 * QREF
@@ -196,13 +240,13 @@ SUBROUTINE WAKMOVR(IEL, XPNEW, YPNEW, ISQ)
         IPO = IPCO(IC)
         IPP = IPCP(IC)
         !
-        IF(ISQ .EQ. 0) THEN
+        IF (ISQ==0) THEN
             QX = QC(1, IC)
             QY = QC(2, IC)
-        ELSEIF(ISQ .EQ. 1) THEN
+        ELSEIF (ISQ==1) THEN
             QX = QCR(1, IC)
             QY = QCR(2, IC)
-        ELSEIF(ISQ .EQ. 2) THEN
+        ELSEIF (ISQ==2) THEN
             QX = QCL(1, IC)
             QY = QCL(2, IC)
         ELSE
@@ -211,20 +255,14 @@ SUBROUTINE WAKMOVR(IEL, XPNEW, YPNEW, ISQ)
         ENDIF
         !
         QMAG = SQRT(QX**2 + QY**2)
-        IF(QMAG.LT.QSTAG) THEN
-            !------- stagnation... don't try to move points
-            RETURN
-        ENDIF
+        !------- stagnation... don't try to move points
+        IF (QMAG<QSTAG) RETURN
         !
         UN = QX / QMAG
         VN = QY / QMAG
         XPNEW(IPP) = XPNEW(IPO) + UN * DSP(IPO)
         YPNEW(IPP) = YPNEW(IPO) + VN * DSP(IPO)
         !
-    END DO
+    ENDDO
     !
-    RETURN
-END
-! WAKMOVR
-
-
+END SUBROUTINE WAKMOVR

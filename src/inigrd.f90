@@ -1,24 +1,26 @@
+!*==INIGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+! UVGRD
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -30,34 +32,49 @@
 
 
 SUBROUTINE INIGRD
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: AMASS, AMASS1, DMASS1, DS, DS1, DX, DXW, DY, &
+            & FRAC, FRC, SMAX, XCB, XDW, XL, XLAST, XTECB, &
+            & XTEDW, XU, YCB, YDW, YL, YLAST, YU, YY
+    INTEGER :: I, IEL, ILWR, IP, IP1CB, IP1DW, IP2CB, IP2DW, &
+            & IPC, IPCB, IPD, IPDW, IPUP, ITE, IUPR, J, K, &
+            & NR
+    REAL, DIMENSION(IPX) :: S
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Sets up vortex wake grid system from rotor and wake
     !     geometry
     !------------------------------------------------------
-    INCLUDE 'DFDC.INC'
-    DIMENSION S(IPX)
     !
-    IF(LDBG) THEN
-        WRITE(*, *) ' '
-        WRITE(*, *) 'INIGRD setup grid for slipstream'
+    IF (LDBG) THEN
+        WRITE (*, *) ' '
+        WRITE (*, *) 'INIGRD setup grid for slipstream'
         !
-        WRITE(LUNDBG, *) ' '
-        WRITE(LUNDBG, *) 'INIGRD setup grid for slipstream'
+        WRITE (LUNDBG, *) ' '
+        WRITE (LUNDBG, *) 'INIGRD setup grid for slipstream'
     ENDIF
     !
     !---- Find most-upstream rotor point on duct wall and set as start of grid
     NRUPSTRM = 1
     IPUP = IPROTDW(NRUPSTRM)
     DO NR = 2, NROTOR
-        IF(IPROTDW(NR).LT.IPUP) THEN
+        IF (IPROTDW(NR)<IPUP) THEN
             NRUPSTRM = NR
             IPUP = IPROTDW(NR)
         ENDIF
-    END DO
+    ENDDO
     !---- Setup rotor at upstream end of grid
     DO NR = 1, NROTOR
         IGROTOR(NR) = 1 + IPROTDW(NR) - IPUP
-    END DO
+    ENDDO
     !
     NR = NRUPSTRM
     !---- Indices of rotor line on CB and duct define upstream grid boundary
@@ -66,11 +83,11 @@ SUBROUTINE INIGRD
     IP1CB = IPFRST(IEL)
     IP2CB = IPLAST(IEL)
     IPCB = IPROTCB(NR)
-    IF(IPCB.EQ.0) THEN
-        WRITE(*, *) 'Error locating rotor on CB wall'
+    IF (IPCB==0) THEN
+        WRITE (*, *) 'Error locating rotor on CB wall'
         STOP
     ENDIF
-    IF(LDBG) WRITE(LUNDBG, *) 'Rotor on CB @ ', IPCB
+    IF (LDBG) WRITE (LUNDBG, *) 'Rotor on CB @ ', IPCB
     XCB = XP(IPCB)
     YCB = YP(IPCB)
     XTECB = XP(IP1CB)
@@ -80,11 +97,11 @@ SUBROUTINE INIGRD
     IP1DW = IPFRST(IEL)
     IP2DW = IPLAST(IEL)
     IPDW = IPROTDW(NR)
-    IF(IPDW.EQ.0) THEN
-        WRITE(*, *) 'Error locating rotor on Duct wall'
+    IF (IPDW==0) THEN
+        WRITE (*, *) 'Error locating rotor on Duct wall'
         STOP
     ENDIF
-    IF(LDBG) WRITE(LUNDBG, *) 'Rotor on Duct wall @ ', IPDW
+    IF (LDBG) WRITE (LUNDBG, *) 'Rotor on Duct wall @ ', IPDW
     XDW = XP(IPDW)
     YDW = YP(IPDW)
     XTEDW = XP(IP2DW)
@@ -99,7 +116,7 @@ SUBROUTINE INIGRD
         XG(I, J) = XP(IP)
         YG(I, J) = YP(IP)
         IP2IG(IP) = I
-    END DO
+    ENDDO
     XLAST = XG(I, J)
     YLAST = YG(I, J)
     IGTECB = I
@@ -108,12 +125,12 @@ SUBROUTINE INIGRD
     !
     !---- Add points at X values of duct wall if it extends downstream of CB
     IPD = IPDW + IGTECB - 1
-    IF(IPD.LT.IP2DW) THEN
+    IF (IPD<IP2DW) THEN
         DO IP = IPD + 1, IP2DW
             I = I + 1
             XG(I, J) = XP(IP)
             YG(I, J) = YLAST
-        END DO
+        ENDDO
         XLAST = XG(I, J)
         YLAST = YG(I, J)
         ITE = I
@@ -121,12 +138,12 @@ SUBROUTINE INIGRD
     ENDIF
     !
     !---- Check downstream wake end location
-    IF(LDBG) WRITE(LUNDBG, *) 'INIGRD XWAKE ', XWAKE
-    IF(XDWKLEN.LT.0.0 .OR. XDWKLEN.GT.5.0) THEN
-        WRITE(*, *) 'Rotor wake length out of bounds ', XDWKLEN
-        WRITE(*, *) '  CB   TE at X,Y =', XBTE(1), YBTE(1)
-        WRITE(*, *) '  Duct TE at X,Y =', XBTE(2), YBTE(2)
-        WRITE(*, *) '  Rotor Diameter =', 2.0 * RTIP(1)
+    IF (LDBG) WRITE (LUNDBG, *) 'INIGRD XWAKE ', XWAKE
+    IF (XDWKLEN<0.0 .OR. XDWKLEN>5.0) THEN
+        WRITE (*, *) 'Rotor wake length out of bounds ', XDWKLEN
+        WRITE (*, *) '  CB   TE at X,Y =', XBTE(1), YBTE(1)
+        WRITE (*, *) '  Duct TE at X,Y =', XBTE(2), YBTE(2)
+        WRITE (*, *) '  Rotor Diameter =', 2.0 * RTIP(1)
         CALL ASKR('Enter length of wake from TE dXlen/D^', XDWKLEN)
     ENDIF
     XWAKE = MAX(XBTE(1), XBTE(2)) + XDWKLEN * 2.0 * RTIP(1)
@@ -144,7 +161,7 @@ SUBROUTINE INIGRD
         I = I + 1
         XG(I, J) = XLAST + S(K)
         YG(I, J) = YLAST
-    END DO
+    ENDDO
     ILWR = I
     !
     !
@@ -158,7 +175,7 @@ SUBROUTINE INIGRD
         XG(I, J) = XP(IP)
         YG(I, J) = YP(IP)
         IP2IG(IP) = I
-    END DO
+    ENDDO
     XLAST = XG(I, J)
     YLAST = YG(I, J)
     IGTEDW = I
@@ -167,12 +184,12 @@ SUBROUTINE INIGRD
     !
     !---- Add points at X values of CB wall if it extends downstream of duct
     IPC = IPCB - IGTEDW + 1
-    IF(IPC.GT.IP1CB) THEN
+    IF (IPC>IP1CB) THEN
         DO IP = IPC - 1, IP1CB, -1
             I = I + 1
             XG(I, J) = XP(IP)
             YG(I, J) = YLAST
-        END DO
+        ENDDO
         XLAST = XG(I, J)
         YLAST = YG(I, J)
         ITE = I
@@ -192,14 +209,14 @@ SUBROUTINE INIGRD
         I = I + 1
         XG(I, J) = XLAST + S(K)
         YG(I, J) = YLAST
-    END DO
+    ENDDO
     IUPR = I
     !
-    IF(ILWR.NE.IUPR) THEN
-        WRITE(*, *) 'INIGRD: incompatible # points on J=1 and J=JJ', &
-                ILWR, IUPR
-        WRITE(*, *) 'IP1CB,IP2CB,IPCB ', IP1CB, IP2CB, IPCB
-        WRITE(*, *) 'IP1DW,IP2DW,IPDW ', IP1DW, IP2DW, IPDW
+    IF (ILWR/=IUPR) THEN
+        WRITE (*, *) 'INIGRD: incompatible # points on J=1 and J=JJ', &
+                & ILWR, IUPR
+        WRITE (*, *) 'IP1CB,IP2CB,IPCB ', IP1CB, IP2CB, IPCB
+        WRITE (*, *) 'IP1DW,IP2DW,IPDW ', IP1DW, IP2DW, IPDW
         STOP
     ENDIF
     !---- Set total # of streamwise points
@@ -214,7 +231,7 @@ SUBROUTINE INIGRD
         XG(I, J) = XRP(J, NR)
         YG(I, J) = YRP(J, NR)
         XGMIN = MIN(XGMIN, XG(I, J))
-    END DO
+    ENDDO
     !
     !---- Sweep downstream setting intermediate J lines preserving relative
     !     massflow between upper and lower walls
@@ -233,13 +250,13 @@ SUBROUTINE INIGRD
             FRAC = (YY - YL) / (YU - YL)
             XG(I, J) = XL + FRAC * (XU - XL)
             YG(I, J) = YY
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
     !---- Done, initial grid defined!
-    IF(LDBG) THEN
-        WRITE(*, *) 'INIGRD grid defined with II,JJ ', II, JJ
-        WRITE(LUNDBG, *) 'INIGRD grid defined with II,JJ ', II, JJ
+    IF (LDBG) THEN
+        WRITE (*, *) 'INIGRD grid defined with II,JJ ', II, JJ
+        WRITE (LUNDBG, *) 'INIGRD grid defined with II,JJ ', II, JJ
     ENDIF
     !
     !     Add initial grid smoothing relaxation?
@@ -255,21 +272,31 @@ SUBROUTINE INIGRD
     LGAMU = .FALSE.
     LGAMA = .FALSE.
     !
-    RETURN
-END
+END SUBROUTINE INIGRD
+!*==UPDGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! INIGRD
 
 
 SUBROUTINE UPDGRD
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IEL, IP, IP1, IP2, J
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Updates grid upper and lower boundaries with
     !     points from current upper and lower vortex wakes
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(LDBG) THEN
-        WRITE(*, *) ' '
-        WRITE(*, *) 'Updating grid system boundaries'
+    IF (LDBG) THEN
+        WRITE (*, *) ' '
+        WRITE (*, *) 'Updating grid system boundaries'
     ENDIF
     !
     !---- Redefine lower streamline (J=1) with IR=1 wake points
@@ -281,10 +308,10 @@ SUBROUTINE UPDGRD
         I = IGTECB + (IP - IP1)
         XG(I, J) = XP(IP)
         YG(I, J) = YP(IP)
-    END DO
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *) 'Updated lower boundary from element ', IEL
-    ENDIF
+    ENDDO
+    IF (LDBG) WRITE (LUNDBG, *)                                      &
+            &'Updated lower boundary from element '&
+            &, IEL
     !
     !---- Redefine upper streamline (J=JJ) with IR=NRP wake points
     J = JJ
@@ -295,32 +322,43 @@ SUBROUTINE UPDGRD
         I = IGTEDW + (IP - IP1)
         XG(I, J) = XP(IP)
         YG(I, J) = YP(IP)
-    END DO
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *) 'Updated upper boundary from element ', IEL
-    ENDIF
+    ENDDO
+    IF (LDBG) WRITE (LUNDBG, *)                                      &
+            &'Updated upper boundary from element '&
+            &, IEL
     !
     !---- Grid boundaries redefined!
-    IF(LDBG) WRITE(*, *) 'UPDGRD grid boundaries updated'
+    IF (LDBG) WRITE (*, *) 'UPDGRD grid boundaries updated'
     !
     !---- Grid smoothing by elliptic solver
     CALL RLXGRD
     !
-    RETURN
-END
+END SUBROUTINE UPDGRD
+!*==RLXGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! UPDGRD
 
 
 
 
 SUBROUTINE RLXGRD
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, ITMAXS, J, KBCBOT, KBCINL, KBCOUT, KBCTOP
+    REAL :: TOLER
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Runs elliptic grid solution to smooth grid
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(II.LE.0 .OR. JJ.LE.0) THEN
-        WRITE(*, *) 'RLXGRD:  no grid defined II,JJ ', II, JJ
+    IF (II<=0 .OR. JJ<=0) THEN
+        WRITE (*, *) 'RLXGRD:  no grid defined II,JJ ', II, JJ
         RETURN
     ENDIF
     !
@@ -328,41 +366,53 @@ SUBROUTINE RLXGRD
     YPOS(1) = 0.0
     DO J = 2, JJ
         YPOS(J) = YG(1, J)**2 - YG(1, J - 1)**2 + YPOS(J - 1)
-    END DO
+    ENDDO
     !---- Set up streamwise spacing array
     DO I = 1, II
         XPOS(I) = XG(I, 1)
-    END DO
+    ENDDO
     !
     !---- Run grid solver
     ITMAXS = -400
     TOLER = 1.0E-9
-    KBCINL = 0   ! inlet plane Dirichlet, fix nodes
-    KBCOUT = 1   ! outlet plane Neumann, move nodes on boundary
-    KBCBOT = 0   ! bottom streamline Dirichlet, fix nodes
-    KBCTOP = 0   ! top streamline Dirichlet, fix nodes
+    KBCINL = 0 ! inlet plane Dirichlet, fix nodes
+    KBCOUT = 1 ! outlet plane Neumann, move nodes on boundary
+    KBCBOT = 0 ! bottom streamline Dirichlet, fix nodes
+    KBCTOP = 0 ! top streamline Dirichlet, fix nodes
     !      WRITE(*,*)
     !      WRITE(*,*) 'Grid relaxation iteration'
-    CALL AXELL(IX, II, JJ, XG, YG, XPOS, YPOS, ITMAXS, TOLER, &
-            KBCINL, KBCOUT, KBCBOT, KBCTOP)
+    CALL AXELL(IX, II, JJ, XG, YG, XPOS, YPOS, ITMAXS, TOLER, KBCINL, KBCOUT, &
+            & KBCBOT, KBCTOP)
     !
-    RETURN
-END
+END SUBROUTINE RLXGRD
+!*==SETGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! RLXGRD
 
 !     &  XG(IX,JX),    YG(IX,JX),
-!     &  QG(IX,JX),    QXG(IX,JX),   QYG(IX,JX),  QTG(IX,JX),  
+!     &  QG(IX,JX),    QXG(IX,JX),   QYG(IX,JX),  QTG(IX,JX),
 !     &  RG(IX,JX),    PG(IX,JX),    POG(IX,JX),
 !     &  BGAMG(IX,JX), DSG(IX,JX),   DHG(IX,JX),
 !     &  XPOS(IX),     YPOS(JX)
 
 
 SUBROUTINE SETGRDFLW
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: DBGAMG, DDHG, DDSG, SIGC, VMC
+    INTEGER :: I, IC, IC1, IC2, IEL, IG, IP1, IP2, IR, J, &
+            & N, NNC
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Sets grid flow data from circulation and entropy on
     !     rotor lines
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- Clear grid data for accumulation over sources
     CALL CLRGRDFLW
@@ -379,8 +429,9 @@ SUBROUTINE SETGRDFLW
         IG = IGROTOR(N)
         !
         NNC = IC2 - IC1 + 1
-        IF(NNC.NE.JJ - 1) THEN
-            WRITE(*, *) 'Rotor source element-grid mismatch ', NNC, JJ - 1
+        IF (NNC/=JJ - 1) THEN
+            WRITE (*, *) 'Rotor source element-grid mismatch ', NNC, &
+                    & JJ - 1
             STOP
         ENDIF
         !
@@ -403,23 +454,33 @@ SUBROUTINE SETGRDFLW
                 DHG(I, J) = DHG(I, J) + DDHG
                 DSG(I, J) = DSG(I, J) + DDSG
                 !c        RG(I,J)    = RG(1,J)
-            END DO
+            ENDDO
             !
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE SETGRDFLW
+!*==CLRGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SETGRDFLW
 
 
 SUBROUTINE CLRGRDFLW
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, J
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Clears (initializes to zero) grid flow BGAMG,DHG,DSG
     !     This is normally done before accumulating disk
     !     contributions
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- Clear grid data for accumulation of circulation, enthalpy, entropy
     DO J = 1, JJ
@@ -428,20 +489,35 @@ SUBROUTINE CLRGRDFLW
             DHG(I, J) = 0.0
             DSG(I, J) = 0.0
             RG(I, J) = RHO
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE CLRGRDFLW
+!*==ROTBG2GRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! CLRGRDFLW
 
 
 SUBROUTINE ROTBG2GRD(N)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N
+    !
+    ! Local variables
+    !
+    REAL :: DBGAMG, DDHG
+    INTEGER :: I, IG, IR, J
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Updates grid flow (circulation) from BGAM on rotor N
     !     rotor lines
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- Set B*GAM circulation, delta enthalpy on grid from blade/rotors
     !---- Set values at grid IG station due to blade row
@@ -457,25 +533,37 @@ SUBROUTINE ROTBG2GRD(N)
         DO I = IG, II - 1
             BGAMG(I, J) = BGAMG(I, J) + DBGAMG
             DHG(I, J) = DHG(I, J) + DDHG
-        END DO
+        ENDDO
         !
-    END DO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE ROTBG2GRD
+!*==GETGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ROTBG2GRD
 
 
 
 SUBROUTINE GETGRDFLW
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, IO, IP, J, JO, JP
+    REAL :: XCG, XOO, XOP, XPO, XPP, YCG, YOO, YOP, YPO, &
+            & YPP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Sets grid initial flow data from rotor line conditions
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     CALL UVGRDC(IX, II, JJ, XG, YG, XPOS, YPOS, QXG, QYG)
     !---- Print grid velocities
-    WRITE(44, *) 'I,J, XC,YC, U, V'
+    WRITE (44, *) 'I,J, XC,YC, U, V'
     DO I = 1, II - 1
         IO = I
         IP = I + 1
@@ -492,23 +580,34 @@ SUBROUTINE GETGRDFLW
             YPP = YG(IP, JP)
             XCG = 0.25 * (XOO + XPO + XOP + XPP)
             YCG = 0.25 * (YOO + YPO + YOP + YPP)
-            WRITE(44, 100) I, J, XCG, YCG, QXG(I, J), QYG(I, J)
-        END DO
-    END DO
-    100  FORMAT(2I5, 5(1X, F11.6))
+            WRITE (44, 100) I, J, XCG, YCG, QXG(I, J), QYG(I, J)
+        ENDDO
+    ENDDO
+    100  FORMAT (2I5, 5(1X, F11.6))
     !
-    RETURN
-END
+END SUBROUTINE GETGRDFLW
+!*==INLSFCN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! GETGRDFLW
 
 
 
 SUBROUTINE INLSFCN
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: J, NR
+    REAL :: VX, YSCL
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Calculates streamfunction (YPOS) at grid inlet using
     !     velocities at rotor and current grid points
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     NR = NRUPSTRM
     !---- Set up streamfunction array using grid and rotor line velocity
@@ -517,26 +616,37 @@ SUBROUTINE INLSFCN
         VX = VABS(1, J - 1, NR)
         YPOS(J) = 0.5 * VX * (YG(1, J)**2 - YG(1, J - 1)**2) + YPOS(J - 1)
         !c        YPOS(J) = 0.5*VX*YG(1,J)**2
-    END DO
+    ENDDO
     YSCL = 1.0 / YPOS(JJ)
     !c      DO J = 1, JJ
     !c        write(*,*) 'j ypos ',j,ypos(j)
     !c        YPOS(J) = YSCL*YPOS(J)
     !c      END DO
     !
-    RETURN
-END
+END SUBROUTINE INLSFCN
+!*==RLXGRD2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! INLSFCN
 
 
 SUBROUTINE RLXGRD2
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, ITMAXS, KBCBOT, KBCINL, KBCOUT, KBCTOP
+    REAL :: TOLER
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------
     !     Runs elliptic grid solution to smooth grid
     !------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(II.LE.0 .OR. JJ.LE.0) THEN
-        WRITE(*, *) 'RLXGRD:  no grid defined II,JJ ', II, JJ
+    IF (II<=0 .OR. JJ<=0) THEN
+        WRITE (*, *) 'RLXGRD:  no grid defined II,JJ ', II, JJ
         RETURN
     ENDIF
     !
@@ -546,28 +656,62 @@ SUBROUTINE RLXGRD2
     !---- Set up streamwise spacing array
     DO I = 1, II
         XPOS(I) = XG(I, 1)
-    END DO
+    ENDDO
     !
     !---- Run grid solver
     ITMAXS = -400
     TOLER = 1.0E-9
-    KBCINL = 0   ! inlet plane Dirichlet, fix nodes
-    KBCOUT = 1   ! outlet plane Neumann, move nodes on boundary
-    KBCBOT = 0   ! bottom streamline Dirichlet, fix nodes
-    KBCTOP = 0   ! top streamline Dirichlet, fix nodes
-    CALL AXELL(IX, II, JJ, XG, YG, XPOS, YPOS, ITMAXS, TOLER, &
-            KBCINL, KBCOUT, KBCBOT, KBCTOP)
+    KBCINL = 0 ! inlet plane Dirichlet, fix nodes
+    KBCOUT = 1 ! outlet plane Neumann, move nodes on boundary
+    KBCBOT = 0 ! bottom streamline Dirichlet, fix nodes
+    KBCTOP = 0 ! top streamline Dirichlet, fix nodes
+    CALL AXELL(IX, II, JJ, XG, YG, XPOS, YPOS, ITMAXS, TOLER, KBCINL, KBCOUT, &
+            & KBCBOT, KBCTOP)
     !
-    RETURN
-END
+END SUBROUTINE RLXGRD2
+!*==AXELL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! RLXGRD2
 
 
-SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
-        KBCINL, KBCOUT, KBCBOT, KBCTOP)
-    IMPLICIT REAL (A-H, M, O-Z)
-    DIMENSION X(IX, *), Y(IX, *)
-    DIMENSION XPOS(*), YPOS(*)
+SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, KBCINL, &
+        & KBCOUT, KBCBOT, KBCTOP)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! PARAMETER definitions
+    !
+    INTEGER, PARAMETER :: IDIM = 500
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: II, ITMAXS, IX, JJ, KBCBOT, KBCINL, KBCOUT, &
+            & KBCTOP
+    REAL :: TOLER
+    REAL, DIMENSION(IX, *) :: X, Y
+    REAL, DIMENSION(*) :: XPOS, YPOS
+    !
+    ! Local variables
+    !
+    REAL :: A, AD1, AD2, AINV, AJA, ALF, B, BET, CETM, &
+            & CETP, CXIM, CXIP, DETAV, DETL, DETM, DETP, DETQ, &
+            & DMAX, DS, DSET1, DSET2, DSET3, DX, DXDE1, DXDE2, &
+            & DXDET, DXDX1, DXDX2, DXDXI, DXIAV, DXIL, DXIM, &
+            & DXIP, DXIQ, DXY, DY, DYDE1, DYDE2, DYDET, DYDX1, &
+            & DYDX2, DYDXI, GAM, REZ, RLX, RLX1, RLX2, RLX3, &
+            & SRLX, XDSE, XLO, XMM, XMO, XMP, XOL, XOM, XOO, &
+            & XOP, XOQ, XPM, XPO, XPP, XQO, XS, XSN, YAA, &
+            & YAM, YAP, YDSE, YLO, YMM, YMO, YMP, YOL, YOM, &
+            & YOO, YOP, YOQ, YPM, YPO
+    REAL, DIMENSION(IDIM) :: C, SB, SBI, ST, STI, XB, XBS, &
+            & XT, XTS, YB, YBS, YT, YTS
+    REAL, DIMENSION(2, IDIM) :: D
+    INTEGER :: IBACK, IFIN, IL, IM, IO, IP, IPASS, IQ, &
+            & ITMAX, JL, JM, JO, JP, JQ
+    REAL :: YPP, YQO, YS, YSN, Z_S, Z_XOO, Z_YOO
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------------
     !     Axisymmetric elliptic grid smoother.
     !     Uses SLOR implicit along i direction.
@@ -623,13 +767,9 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
     !       a r_ss  -  2b r_se  +  c/r (r r_e)_e  -  b/r r_s r_e  =  0
     !
     !-------------------------------------------------------------
-    PARAMETER (IDIM = 500)
-    DIMENSION C(IDIM), D(2, IDIM)
     !
-    DIMENSION XT(IDIM), YT(IDIM), ST(IDIM), XTS(IDIM), YTS(IDIM), STI(IDIM)
-    DIMENSION XB(IDIM), YB(IDIM), SB(IDIM), XBS(IDIM), YBS(IDIM), SBI(IDIM)
     !
-    IF(II.GT.IDIM) STOP 'ELLIP: Array overflow.  Increase IDIM.'
+    IF (II>IDIM) STOP 'ELLIP: Array overflow.  Increase IDIM.'
     !
     ITMAX = IABS(ITMAXS)
     !
@@ -638,11 +778,11 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
     DSET2 = 5.0E-3
     DSET3 = 5.0E-7
     !
-    IF(ITMAXS.GT.0) THEN
+    IF (ITMAXS>0) THEN
         !----- over-relaxation parameter for each phase
-        RLX1 = 1.00       !          DMAX > DSET1
-        RLX2 = 1.10       !  DSET1 > DMAX > DSET2
-        RLX3 = 1.40       !  DSET2 > DMAX > DSET3
+        RLX1 = 1.00      !          DMAX > DSET1
+        RLX2 = 1.10      !  DSET1 > DMAX > DSET2
+        RLX3 = 1.40      !  DSET2 > DMAX > DSET3
         !CC    STOP              !  DSET3 > DMAX
     ELSE
         RLX1 = 1.0
@@ -682,12 +822,12 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
     !
     RLX = RLX1
     !
-    DO 1000 IPASS = 1, ITMAX
+    DO IPASS = 1, ITMAX
         !
         DMAX = 0.
         !
         JO = 1
-        IF(KBCBOT.EQ.1 .AND. JJ.GT.2) THEN
+        IF (KBCBOT==1 .AND. JJ>2) THEN
             !-------- relax to get dX/dj = 0 on lower streamline
             DO IO = 2, II - 1
                 IP = IO + 1
@@ -716,8 +856,8 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 DYDE1 = (YOP - YOO) / DETP
                 DYDE2 = (YOQ - YOP) / DETQ
                 !
-                REZ = XS * (DXDE1 - DETP * (DXDE2 - DXDE1) / (DETP + DETQ))&
-                        + YS * (DYDE1 - DETP * (DYDE2 - DYDE1) / (DETP + DETQ))
+                REZ = XS * (DXDE1 - DETP * (DXDE2 - DXDE1) / (DETP + DETQ))          &
+                        & + YS * (DYDE1 - DETP * (DYDE2 - DYDE1) / (DETP + DETQ))
                 !
                 Z_XOO = XS * (-1.0 / DETP - 1.0 / (DETP + DETQ))
                 Z_YOO = YS * (-1.0 / DETP - 1.0 / (DETP + DETQ))
@@ -734,7 +874,7 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
         ENDIF
         !
         JO = JJ
-        IF(KBCTOP.EQ.1 .AND. JJ.GT.2) THEN
+        IF (KBCTOP==1 .AND. JJ>2) THEN
             !-------- relax to get dX/dj = 0 on upper streamline
             DO IO = 2, II - 1
                 IP = IO + 1
@@ -763,8 +903,8 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 DYDE1 = (YOO - YOM) / DETM
                 DYDE2 = (YOM - YOL) / DETL
                 !
-                REZ = XS * (DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL))&
-                        + YS * (DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL))
+                REZ = XS * (DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL))          &
+                        & + YS * (DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL))
                 !
                 Z_XOO = XS * (1.0 / DETM + 1.0 / (DETM + DETL))
                 Z_YOO = YS * (1.0 / DETM + 1.0 / (DETM + DETL))
@@ -782,11 +922,11 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
         !
         !
         !------ go over all interior streamlines
-        DO 100 JO = 2, JJ - 1
+        DO JO = 2, JJ - 1
             JM = JO - 1
             JP = JO + 1
             !
-            IF(KBCINL.EQ.1) THEN
+            IF (KBCINL==1) THEN
                 !---------- Neumann BC is specified on i=1 plane:  relax node positions
                 !
                 IO = 1
@@ -817,8 +957,8 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 DYDX2 = (YQO - YPO) / DXIQ
                 !
                 !---------- 2nd-order 3-point difference for tangential velocity
-                REZ = XSN * (DXDX1 - DXIP * (DXDX2 - DXDX1) / (DXIP + DXIQ))&
-                        + YSN * (DYDX1 - DXIP * (DYDX2 - DYDX1) / (DXIP + DXIQ))
+                REZ = XSN * (DXDX1 - DXIP * (DXDX2 - DXDX1) / (DXIP + DXIQ))         &
+                        & + YSN * (DYDX1 - DXIP * (DYDX2 - DYDX1) / (DXIP + DXIQ))
                 !
                 Z_XOO = XSN * (-1.0 / DXIP - 1.0 / (DXIP + DXIQ))
                 Z_YOO = YSN * (-1.0 / DXIP - 1.0 / (DXIP + DXIQ))
@@ -832,7 +972,7 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 Y(IO, JO) = Y(IO, JO) + DS * YSN
             ENDIF
             !
-            IF(KBCOUT.EQ.1) THEN
+            IF (KBCOUT==1) THEN
                 !---------- Neumann BC is specified on i=II plane:  relax node positions
                 !
                 IO = II
@@ -863,8 +1003,8 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 DYDX2 = (YMO - YLO) / DXIL
                 !
                 !---------- 2nd-order 3-point difference for tangential velocity
-                REZ = XSN * (DXDX1 + DXIM * (DXDX1 - DXDX2) / (DXIM + DXIL))&
-                        + YSN * (DYDX1 + DXIM * (DYDX1 - DYDX2) / (DXIM + DXIL))
+                REZ = XSN * (DXDX1 + DXIM * (DXDX1 - DXDX2) / (DXIM + DXIL))         &
+                        & + YSN * (DYDX1 + DXIM * (DYDX1 - DYDX2) / (DXIM + DXIL))
                 !
                 Z_XOO = XSN * (1.0 / DXIM + 1.0 / (DXIM + DXIL))
                 Z_YOO = YSN * (1.0 / DXIM + 1.0 / (DXIM + DXIL))
@@ -879,7 +1019,7 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
             ENDIF
 
             !-------- relax all points on this streamline by SLOR
-            DO 10 IO = 2, II - 1
+            DO IO = 2, II - 1
                 IM = IO - 1
                 IP = IO + 1
                 !
@@ -989,33 +1129,35 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 B = -ALF * CXIM
                 A = ALF * (CXIM + CXIP) + GAM * (CETM + CETP)
                 C(IO) = -ALF * CXIP
-                IF(IO.EQ.2) B = 0.0
+                IF (IO==2) B = 0.0
                 !
                 XDSE = DETM * DETP * (XPP - XMP - XPM + XMM) / (4.0 * DXIAV * DETAV)
                 YDSE = DETM * DETP * (YPP - YMP - YPM + YMM) / (4.0 * DXIAV * DETAV)
                 !
-                D(1, IO) = ALF * ((XPO - XOO) * CXIP - (XOO - XMO) * CXIM)&
-                        - 2.0 * BET * XDSE  & !!! (XPP-XMP-XPM+XMM) / (4.0*DXIAV*DETAV)&
-                + GAM*((XOP-XOO)*CETP - (XOO-XOM)*CETM)&
-                        - BET*DYDXI*DXDET*DETM*DETP/YAA
+                D(1, IO) = ALF * ((XPO - XOO) * CXIP - (XOO - XMO) * CXIM)            &
+                        & - 2.0 * BET * XDSE + &
+                        & GAM * ((XOP - XOO) * CETP - (XOO - XOM) * CETM)            &
+                        & - BET * DYDXI * DXDET * DETM * DETP / YAA
+                ! !!! (XPP-XMP-XPM+XMM) / (4.0*DXIAV*DETAV)&
                 !
-                D(2, IO) = ALF * ((YPO - YOO) * CXIP - (YOO - YMO) * CXIM)&
-                        - 2.0 * BET * YDSE & !!! (YPP-YMP-YPM+YMM) / (4.0*DXIAV*DETAV)&
-                + GAM*((YOP-YOO)*CETP - (YOO-YOM)*CETM)&
-                        - BET*DYDXI*DYDET*DETM*DETP/YAA
+                D(2, IO) = ALF * ((YPO - YOO) * CXIP - (YOO - YMO) * CXIM)            &
+                        & - 2.0 * BET * YDSE + &
+                        & GAM * ((YOP - YOO) * CETP - (YOO - YOM) * CETM)            &
+                        & - BET * DYDXI * DYDET * DETM * DETP / YAA
+                ! !!! (YPP-YMP-YPM+YMM) / (4.0*DXIAV*DETAV)&
                 !
                 AINV = 1.0 / (A - B * C(IM))
                 C(IO) = C(IO) * AINV
                 D(1, IO) = (D(1, IO) - B * D(1, IM)) * AINV
                 D(2, IO) = (D(2, IO) - B * D(2, IM)) * AINV
                 !
-            10       CONTINUE
+            ENDDO
             !
             D(1, II) = 0.
             D(2, II) = 0.
             !
             IFIN = II - 1
-            DO 20 IBACK = 2, IFIN
+            DO IBACK = 2, IFIN
                 IO = II - IBACK + 1
                 IP = IO + 1
                 D(1, IO) = D(1, IO) - C(IO) * D(1, IP)
@@ -1026,23 +1168,21 @@ SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, &
                 AD1 = ABS(D(1, IO))
                 AD2 = ABS(D(2, IO))
                 DMAX = MAX(DMAX, AD1, AD2)
-            20       CONTINUE
+            ENDDO
             !
-        100    CONTINUE
+        ENDDO
         !
         !        IF(MOD(IPASS,10).EQ.0) THEN
         !          WRITE(*,*) IPASS, '  Dmax = ', DMAX, RLX
         !        ENDIF
         !
-        IF(DMAX.LT.TOLER * DXY) RETURN
+        IF (DMAX<TOLER * DXY) RETURN
         !
         RLX = RLX1
-        IF(DMAX.LT.DSET1 * DXY) RLX = RLX2
-        IF(DMAX.LT.DSET2 * DXY) RLX = RLX3
-        IF(DMAX.LT.DSET3 * DXY) RETURN
+        IF (DMAX<DSET1 * DXY) RLX = RLX2
+        IF (DMAX<DSET2 * DXY) RLX = RLX3
+        IF (DMAX<DSET3 * DXY) RETURN
         !
-    1000 CONTINUE
+    ENDDO
     !
-    RETURN
-END
-! AXELL
+END SUBROUTINE AXELL

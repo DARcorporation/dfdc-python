@@ -1,24 +1,31 @@
+!*==PANDEF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+
+
+
+
+
+
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -29,13 +36,28 @@
 !=========================================================================
 
 SUBROUTINE PANDEF(IELDEF)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: IELDEF
+    !
+    ! Local variables
+    !
+    REAL :: ANPAN, SBMAG, SBMAX, SBMIN
+    INTEGER :: IEL, IEL1, IEL2, IRPN, NPANMAX, NPANMIN
+    REAL, DIMENSION(NEX) :: SBTOT
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-----------------------------------------------
     !     Sets default paneling parameters
     !-----------------------------------------------
-    INCLUDE 'DFDC.INC'
-    DIMENSION SBTOT(NEX)
     !
-    IF(IELDEF.EQ.0) THEN
+    IF (IELDEF==0) THEN
         IEL1 = 1
         IEL2 = NBEL
     ELSE
@@ -47,7 +69,7 @@ SUBROUTINE PANDEF(IELDEF)
     SBMAX = 0.0
     DO IEL = IEL1, IEL2
         SBTOT(IEL) = SB(IBLAST(IEL)) - SB(IBFRST(IEL))
-        IF(NETYPE(IEL).EQ.0) THEN
+        IF (NETYPE(IEL)==0) THEN
             SBMIN = MIN(SBMIN, SBTOT(IEL))
             SBMAX = MAX(SBMAX, SBTOT(IEL))
         ENDIF
@@ -66,35 +88,32 @@ SUBROUTINE PANDEF(IELDEF)
         FSLE(IEL) = 0.6
         FSTE(IEL) = 0.6
         !
-        IF(SBTOT(IEL).EQ.0.0) THEN
+        IF (SBTOT(IEL)==0.0) THEN
             NPAN(IEL) = 1
+        ELSEIF (NETYPE(IEL)==0) THEN
+            !-------- solid airfoil element
+            NPAN(IEL) = INT(ANPAN * (SBTOT(IEL) / SBMAG)**FPANDEF)
+            NPAN(IEL) = MAX(NPANMIN, NPAN(IEL))
+            NPAN(IEL) = MIN(NPANMAX, NPAN(IEL))
+            CVEX(IEL) = 1.0
+            FSLE(IEL) = 0.6
+            FSTE(IEL) = 0.6
+            !
+        ELSEIF (NETYPE(IEL)==1 .OR. NETYPE(IEL)==2 .OR. NETYPE(IEL)   &
+                & ==5) THEN
+            !-------- wake sheet, wake line or source line element
+            NPAN(IEL) = INT(ANPAN / 4.0 * (SBTOT(IEL) / SBMAG)**FPANDEF)
+            !---- not less than 2 panels for these...
+            NPAN(IEL) = MAX(2, NPAN(IEL))
+            CVEX(IEL) = 1.0
+            FSLE(IEL) = 0.6
+            FSTE(IEL) = 5.0
         ELSE
-            IF (NETYPE(IEL).EQ.0) THEN
-                !-------- solid airfoil element
-                NPAN(IEL) = INT(ANPAN * (SBTOT(IEL) / SBMAG)**FPANDEF)
-                NPAN(IEL) = MAX(NPANMIN, NPAN(IEL))
-                NPAN(IEL) = MIN(NPANMAX, NPAN(IEL))
-                CVEX(IEL) = 1.0
-                FSLE(IEL) = 0.6
-                FSTE(IEL) = 0.6
-                !
-            ELSEIF(NETYPE(IEL).EQ.1&
-                    .OR. NETYPE(IEL).EQ.2&
-                    .OR. NETYPE(IEL).EQ.5) THEN
-                !-------- wake sheet, wake line or source line element
-                NPAN(IEL) = INT(ANPAN / 4.0 * (SBTOT(IEL) / SBMAG)**FPANDEF)
-                !---- not less than 2 panels for these...
-                NPAN(IEL) = MAX(2, NPAN(IEL))
-                CVEX(IEL) = 1.0
-                FSLE(IEL) = 0.6
-                FSTE(IEL) = 5.0
-            ELSE
-                !-------- point or ring element (these won't really be used)
-                NPAN(IEL) = 1
-                CVEX(IEL) = 1.0
-                FSLE(IEL) = 1.0
-                FSTE(IEL) = 1.0
-            ENDIF
+            !-------- point or ring element (these won't really be used)
+            NPAN(IEL) = 1
+            CVEX(IEL) = 1.0
+            FSLE(IEL) = 1.0
+            FSTE(IEL) = 1.0
         ENDIF
         !
         !------ refinement-station parameters
@@ -109,18 +128,29 @@ SUBROUTINE PANDEF(IELDEF)
     LRSPCDEF = .TRUE.
     LRSPCUSR = .FALSE.
     !
-    RETURN
-END
+END SUBROUTINE PANDEF
+!*==PANCOP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! PANDEF
 
 
 SUBROUTINE PANCOP
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: DUMMY
+    INTEGER :: I, IB, IEL, IP, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------------
     !     Copies XB,YB arrays directly into panel arrays.
     !------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NBTOT.GT.IPX) STOP 'PANCOP: Array overflow on IPX.'
+    IF (NBTOT>IPX) STOP 'PANCOP: Array overflow on IPX.'
     !
     !---- total number of panel nodes
     NPTOT = NBTOT
@@ -135,7 +165,7 @@ SUBROUTINE PANCOP
         XP(IP) = XB(IB)
         YP(IP) = YB(IB)
     ENDDO
-    99   format(i5, 6F12.6)
+    99   FORMAT (i5, 6F12.6)
     !
     !---- reference point location for each element
     DO IEL = 1, NEL
@@ -151,7 +181,7 @@ SUBROUTINE PANCOP
         !c       write(60,*) IEL,IPFRST(IEL),IPLAST(IEL),IBFRST(IEL),IBLAST(IEL)
         IPFRST(IEL) = IBFRST(IEL)
         IPLAST(IEL) = IBLAST(IEL)
-        IF(IPLAST(IEL).GT.IPX) STOP 'PANCOP: Array overflow on IPX'
+        IF (IPLAST(IEL)>IPX) STOP 'PANCOP: Array overflow on IPX'
         !
         !------ set prescribed panel number to actual new panel number
         NPAN(IEL) = IPLAST(IEL) - IPFRST(IEL) + 1
@@ -188,28 +218,44 @@ SUBROUTINE PANCOP
     !
     LGSAME = .TRUE.
     !
-    RETURN
-END
+END SUBROUTINE PANCOP
+!*==PANGEN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! PANCOP
 
 SUBROUTINE PANGEN(LQUERY)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    LOGICAL :: LQUERY
+    !
+    ! Local variables
+    !
+    REAL :: DUMMY, SBI
+    INTEGER :: I, IB, IB1, IB2, IEL, IG, IP, IP1, IP2, &
+            & IPDEL, KEL, KP, KP1, KP2, KPD, N, NBPTS, NG, &
+            & NPPTS
+    LOGICAL, SAVE :: LCPLOT
+    REAL, DIMENSION(IPX) :: SG
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------------------
     !     Generates panel nodes X,Y from buffer-airfoil XB,YB arrays.
     !     If LQUERY=T, then user's interaction is requested.
     !------------------------------------------------------------------
-    INCLUDE 'DFDC.INC'
-    LOGICAL LQUERY
     !
-    LOGICAL LCPLOT
-    DIMENSION SG(IPX)
     !
-    DATA LCPLOT / .FALSE. /
+    DATA LCPLOT/.FALSE./
     !
-    IF(NBEL.EQ.0) RETURN
+    IF (NBEL==0) RETURN
     NEL = NBEL
     !
     !---- process each element
-    DO 100 IEL = 1, NBEL
+    DO IEL = 1, NBEL
         !
         IB1 = IBFRST(IEL)
         IB2 = IBLAST(IEL)
@@ -217,46 +263,44 @@ SUBROUTINE PANGEN(LQUERY)
         IP1 = IPFRST(IEL)
         IP2 = IPLAST(IEL)
         NPPTS = IP2 - IP1 + 1
-        IF(LDBG) THEN
-            WRITE(*, *) 'PANGEN IEL ', IEL
-            WRITE(*, *) 'IB1,IB2 ', IB1, IB2
-            WRITE(*, *) 'IP1,IP2 ', IP1, IP2
+        IF (LDBG) THEN
+            WRITE (*, *) 'PANGEN IEL ', IEL
+            WRITE (*, *) 'IB1,IB2 ', IB1, IB2
+            WRITE (*, *) 'IP1,IP2 ', IP1, IP2
         ENDIF
         !
-        IF(NPPTS.LE.1 .AND. NBPTS.LE.1) THEN
+        IF (NPPTS<=1 .AND. NBPTS<=1) THEN
             !------- don't try to panel point or ring element
             NG = 1
             SG(1) = 0.
             !
         ELSE
             !
-            IF(LQUERY) THEN
-                !-------- set current spacing so SGCURV has something to plot
-                IF(NPPTS.GT.1) THEN
-                    !--------- set SG from existing paneled geometry, if defined
-                    NG = NPPTS
-                    DO IP = IP1, IP2
-                        IG = IP - IP1 + 1
-                        SG(IG) = (SP(IP) - SP(IP1)) / (SP(IP2) - SP(IP1))
-                    ENDDO
-                ELSEIF(NBPTS.GT.1) THEN
-                    !--------- or, set SG from buffer geometry
-                    NG = NBPTS
-                    DO IB = IB1, IB2
-                        IG = IB - IB1 + 1
-                        SG(IG) = (SB(IB) - SB(IB1)) / (SB(IB2) - SB(IB1))
-                    ENDDO
-                    IF(NPAN(IEL).LE.0) NPAN(IEL) = NBPTS
-                ELSE
-                    WRITE(*, *)
-                    WRITE(*, *) '  No current paneling to modify'
-                    WRITE(*, *) '  Input case and/or Execute PANE command'
-                    RETURN
-                ENDIF
-                !
-            ELSE
+            IF (.NOT.(LQUERY)) THEN
                 !--------- no initial paneling for SGCURV
                 SG(1) = 0.
+                !-------- set current spacing so SGCURV has something to plot
+            ELSEIF (NPPTS>1) THEN
+                !--------- set SG from existing paneled geometry, if defined
+                NG = NPPTS
+                DO IP = IP1, IP2
+                    IG = IP - IP1 + 1
+                    SG(IG) = (SP(IP) - SP(IP1)) / (SP(IP2) - SP(IP1))
+                ENDDO
+            ELSEIF (NBPTS>1) THEN
+                !--------- or, set SG from buffer geometry
+                NG = NBPTS
+                DO IB = IB1, IB2
+                    IG = IB - IB1 + 1
+                    SG(IG) = (SB(IB) - SB(IB1)) / (SB(IB2) - SB(IB1))
+                ENDDO
+                IF (NPAN(IEL)<=0) NPAN(IEL) = NBPTS
+            ELSE
+                WRITE (*, *)
+                WRITE (*, *) '  No current paneling to modify'
+                WRITE (*, *) '  Input case and/or Execute PANE command'
+                RETURN
+                !
             ENDIF
             !
             !         WRITE(*,1150) IEL
@@ -266,37 +310,34 @@ SUBROUTINE PANGEN(LQUERY)
             !
             !------- surface element... generate spacing array SG
             !
-            CALL SGCURV(LQUERY, LCPLOT, NBPTS, &
-                    XB(IB1), XBS(IB1), &
-                    YB(IB1), YBS(IB1), &
-                    SB(IB1), &
-                    IPX, NG, SG, &
-                    NPAN(IEL), CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL), &
-                    NRPNX, SRPN1(1, IEL), SRPN2(1, IEL), CRRAT(1, IEL))
+            CALL SGCURV(LQUERY, LCPLOT, NBPTS, XB(IB1), XBS(IB1), YB(IB1), &
+                    & YBS(IB1), SB(IB1), IPX, NG, SG, NPAN(IEL), CVEX(IEL), &
+                    & SMOF(IEL), FSLE(IEL), FSTE(IEL), NRPNX, SRPN1(1, IEL)&
+                    &, SRPN2(1, IEL), CRRAT(1, IEL))
         ENDIF
         !
-        IF(LQUERY) THEN
+        IF (LQUERY) THEN
             !---- Set flag for spacing defined, unset user-defined flag
             LRSPCDEF = .TRUE.
             LRSPCUSR = .TRUE.
         ENDIF
         !
         !------ starting and ending indices for this element IEL
-        IF(IEL.EQ.1) THEN
+        IF (IEL==1) THEN
             IP1 = 1
             IP2 = NG
         ELSE
             IP1 = IPLAST(IEL - 1) + 1
             IP2 = IPLAST(IEL - 1) + NG
         ENDIF
-        IF(IP2.GT.IPX) STOP 'PANGEN: Array overflow on IPX'
+        IF (IP2>IPX) STOP 'PANGEN: Array overflow on IPX'
         !
-        IF(LQUERY) THEN
+        IF (LQUERY) THEN
             IPDEL = IP2 - IPLAST(IEL)
-            IF(NPTOT + IPDEL.GT.IPX) STOP 'PANGEN: Array overflow on IPX'
+            IF (NPTOT + IPDEL>IPX) STOP 'PANGEN: Array overflow on IPX'
             !
             !-------- move current points in subsequent elements to make/take-up room
-            IF(IPDEL.GT.0) THEN
+            IF (IPDEL>0) THEN
                 KP1 = NPTOT
                 KP2 = IPLAST(IEL) + 1
                 KPD = -1
@@ -343,7 +384,7 @@ SUBROUTINE PANGEN(LQUERY)
         N = IPLAST(IEL) - IPFRST(IEL) + 1
         CALL MINMAX(N, XP(I), XPMINE(IEL), XPMAXE(IEL))
         CALL MINMAX(N, YP(I), YPMINE(IEL), YPMAXE(IEL))
-    100  CONTINUE
+    ENDDO
     !
     !---- set total number of panel vertices
     NPTOT = IPLAST(NEL)
@@ -375,106 +416,129 @@ SUBROUTINE PANGEN(LQUERY)
     LQSPEC = .FALSE.
     LGSAME = .FALSE.
     !
-    RETURN
-END
+END SUBROUTINE PANGEN
+!*==PANWRT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! PANGEN
 
 
 
 SUBROUTINE PANWRT
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: IEL, IRPN, LU
+    CHARACTER(80) :: PFNDEF
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-----------------------------------------
     !     Writes paneling-parameter file
     !-----------------------------------------
-    INCLUDE 'DFDC.inc'
-    CHARACTER*80 PFNDEF
     !
-    1000 FORMAT(A)
+    1000 FORMAT (A)
     !
     LU = 8
+    20   DO
+        !
+        !---- use existing paneling-parameter filename (if any) as the default
+        WRITE (*, 1200) PFILE(1:60)
+        1200    FORMAT (/' Enter output filename:  ', A)
+        !
+        READ (*, 1000) PFNDEF
+        IF (PFNDEF(1:1)/=' ') THEN
+            PFILE = PFNDEF
+        ELSEIF (PFILE(1:1)==' ') THEN
+            CYCLE
+        ENDIF
+        EXIT
+    ENDDO
     !
-    !---- use existing paneling-parameter filename (if any) as the default
-    20   WRITE(*, 1200) PFILE(1:60)
-    1200 FORMAT(/' Enter output filename:  ', A)
+    OPEN (LU, FILE = PFILE, STATUS = 'UNKNOWN', ERR = 20)
+    REWIND (LU)
     !
-    READ(*, 1000) PFNDEF
-    IF(PFNDEF(1:1).EQ.' ') THEN
-        IF(PFILE(1:1).EQ.' ') GO TO 20
-    ELSE
-        PFILE = PFNDEF
-    ENDIF
-    !
-    OPEN(LU, FILE = PFILE, STATUS = 'UNKNOWN', ERR = 20)
-    REWIND(LU)
-    !
-    WRITE(LU, *) NEL, NRPNX
+    WRITE (LU, *) NEL, NRPNX
     DO IEL = 1, NEL
-        WRITE(LU, *) NPAN(IEL)
-        WRITE(LU, *) CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL)
+        WRITE (LU, *) NPAN(IEL)
+        WRITE (LU, *) CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL)
         DO IRPN = 1, NRPNX
-            WRITE(LU, *) SRPN1(IRPN, IEL), &
-                    SRPN2(IRPN, IEL), &
-                    CRRAT(IRPN, IEL)
+            WRITE (LU, *) SRPN1(IRPN, IEL), SRPN2(IRPN, IEL), &
+                    & CRRAT(IRPN, IEL)
         ENDDO
     ENDDO
-    CLOSE(LU)
+    CLOSE (LU)
     !
-    RETURN
-END
+END SUBROUTINE PANWRT
+!*==PANGET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! PANWRT
 
 
 
 SUBROUTINE PANGET(FNAME, ERROR)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    LOGICAL :: ERROR
+    CHARACTER(*) :: FNAME
+    !
+    ! Local variables
+    !
+    INTEGER :: IEL, IRPN, LU, NEL0, NFNAME, NRPN0
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-----------------------------------------
     !     Reads paneling-parameter file FNAME
     !-----------------------------------------
-    INCLUDE 'DFDC.inc'
-    CHARACTER*(*) FNAME
-    LOGICAL ERROR
     !
     LU = 8
     !
-    IF(FNAME(1:1).EQ.' ') THEN
-        CALL ASKS('Enter paneling-parameter filename^', FNAME)
-    ENDIF
+    IF (FNAME(1:1)==' ') CALL ASKS(&
+            &'Enter paneling-parameter filename^'&
+            &, FNAME)
     !
     !---- strip off leading blanks and get number of characters
     CALL STRIP(FNAME, NFNAME)
     !
-    WRITE(*, *)
+    WRITE (*, *)
     !
-    OPEN(LU, FILE = FNAME, STATUS = 'OLD', ERR = 90)
-    REWIND(LU)
+    OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 90)
+    REWIND (LU)
     !
-    READ(LU, *, ERR = 80) NEL0, NRPN0
+    READ (LU, *, ERR = 80) NEL0, NRPN0
     NEL0 = MIN(NEL0, NEX)
     NRPN0 = MIN(NRPN0, NRPNX)
     !
     DO IEL = 1, NEL0
-        READ(LU, *, ERR = 80) NPAN(IEL)
-        READ(LU, *, ERR = 80) CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL)
+        READ (LU, *, ERR = 80) NPAN(IEL)
+        READ (LU, *, ERR = 80) CVEX(IEL), SMOF(IEL), FSLE(IEL), &
+                & FSTE(IEL)
         DO IRPN = 1, NRPN0
-            READ(LU, *, ERR = 80) SRPN1(IRPN, IEL), &
-                    SRPN2(IRPN, IEL), &
-                    CRRAT(IRPN, IEL)
+            READ (LU, *, ERR = 80) SRPN1(IRPN, IEL), SRPN2(IRPN, IEL), &
+                    & CRRAT(IRPN, IEL)
         ENDDO
     ENDDO
-    CLOSE(LU)
-    WRITE(*, *) 'Paneling parameters read from file ', FNAME(1:NFNAME)
+    CLOSE (LU)
+    WRITE (*, *) 'Paneling parameters read from file ', &
+            & FNAME(1:NFNAME)
     LRSPCDEF = .TRUE.
     LRSPCUSR = .TRUE.
     ERROR = .FALSE.
     RETURN
     !
-    80   CONTINUE
-    CLOSE(LU)
-    WRITE(*, *) 'READ error on panel-parameter file ', FNAME(1:NFNAME)
+    80   CLOSE (LU)
+    WRITE (*, *) 'READ error on panel-parameter file ', &
+            & FNAME(1:NFNAME)
     ERROR = .TRUE.
     RETURN
     !
-    90   CONTINUE
     !      WRITE(*,*) 'OPEN error on panel-parameter file ', FNAME(1:NFNAME)
-    ERROR = .TRUE.
-    RETURN
-END
-! PANGET
+    90   ERROR = .TRUE.
+END SUBROUTINE PANGET

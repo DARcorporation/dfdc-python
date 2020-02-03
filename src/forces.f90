@@ -1,24 +1,28 @@
+!*==CPCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+! DFSAVE
+
+
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -30,12 +34,29 @@
 
 
 SUBROUTINE CPCALC(N, Q, QINF, QREF, CP, CP_Q, CP_QINF)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N
+    REAL :: QINF, QREF
+    REAL, DIMENSION(*) :: CP, CP_QINF
+    REAL, DIMENSION(2, *) :: CP_Q, Q
+    !
+    ! Local variables
+    !
+    INTEGER :: I
+    REAL :: QSQ, QSQREF
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------------
     !     Sets Cp from speed.
     !-------------------------------------------------------------
-    DIMENSION Q(2, *), CP(*), CP_Q(2, *), CP_QINF(*)
     !
-    IF(QREF.NE.0.0) THEN
+    IF (QREF/=0.0) THEN
         QSQREF = QREF**2
     ELSE
         QSQREF = 1.0
@@ -49,33 +70,49 @@ SUBROUTINE CPCALC(N, Q, QINF, QREF, CP, CP_Q, CP_QINF)
         CP_QINF(I) = 2.0 * QINF / QSQREF
     ENDDO
     !
-    RETURN
-END
+END SUBROUTINE CPCALC
+!*==CPADDHS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! CPCALC
 
 
 
 SUBROUTINE CPADDHS(XX, YY, CP, DHH, DSS, VTT)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: CP, DHH, DSS, VTT, XX, YY
+    !
+    ! Local variables
+    !
+    REAL :: CIRC, QRSQ, VTSQ
+    REAL, SAVE :: EPS
+    INTEGER :: IC, JC
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Add enthalpy from rotor to Cp at XX,YY if point
     !     falls within the slipstream grid
     !     CP is modified and DH,DS and Vtheta are returned
     !-------------------------------------------------------
-    INCLUDE 'DFDC.INC'
     !
-    DATA EPS /1.0E-3/
+    DATA EPS/1.0E-3/
     !
     VTT = 0.0
     DHH = 0.0
     DSS = 0.0
     !
     !---- Check for point upstream of rotor
-    IF(XX.LT.XGMIN) RETURN
+    IF (XX<XGMIN) RETURN
     !
     !---- check for point in rotor wake grid
     CALL XYGRDFIND(XX, YY, IX, XG, YG, II, JJ, IC, JC)
     !
-    IF(IC.NE.0 .AND. JC.NE.0) THEN
+    IF (IC/=0 .AND. JC/=0) THEN
         !c        write(*,99) 'cpaddhs grid point i,j for x,y ',ic,jc,xx,yy
         QRSQ = QREF**2
         CIRC = BGAMG(IC, JC)
@@ -87,21 +124,40 @@ SUBROUTINE CPADDHS(XX, YY, CP, DHH, DSS, VTT)
         !c      ELSE
         !c        write(*,99) 'cpaddhs no grid point i,j for x,y ',ic,jc,xx,yy
     ENDIF
-    99   format(A, 2I5, 5(1X, F12.6))
+    99   FORMAT (A, 2I5, 5(1X, F12.6))
     !
-    RETURN
-END
+END SUBROUTINE CPADDHS
+!*==FCOEFF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-SUBROUTINE FCOEFF(NC, CPL, CPR, XC, YC, ANC, DSC, &
-        CX, CY, CM)
+SUBROUTINE FCOEFF(NC, CPL, CPR, XC, YC, ANC, DSC, CX, CY, CM)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! PARAMETER definitions
+    !
+    REAL, PARAMETER :: PI = 3.1415926535897932384
+    !
+    ! Dummy arguments
+    !
+    REAL :: CM, CX, CY
+    INTEGER :: NC
+    REAL, DIMENSION(2, *) :: ANC
+    REAL, DIMENSION(*) :: CPL, CPR, DSC, XC, YC
+    !
+    ! Local variables
+    !
+    INTEGER :: IC
+    REAL :: TWOPIR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !
     !---- Integrate inviscid panel forces from Cp's at control points
     !     using the difference of pressures on both sides of sheet
     !
-    DIMENSION CPL(*), CPR(*), XC(*), YC(*), ANC(2, *), DSC(*)
     !
-    PARAMETER (PI = 3.1415926535897932384)
     !
     CX = 0.
     CY = 0.
@@ -116,5 +172,4 @@ SUBROUTINE FCOEFF(NC, CPL, CPR, XC, YC, ANC, DSC, &
         !cc  &             - YC(IC)*ANC(1,IC) )*DSC(IC)*TWOPIR
     ENDDO
     !
-END
-! FCOEFF
+END SUBROUTINE FCOEFF

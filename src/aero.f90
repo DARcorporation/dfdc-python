@@ -1,3 +1,4 @@
+!*==SETIAERO.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
@@ -77,11 +78,22 @@
 !
 
 SUBROUTINE SETIAERO
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: I, N, NR
+    REAL :: XI
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------
     !     Sets up indices referring to aero section for
     !     each radial station
     !--------------------------------------------------
-    INCLUDE 'DFDC.INC'
     !
     !--- Find lower index of aero data sections XIAERO(N) bounding XI=YRC/RTIP
     DO NR = 1, NROTOR
@@ -89,20 +101,31 @@ SUBROUTINE SETIAERO
             IAERO(I, NR) = 1
             DO N = 1, NAERO(NR)
                 XI = YRC(I, NR) / RTIP(NR)
-                IF(XIAERO(N, NR).LE.XI) THEN
-                    IAERO(I, NR) = N
-                ENDIF
-            END DO
-        END DO
-    END DO
-    RETURN
-END
+                IF (XIAERO(N, NR)<=XI) IAERO(I, NR) = N
+            ENDDO
+        ENDDO
+    ENDDO
+END SUBROUTINE SETIAERO
+!*==GETAERO.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
-        DCLDA, DCLDA_STALL, DCL_STALL, &
-        CDMIN, CLDMIN, DCDCL2, DCDCL2S, &
-        CMCON, MCRIT, TOC, REREF, REXP)
+SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
+        & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
+        & MCRIT, TOC, REREF, REXP)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: A0, CDMIN, CLDMIN, CLMAX, CLMIN, CMCON, DCDCL2, &
+            & DCDCL2S, DCLDA, DCLDA_STALL, DCL_STALL, MCRIT, &
+            & REREF, REXP, TOC, XISECT
+    INTEGER :: N, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------
     !     Gets aero data from stored section array
     !
@@ -123,14 +146,13 @@ SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
     !               AERODATA(14,x) = TOC (thickness/chord)
     !               AERODATA(15,x) = DCDCL2S (Secondary, annulus drag param d(Cd)/dCL^2)
     !---------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NR.LT.1 .OR. NR.GT.NROTOR) THEN
-        WRITE(*, *) 'Error: blade index of aero section out of bounds'
+    IF (NR<1 .OR. NR>NROTOR) THEN
+        WRITE (*, *) 'Error: blade index of aero section out of bounds'
         RETURN
     ENDIF
-    IF(N.LT.1 .OR. N.GT.NAERO(NR)) THEN
-        WRITE(*, *) 'Error: index of aero section out of bounds'
+    IF (N<1 .OR. N>NAERO(NR)) THEN
+        WRITE (*, *) 'Error: index of aero section out of bounds'
         RETURN
     ENDIF
     !
@@ -151,14 +173,27 @@ SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
     DCDCL2S = AERODATA(15, N, NR)
     XISECT = XIAERO(N, NR)
     !
-    RETURN
-END
+END SUBROUTINE GETAERO
+!*==PUTAERO.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
-        DCLDA, DCLDA_STALL, DCL_STALL, &
-        CDMIN, CLDMIN, DCDCL2, DCDCL2S, &
-        CMCON, MCRIT, TOC, REREF, REXP)
+SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
+        & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
+        & MCRIT, TOC, REREF, REXP)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: A0, CDMIN, CLDMIN, CLMAX, CLMIN, CMCON, DCDCL2, &
+            & DCDCL2S, DCLDA, DCLDA_STALL, DCL_STALL, MCRIT, &
+            & REREF, REXP, TOC, XISECT
+    INTEGER :: N, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------------
     !     Puts aero data into stored section array at index N
     !
@@ -179,18 +214,17 @@ SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
     !               AERODATA(14,x) = TOC (thickness/chord)
     !               AERODATA(15,x) = DCDCL2S (Secondary, annulus drag param d(Cd)/dCL^2)
     !--------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NR.LT.1 .OR. NR.GT.NRX) THEN
-        WRITE(*, *) 'Error: blade index of aero section out of bounds'
+    IF (NR<1 .OR. NR>NRX) THEN
+        WRITE (*, *) 'Error: blade index of aero section out of bounds'
         RETURN
     ENDIF
-    IF(N.LT.1) THEN
-        WRITE(*, *) 'Error: index of aero section out of bounds'
+    IF (N<1) THEN
+        WRITE (*, *) 'Error: index of aero section out of bounds'
         RETURN
     ENDIF
-    IF(N.GT.NAX) THEN
-        WRITE(*, *) 'Too many aero sections defined...'
+    IF (N>NAX) THEN
+        WRITE (*, *) 'Too many aero sections defined...'
         RETURN
     ENDIF
     !
@@ -211,23 +245,39 @@ SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, &
     AERODATA(15, N, NR) = DCDCL2S
     XIAERO(N, NR) = XISECT
     !
-    RETURN
-END
+END SUBROUTINE PUTAERO
+!*==SORTAR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE SORTAR(NS, S, W, NDIM)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: NDIM, NS
+    REAL, DIMENSION(NS) :: S
+    REAL, DIMENSION(NDIM, NS) :: W
+    !
+    ! Local variables
+    !
+    LOGICAL :: DONE
+    INTEGER :: IPASS, L, N, NP
+    REAL :: TEMP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------
     !---- sort arrays by S values
     !     Orders data monotonically increasing in S(i)
     !----------------------------------------------------
-    DIMENSION S(NS), W(NDIM, NS)
-    LOGICAL DONE
     !
     DO IPASS = 1, 500
         DONE = .TRUE.
         DO N = 1, NS - 1
             NP = N + 1
-            IF(S(NP).LT.S(N)) THEN
+            IF (S(NP)<S(N)) THEN
                 TEMP = S(NP)
                 S(NP) = S(N)
                 S(N) = TEMP
@@ -235,16 +285,16 @@ SUBROUTINE SORTAR(NS, S, W, NDIM)
                     TEMP = W(L, NP)
                     W(L, NP) = W(L, N)
                     W(L, N) = TEMP
-                END DO
+                ENDDO
                 DONE = .FALSE.
             ENDIF
-        END DO
-        IF(DONE) GO TO 10
-    END DO
+        ENDDO
+        IF (DONE) GOTO 10
+    ENDDO
     STOP 'SORTAR failed'
     !
-    10   RETURN
-END
+10   END SUBROUTINE SORTAR
+!*==GETCLCDCM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SORTAR
 
 
@@ -255,38 +305,56 @@ END
 !*************************************************************************
 
 
-SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, &
-        CLIFT, CL_ALF, CL_W, &
-        CLMAX, CLMIN, DCL_STALL, STALLF, &
-        CDRAG, CD_ALF, CD_W, CD_REY, &
-        CMOM, CM_AL, CM_W)
+SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, CLIFT, &
+        & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, STALLF, &
+        & CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: ALF, CDRAG, CD_ALF, CD_REY, CD_W, CLIFT, CLMAX, &
+            & CLMIN, CL_ALF, CL_W, CMOM, CM_AL, CM_W, &
+            & DCL_STALL, REY, SECSIG, SECSTAGR, W, XI
+    INTEGER :: IS, NR
+    LOGICAL :: STALLF
+    !
+    ! Local variables
+    !
+    REAL :: A0, A02, CDMIN, CDRAG2, CD_ALF2, CD_REY2, CD_W2, &
+            & CLDMIN, CLIFT2, CLMAX2, CLMIN2, CL_ALF2, CL_W2, &
+            & CMCON, CMOM2, CM_AL2, CM_W2, DCDCL2, DCDCL2S, &
+            & DCLDA, DCLDA_STALL, DCL_STALL2, FRAC, MCRIT, &
+            & REREF, REXP, TOC, XISECT1, XISECT2
+    INTEGER :: N
+    LOGICAL :: STALLF2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------------
     !     CL(alpha),
     !      CD(alpha),
     !       CM(alpha) interpolation function for blade at station IS at XI=r/R
     !-------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    LOGICAL STALLF, STALLF2
     !
-    IF(XI.LT.0.0 .OR. XI.GT.1.0) THEN
-        WRITE(*, *) 'Undefined section XI in GETCLCDCM ', XI
-    ENDIF
+    IF (XI<0.0 .OR. XI>1.0) WRITE (*, *)                             &
+            &'Undefined section XI in GETCLCDCM '&
+            &, XI
     !
     !--- Check for installed aero data section index
     N = IAERO(IS, NR)
-    IF(N.LT.1 .OR. N.GT.NAERO(NR)) THEN
+    IF (N<1 .OR. N>NAERO(NR)) THEN
         !
-        IF(NAERO(NR).GT.1) THEN
+        IF (NAERO(NR)>1) THEN
             !--- Find lower index of aero data sections XIAERO(N) bounding XI
             DO N = 1, NAERO(NR)
-                IF(XIAERO(N, NR).LE.XI) THEN
-                    !c          write(*,*) 'getcl iaero= ',N,' is= ',is,xiaero(N),xi
-                    IAERO(IS, NR) = N
-                ELSE
-                    GO TO 10
-                ENDIF
-            END DO
-            WRITE(*, *) 'Aero section not found for station ', XI
+                IF (XIAERO(N, NR)>XI) GOTO 10
+                !c          write(*,*) 'getcl iaero= ',N,' is= ',is,xiaero(N),xi
+                IAERO(IS, NR) = N
+            ENDDO
+            WRITE (*, *) 'Aero section not found for station ', XI
         ENDIF
         !
         N = 1
@@ -312,20 +380,17 @@ SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, &
     XISECT1 = XIAERO(N, NR)
     !
     !--- Get data for inner bounding aero section
-    CALL CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
-            CLIFT, CL_ALF, CL_W, STALLF, &
-            CDRAG, CD_ALF, CD_W, CD_REY, &
-            CMOM, CM_AL, CM_W, &
-            A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, DCL_STALL, &
-            CDMIN, CLDMIN, DCDCL2, CMCON, MCRIT, REREF, REXP, &
-            TOC, DCDCL2S)
+    CALL CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, CLIFT, CL_ALF, CL_W, &
+            & STALLF, CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W, A0, &
+            & CLMAX, CLMIN, DCLDA, DCLDA_STALL, DCL_STALL, CDMIN, CLDMIN, &
+            & DCDCL2, CMCON, MCRIT, REREF, REXP, TOC, DCDCL2S)
     !
     !--- Check for another bounding section, if not we are done,
     !    if we have another section linearly interpolate data to station IS
-    IF(N.LT.NAERO(NR)) THEN
+    IF (N<NAERO(NR)) THEN
         XISECT2 = XIAERO(N + 1, NR)
         FRAC = (XI - XISECT1) / (XISECT2 - XISECT1)
-        IF(FRAC.LE.0.0 .OR. FRAC.GT.1.0) THEN
+        IF (FRAC<=0.0 .OR. FRAC>1.0) THEN
             !c         write(*,*) 'CL n,is,xi,frac = ',n,is,xi(is),frac
         ENDIF
         !
@@ -349,13 +414,11 @@ SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, &
         DCDCL2S = AERODATA(15, N + 1, NR)
         !
         !--- Get data for outer bounding aero section
-        CALL CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
-                CLIFT2, CL_ALF2, CL_W2, STALLF2, &
-                CDRAG2, CD_ALF2, CD_W2, CD_REY2, &
-                CMOM2, CM_AL2, CM_W2, &
-                A02, CLMAX2, CLMIN2, DCLDA, DCLDA_STALL, DCL_STALL2, &
-                CDMIN, CLDMIN, DCDCL2, CMCON, MCRIT, REREF, REXP, &
-                TOC, DCDCL2S)
+        CALL CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, CLIFT2, CL_ALF2, CL_W2, &
+                & STALLF2, CDRAG2, CD_ALF2, CD_W2, CD_REY2, CMOM2, CM_AL2, &
+                & CM_W2, A02, CLMAX2, CLMIN2, DCLDA, DCLDA_STALL, &
+                & DCL_STALL2, CDMIN, CLDMIN, DCDCL2, CMCON, MCRIT, REREF, &
+                & REXP, TOC, DCDCL2S)
         !--- Interpolate aero data to blade station
         STALLF = STALLF .OR. STALLF2
         CLIFT = (1.0 - FRAC) * CLIFT + FRAC * CLIFT2
@@ -378,22 +441,43 @@ SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, &
     !
     AZERO(IS, NR) = A0
     !
-    RETURN
-END
+END SUBROUTINE GETCLCDCM
+!*==GETALF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 !GETCLCDCM
 
 
 
-SUBROUTINE GETALF(NR, IS, XI, SECSIG, SECSTAGR, &
-        CLIFT, W, ALF, ALF_CL, ALF_W, STALLF)
+SUBROUTINE GETALF(NR, IS, XI, SECSIG, SECSTAGR, CLIFT, W, ALF, ALF_CL, &
+        & ALF_W, STALLF)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: ALF, ALF_CL, ALF_W, CLIFT, SECSIG, SECSTAGR, W, &
+            & XI
+    INTEGER :: IS, NR
+    LOGICAL :: STALLF
+    !
+    ! Local variables
+    !
+    REAL :: A0, CDRAG, CD_ALF, CD_REY, CD_W, CLMAX, CLMIN, &
+            & CLTEMP, CL_ALF, CL_W, CMOM, CM_AL, CM_W, DALF, &
+            & DCL_STALL, REY
+    REAL, SAVE :: EPS
+    INTEGER :: ITER
+    INTEGER, SAVE :: NITER
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------------
     !     Inverse alpha(CL) function
     !     Uses Newton-Raphson iteration to get ALF from CL function
     !------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    LOGICAL STALLF
-    DATA NITER / 10 /
-    DATA EPS   / 1.0E-5 /
+    DATA NITER/10/
+    DATA EPS/1.0E-5/
     !
     STALLF = .FALSE.
     !
@@ -403,26 +487,24 @@ SUBROUTINE GETALF(NR, IS, XI, SECSIG, SECSTAGR, &
     !
     ALF = A0
     DO ITER = 1, NITER
-        CALL GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, &
-                CLTEMP, CL_ALF, CL_W, &
-                CLMAX, CLMIN, DCL_STALL, STALLF, &
-                CDRAG, CD_ALF, CD_W, CD_REY, &
-                CMOM, CM_AL, CM_W)
+        CALL GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, CLTEMP, &
+                & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, STALLF, CDRAG, &
+                & CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W)
         !c      IF(STALLF) GO TO 20
         DALF = -(CLTEMP - CLIFT) / CL_ALF
         ALF = ALF + DALF
         ALF_CL = 1.0 / CL_ALF
         ALF_W = -CL_W / CL_ALF
-        IF(ABS(DALF).LT.EPS) RETURN
-    END DO
+        IF (ABS(DALF)<EPS) RETURN
+    ENDDO
     !
-    20 WRITE(*, *) 'GETALF: alpha(CL) function inversion failed'
+    WRITE (*, *) 'GETALF: alpha(CL) function inversion failed'
     !      write(*,*) 'is,clift  ',is,clift
     !      write(*,*) 'abs(dalf) ',abs(dalf)
     !      write(*,*) 'cl_alf    ',cl_alf
     !
-    RETURN
-END
+END SUBROUTINE GETALF
+!*==CLCDCM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! GETALF
 
 
@@ -433,13 +515,11 @@ END
 !  blade section aero properties (CL,CD,CM) vs ALF
 !*************************************************************************
 
-SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
-        CLIFT, CL_ALF, CL_W, STALLF, &
-        CDRAG, CD_ALF, CD_W, CD_REY, &
-        CMOM, CM_AL, CM_W, &
-        A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, DCL_STALL, &
-        CDMIN, CLDMIN, DCDCL2, CMCON, MCRIT, REREF, REXP, &
-        TOC, DCDCL2S)
+SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, CLIFT, CL_ALF, CL_W, &
+        & STALLF, CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W, &
+        & A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, DCL_STALL, &
+        & CDMIN, CLDMIN, DCDCL2, CMCON, MCRIT, REREF, REXP, TOC, &
+        & DCDCL2S)
     !------------------------------------------------------------
     !     CL(alpha) function
     !     Note that in addition to setting CLIFT and its derivatives
@@ -461,9 +541,33 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     !------------------------------------------------------------
     !
     !C    INCLUDE 'DFDC.inc'
-    IMPLICIT REAL (M)
-    LOGICAL STALLF
-    DOUBLE PRECISION ECMIN, ECMAX
+    USE F77KINDS
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: A0, ALF, CDMIN, CDRAG, CD_ALF, CD_REY, CD_W, &
+            & CLDMIN, CLIFT, CLMAX, CLMIN, CL_ALF, CL_W, CMCON, &
+            & CMOM, CM_AL, CM_W, DCDCL2, DCDCL2S, DCLDA, &
+            & DCLDA_STALL, DCL_STALL, MCRIT, REREF, REXP, REY, &
+            & SECSIG, SECSTAGR, TOC, VSO, W
+    LOGICAL :: STALLF
+    !
+    ! Local variables
+    !
+    REAL :: CDC, CDCL2, CDC_ALF, CDC_W, CDMDD, CDMFACTOR, &
+            & CDMSTALL, CLA, CLA_ALF, CLA_W, CLFACTOR, CLLIM, &
+            & CLLIM_CLA, CLMAXM, CLMFACTOR, CLMINM, CLMN, CLMX, &
+            & CRITMACH, CRITMACH_ALF, CRITMACH_W, DCD, DCDX, &
+            & DCD_ALF, DCD_W, DMDD, DMSTALL, FAC, FAC_W, &
+            & FSTALL, MACH, MACH_W, MEXP, MSQ, MSQ_W, PGRT, &
+            & PGRT_W, RCORR, RCORR_REY
+    REAL(R8KIND) :: ECMAX, ECMIN
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !
     !---- Factors for compressibility drag model, HHY 10/23/00
     !     Mcrit is set by user
@@ -481,9 +585,9 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     !---- Prandtl-Glauert compressibility factor
     MSQ = W * W / VSO**2
     MSQ_W = 2.0 * W / VSO**2
-    IF(MSQ.GE.1.0) THEN
-        WRITE(*, *)&
-                'CLFUNC: Local Mach number limited to 0.99, was ', MSQ
+    IF (MSQ>=1.0) THEN
+        WRITE (*, *) 'CLFUNC: Local Mach number limited to 0.99, was ', &
+                & MSQ
         MSQ = 0.99
         MSQ_W = 0.
     ENDIF
@@ -493,14 +597,12 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     !---- Mach number and dependence on velocity
     MACH = SQRT(MSQ)
     MACH_W = 0.0
-    IF(MACH.NE.0.0) MACH_W = 0.5 * MSQ_W / MACH
+    IF (MACH/=0.0) MACH_W = 0.5 * MSQ_W / MACH
     !
     !------------------------------------------------------------
     !--- Generate CLFACTOR for cascade effects from section solidity
     CLFACTOR = 1.0
-    IF(SECSIG.GT.0.0) THEN
-        CALL GETCLFACTOR(SECSIG, SECSTAGR, CLFACTOR)
-    ENDIF
+    IF (SECSIG>0.0) CALL GETCLFACTOR(SECSIG, SECSTAGR, CLFACTOR)
     !
     !------------------------------------------------------------
     !--- Generate CL from dCL/dAlpha and Prandtl-Glauert scaling
@@ -542,8 +644,8 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     CL_W = CLA_W - (1.0 - FSTALL) * CLLIM_CLA * CLA_W
     !
     STALLF = .FALSE.
-    IF(CLIFT.GT.CLMAX) STALLF = .TRUE.
-    IF(CLIFT.LT.CLMIN) STALLF = .TRUE.
+    IF (CLIFT>CLMAX) STALLF = .TRUE.
+    IF (CLIFT<CLMIN) STALLF = .TRUE.
     !
     !
     !------------------------------------------------------------
@@ -557,7 +659,7 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     !--- CD from profile drag, stall drag and compressibility drag
     !
     !---- Reynolds number scaling factor
-    IF(REY.LE.0) THEN
+    IF (REY<=0) THEN
         RCORR = 1.0
         RCORR_REY = 0.0
     ELSE
@@ -568,7 +670,8 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     !--- Include quadratic lift drag terms from airfoil and annulus
     !
     !      CDCL2 = DCDCL2 + DCDCL2S
-    CDCL2 = DCDCL2  ! no chance of getting messed up...
+    CDCL2 = DCDCL2
+    ! no chance of getting messed up...
     !
     !--- In the basic linear lift range drag is a function of lift
     !    CD = CD0 (constant) + quadratic with CL)
@@ -582,11 +685,9 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     DCDX = (1.0 - FSTALL) * CLLIM / (PGRT * DCLDA)
     !      write(*,*) 'cla,cllim,fstall,pg,dclda ',cla,cllim,fstall,pg,dclda
     DCD = 2.0 * DCDX**2
-    DCD_ALF = 4.0 * DCDX * &
-            (1.0 - FSTALL) * CLLIM_CLA * CLA_ALF / (PGRT * DCLDA)
-    DCD_W = 4.0 * DCDX * &
-            ((1.0 - FSTALL) * CLLIM_CLA * CLA_W / (PGRT * DCLDA)&
-                    - DCD / PGRT * PGRT_W)
+    DCD_ALF = 4.0 * DCDX * (1.0 - FSTALL) * CLLIM_CLA * CLA_ALF / (PGRT * DCLDA)
+    DCD_W = 4.0 * DCDX * ((1.0 - FSTALL) * CLLIM_CLA * CLA_W / (PGRT * DCLDA)       &
+            & - DCD / PGRT * PGRT_W)
     !      write(*,*) 'alf,cl,dcd,dcd_alf,dcd_w ',alf,clift,dcd,dcd_alf,dcd_w
     !
     !--- Compressibility drag (accounts for drag rise above Mcrit with CL effects
@@ -596,14 +697,14 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     CRITMACH = MCRIT - CLMFACTOR * ABS(CLIFT - CLDMIN) - DMDD
     CRITMACH_ALF = -CLMFACTOR * ABS(CL_ALF)
     CRITMACH_W = -CLMFACTOR * ABS(CL_W)
-    IF(MACH.LT.CRITMACH) THEN
+    IF (MACH<CRITMACH) THEN
         CDC = 0.0
         CDC_ALF = 0.0
         CDC_W = 0.0
     ELSE
         CDC = CDMFACTOR * (MACH - CRITMACH)**MEXP
         CDC_W = MEXP * MACH_W * CDC / MACH - MEXP * CRITMACH_W * CDC / CRITMACH
-        CDC_ALF = - MEXP * CRITMACH_ALF * CDC / CRITMACH
+        CDC_ALF = -MEXP * CRITMACH_ALF * CDC / CRITMACH
     ENDIF
     !      write(*,*) 'critmach,mach ',critmach,mach
     !      write(*,*) 'cdc,cdc_w,cdc_alf ',cdc,cdc_w,cdc_alf
@@ -621,96 +722,145 @@ SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, &
     CD_W = FAC * CD_W + FAC_W * CDRAG + DCD_W + CDC_ALF
     CD_REY = FAC * CD_REY
     !
-    RETURN
-END
+END SUBROUTINE CLCDCM
+!*==CHKLIM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! CLCDCM
 
 
 
 SUBROUTINE CHKLIM(N, NSTRT, NEND, F, FMAX)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: FMAX
+    INTEGER :: N, NEND, NSTRT
+    REAL, DIMENSION(N) :: F
+    !
+    ! Local variables
+    !
+    INTEGER :: I
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--- Get starting and end index for array values F(i) < FMAX
-    DIMENSION F(N)
     NSTRT = 1
     NEND = N
     !--- Look for first point where F(i)<FMAX
     DO I = 1, N
-        IF(F(I).LT.FMAX) GO TO 10
-    END DO
-    10   NSTRT = MAX(I - 1, 1)
+        IF (F(I)<FMAX) EXIT
+    ENDDO
+    NSTRT = MAX(I - 1, 1)
     !--- Look for last point where F(i)<FMAX
     DO I = N, 1, -1
-        IF(F(I).LT.FMAX) GO TO 20
-    END DO
-    20   NEND = MIN(I + 1, N)
+        IF (F(I)<FMAX) EXIT
+    ENDDO
+    NEND = MIN(I + 1, N)
     !
-    RETURN
-END
+END SUBROUTINE CHKLIM
+!*==OPFILE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE OPFILE(LU, FNAME)
-    CHARACTER*(*) FNAME
+    IMPLICIT NONE
     !
-    CHARACTER*4 COMAND
-    CHARACTER*128 COMARG, TMP
-    CHARACTER*1 ANS, DUMMY
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    CHARACTER(*) :: FNAME
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    CHARACTER(1) :: ANS, DUMMY
+    CHARACTER(4) :: COMAND
+    CHARACTER(128) :: COMARG, TMP
+    INTEGER :: K, NF
+    !
+    !*** End of declarations rewritten by SPAG
+    !
+    !
     !
     !---- get filename if it hasn't been already specified
-    IF(FNAME.EQ.' ') CALL ASKS('Enter output filename^', FNAME)
+    IF (FNAME==' ') CALL ASKS('Enter output filename^', FNAME)
     !
     !---- try to open file
-    OPEN(LU, FILE = FNAME, STATUS = 'OLD', ERR = 50)
+    OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 50)
     !
     !---- file exists... ask how to proceed
     NF = INDEX(FNAME, ' ') - 1
-    TMP = 'File  ' // FNAME(1:NF) // &
-            '  exists.  Overwrite / Append / New file ?^'
+    TMP = 'File  ' // FNAME(1:NF)                                       &
+            & // '  exists.  Overwrite / Append / New file ?^'
     CALL ASKC(TMP, COMAND, COMARG)
     ANS = COMAND(1:1)
     !
     !---- ask again if reply is invalid
-    IF(INDEX('OoAaNn', ANS).EQ.0) THEN
+    IF (INDEX('OoAaNn', ANS)==0) THEN
         CALL ASKC(' O / A / N  ?^', COMAND, COMARG)
         ANS = COMAND(1:1)
         !
-        IF(INDEX('OoAaNn', ANS).EQ.0) THEN
+        IF (INDEX('OoAaNn', ANS)==0) THEN
             !------- Still bad reply. Give up asking and just return
-            WRITE(*, *) 'No action taken'
+            WRITE (*, *) 'No action taken'
             RETURN
         ENDIF
     ENDIF
     !
     !---- at this point, file is open and reply is valid
-    IF    (INDEX('Oo', ANS) .NE. 0) THEN
+    IF (INDEX('Oo', ANS)/=0) THEN
         !------ go to beginning of file to overwrite
-        REWIND(LU)
-        GO TO 60
-    ELSEIF(INDEX('Aa', ANS) .NE. 0) THEN
+        REWIND (LU)
+        GOTO 60
+    ELSEIF (INDEX('Aa', ANS)/=0) THEN
         !------ go to end of file to append
         DO K = 1, 12345678
-            READ(LU, 1000, END = 40) DUMMY
-            1000     FORMAT(A)
+            READ (LU, 1000, END = 40) DUMMY
+            1000       FORMAT (A)
         ENDDO
-        40     BACKSPACE(LU)
+        40      BACKSPACE (LU)
         GOTO 60
     ELSE
         !------ new file... get filename from command argument, or ask if not supplied
         FNAME = COMARG
-        IF(FNAME(1:1).EQ.' ') CALL ASKS('Enter output filename^', FNAME)
+        IF (FNAME(1:1)==' ') CALL ASKS('Enter output filename^', &
+                & FNAME)
     ENDIF
     !
     !---- at this point, file FNAME is new or is to be overwritten
-    50   OPEN(LU, FILE = FNAME, STATUS = 'UNKNOWN', ERR = 90)
-    REWIND(LU)
+    50   OPEN (LU, FILE = FNAME, STATUS = 'UNKNOWN', ERR = 90)
+    REWIND (LU)
     !
     60   RETURN
     !
-    90   WRITE(*, *) 'Bad filename.'
-    RETURN
-END
+    90   WRITE (*, *) 'Bad filename.'
+END SUBROUTINE OPFILE
+!*==GETCLFACTOR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! OPFILE
 
 
 SUBROUTINE GETCLFACTOR(SIGMA, STAGGER, CLFACTOR)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! PARAMETER definitions
+    !
+    REAL, PARAMETER :: PI = 3.1415926535897932384, DTR = PI / 180.
+    !
+    ! Dummy arguments
+    !
+    REAL :: CLFACTOR, SIGMA, STAGGER
+    !
+    ! Local variables
+    !
+    REAL, DIMENSION(11), SAVE :: A0, A1, A2, X
+    REAL :: AA0, AA1, AA2, DAA0, DAA1, DAA2, SIGI, STAGR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !------------------------------------------------------------
     !     Calculates multi-plane cascade effect on lift slope as a
     !     function of solidity and stagger angle
@@ -723,58 +873,21 @@ SUBROUTINE GETCLFACTOR(SIGMA, STAGGER, CLFACTOR)
     !     Implements table-driven quadratic fit to Figure 6-29 in
     !     Wallis, Axial Flow Fans and Ducts.
     !------------------------------------------------------------
-    PARAMETER (PI = 3.1415926535897932384)
-    PARAMETER (DTR = PI / 180.)
     !
-    DIMENSION X(11), A0(11), A1(11), A2(11)
     !---- Table of quadratic fit coefficients
-    DATA X      / 0.5, &
-            0.6, &
-            0.7, &
-            0.8, &
-            0.9, &
-            1.0, &
-            1.1, &
-            1.2, &
-            1.3, &
-            1.4, &
-            1.5 /
-    DATA A0     / 0.4755, &
-            0.5255, &
-            0.5722, &
-            0.6142, &
-            0.6647, &
-            0.7016, &
-            0.7643, &
-            0.8302, &
-            0.8932, &
-            0.9366, &
-            0.9814 /
-    DATA A1     / -0.367495, &
-            -0.341941, &
-            -0.300058, &
-            -0.255883, &
-            -0.200593, &
-            -0.114993, &
-            -0.118602, &
-            -0.130921, &
-            -0.133442, &
-            -0.077980, &
-            -0.123071 /
-    DATA A2     /  0.489466, &
-            0.477648, &
-            0.453027, &
-            0.430048, &
-            0.381462, &
-            0.310028, &
-            0.298309, &
-            0.285309, &
-            0.263084, &
-            0.184165, &
-            0.251594 /
+    DATA X/0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, &
+            & 1.5/
+    DATA A0/0.4755, 0.5255, 0.5722, 0.6142, 0.6647, 0.7016, &
+            & 0.7643, 0.8302, 0.8932, 0.9366, 0.9814/
+    DATA A1/ - 0.367495, -0.341941, -0.300058, -0.255883, &
+            & -0.200593, -0.114993, -0.118602, -0.130921, -0.133442, &
+            & -0.077980, -0.123071/
+    DATA A2/0.489466, 0.477648, 0.453027, 0.430048, 0.381462, &
+            & 0.310028, 0.298309, 0.285309, 0.263084, 0.184165, &
+            & 0.251594/
     !
     CLFACTOR = 1.0
-    IF(SIGMA.LE.0.6) RETURN
+    IF (SIGMA<=0.6) RETURN
     !
     !---- Interpolate quadratic fit coefficients by 1/solidity
     SIGI = 1.0 / SIGMA
@@ -785,13 +898,12 @@ SUBROUTINE GETCLFACTOR(SIGMA, STAGGER, CLFACTOR)
     !---- Only valid for stagger 20deg to 90deg,
     !     Limit low stagger to 20deg value to give constant lift ratio below that
     STAGR = STAGGER
-    IF(STAGR.LT.20.0 * DTR) STAGR = 20.0 * DTR
-    IF(STAGR.GT.90.0 * DTR) STAGR = 90.0 * DTR
+    IF (STAGR<20.0 * DTR) STAGR = 20.0 * DTR
+    IF (STAGR>90.0 * DTR) STAGR = 90.0 * DTR
     !
     !---- Quadratic fit for CLFACTOR at this SIGMA as function of STAGGER
     CLFACTOR = AA0 + AA1 * STAGR + AA2 * STAGR * STAGR
     !---- maximum value of lift ratio should be limited to 1.0
     CLFACTOR = MIN(1.0, CLFACTOR)
     !
-    RETURN
-END
+END SUBROUTINE GETCLFACTOR

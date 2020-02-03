@@ -1,24 +1,26 @@
+!*==ROTINITTHR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+! QFCALC
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -39,8 +41,8 @@
 !     Alpha and CDR zeroed for final station, tip gap cases.
 !     SHOWDUCT, SHOWACTDISK, SHOWBLADE...: argument (LU), formats tweaked.
 !
-!     ROTRPRT: Alpha listing added, formats tweaked. 
-!     Beta and Alpha listed in local coords if LCOORD is TRUE and RPM.LE.0. 
+!     ROTRPRT: Alpha listing added, formats tweaked.
+!     Beta and Alpha listed in local coords if LCOORD is TRUE and RPM.LE.0.
 !     Global/local message added to output for rotors of RPM.LE.0.
 !
 !     Version 070-ES1a  4 March 2009
@@ -52,20 +54,36 @@
 
 
 SUBROUTINE ROTINITTHR(THR)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: THR
+    !
+    ! Local variables
+    !
+    REAL :: BGAMA, THRUST, VAIND, VHSQ
+    INTEGER :: IR, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Initialize rotor velocities with estimate of
     !     blade circulation and induced velocites derived from thrust
     !
     !     Assumes momentum theory for axial flow calculation
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.INC'
     !
     !---- Assume that rotor/act. disk is first disk
     NR = 1
     !---- Initialize rotor with constant circulation derived from thrust
     THRUST = THR
     BGAMA = 2.0 * PI * THRUST / (RHO * ADISK(NR) * OMEGA(NR))
-    IF(LDBG) WRITE(LUNDBG, *) 'ROTINITTHR  THRUST  BGAMA ', THRUST, BGAMA
+    IF (LDBG) WRITE (LUNDBG, *) 'ROTINITTHR  THRUST  BGAMA ', &
+            & THRUST, BGAMA
     !---- Induced velocity from momentum theory
     VHSQ = 2.0 * THRUST / (RHO * ADISK(NR))
     VAIND = -0.5 * QINF + SQRT((0.5 * QINF)**2 + VHSQ)
@@ -74,34 +92,47 @@ SUBROUTINE ROTINITTHR(THR)
     !---- Set blade circulation
     DO IR = 1, NRC
         BGAM(IR, NR) = BGAMA
-    END DO
-    IF(TGAP.GT.0.0) BGAM(NRC, NR) = 0.0
+    ENDDO
+    IF (TGAP>0.0) BGAM(NRC, NR) = 0.0
     !---- Initialize using our circulation estimate
     CALL ROTINITBGAM
     !
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *) 'ROTINITTHR'
-        WRITE(LUNDBG, *) ' Setting circulation from THRUST= ', THRUST
-        WRITE(LUNDBG, *) ' Average circulation       B*GAM= ', BGAMA
-        WRITE(LUNDBG, *) ' Average axial velocity    VAavg= ', VAVGINIT
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) 'ROTINITTHR'
+        WRITE (LUNDBG, *) ' Setting circulation from THRUST= ', THRUST
+        WRITE (LUNDBG, *) ' Average circulation       B*GAM= ', BGAMA
+        WRITE (LUNDBG, *) ' Average axial velocity    VAavg= ', &
+                & VAVGINIT
     ENDIF
     !
-    RETURN
-END
+END SUBROUTINE ROTINITTHR
+!*==ROTINITBGAM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ROTINITTHR
 
 
 
 SUBROUTINE ROTINITBGAM
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: ABGAM, AREA, BGAMA, DA, PHIR, THRUST, VAIND, &
+            & VHSQ, WM, WR, WT, WX
+    INTEGER :: IR, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Initialize rotor velocities using current blade circulation
     !     Sets approximate axial induced velocites from thrust
     !
     !     Assumes momentum theory for axial flow calculation
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(LDBG) WRITE(*, *) 'Initializing rotor GAM and induced vel.'
+    IF (LDBG) WRITE (*, *) 'Initializing rotor GAM and induced vel.'
     !
     !---- Find area averaged B*GAMMA for rotor(s) to estimate thrust
     THRUST = 0.0
@@ -112,13 +143,14 @@ SUBROUTINE ROTINITBGAM
             DA = PI * (YRP(IR + 1, NR)**2 - YRP(IR, NR)**2)
             AREA = AREA + DA
             ABGAM = ABGAM + DA * BGAM(IR, NR)
-        END DO
+        ENDDO
         BGAMA = ABGAM / AREA
         THRUST = THRUST + ADISK(NR) * RHO * OMEGA(NR) * BGAMA * PI2I
-    END DO
+    ENDDO
     !
     !     Thrust used for estimates for slipstream axial velocities
-    IF(LDBG) WRITE(*, *) 'Est. rotor thrust (from B*GAM) = ', THRUST
+    IF (LDBG) WRITE (*, *) 'Est. rotor thrust (from B*GAM) = ', &
+            & THRUST
     !---- Induced velocity from momentum theory
     VHSQ = 2.0 * THRUST / (RHO * ADISK(1))
     VAIND = -0.5 * QINF + SQRT((0.5 * QINF)**2 + VHSQ)
@@ -126,11 +158,12 @@ SUBROUTINE ROTINITBGAM
     VAVGINIT = VAIND + QINF
     !c    VAVGINIT = SQRT(THRUST/(RHO*ADISK(1)))  ! old definition
     !
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *) 'ROTINITBGAM'
-        WRITE(LUNDBG, *) ' Average circulation       B*GAM= ', BGAMA
-        WRITE(LUNDBG, *) ' Estimated                THRUST= ', THRUST
-        WRITE(LUNDBG, *) ' Average axial velocity    VAavg= ', VAVGINIT
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) 'ROTINITBGAM'
+        WRITE (LUNDBG, *) ' Average circulation       B*GAM= ', BGAMA
+        WRITE (LUNDBG, *) ' Estimated                THRUST= ', THRUST
+        WRITE (LUNDBG, *) ' Average axial velocity    VAavg= ', &
+                & VAVGINIT
     ENDIF
     !
     DO NR = 1, NROTOR
@@ -139,42 +172,59 @@ SUBROUTINE ROTINITBGAM
             VIND(1, IR, NR) = VAIND
             VIND(2, IR, NR) = 0.0
             VIND(3, IR, NR) = BGAM(IR, NR) * PI2I / YRC(IR, NR)
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     CALL SETROTVEL
     LVMAV = .FALSE.
     !c      CALL VMAVGINIT(VAVGINIT)
     !
-    IF(LDBG) THEN
+    IF (LDBG) THEN
         NR = 1
-        WRITE(*, 1400) NR
+        WRITE (*, 1400) NR
         DO IR = 1, NRC
             WX = VREL(1, IR, NR)
             WR = VREL(2, IR, NR)
             WT = VREL(3, IR, NR)
             WM = SQRT(WX * WX + WR * WR)
-            IF(WT.NE.0.0) THEN
+            IF (WT/=0.0) THEN
                 PHIR = ATAN2(WM, -WT)
             ELSE
                 PHIR = 0.5 * PI
             ENDIF
-            WRITE(*, 1401) YRC(IR, NR), WX, WR, WM, WT, PHIR / DTR, BGAM(IR, NR)
-        END DO
+            WRITE (*, 1401) YRC(IR, NR), WX, WR, WM, WT, PHIR / DTR, &
+                    & BGAM(IR, NR)
+        ENDDO
     ENDIF
     !
-    1400 FORMAT(/'Blade velocities initialized on blade row ', I3&
-            /'     r          Wx         Wr         Wm', &
-            '         Wt        Phi       BGam')
-    1401 FORMAT(1X, 8G11.4)
+    1400 FORMAT (/'Blade velocities initialized on blade row ', &
+            &I3/'     r          Wx         Wr         Wm', &
+            &'         Wt        Phi       BGam')
+    1401 FORMAT (1X, 8G11.4)
     !
-    RETURN
-END
+END SUBROUTINE ROTINITBGAM
+!*==ROTINITBLD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ROTINITBGAM
 
 
 
 SUBROUTINE ROTINITBLD
-    INCLUDE 'DFDC.inc'
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: ALF, BGAMNEW, BGAMOLD, BLDS, CDRAG, CD_ALF, &
+            & CD_REY, CD_W, CI, CLB, CLMAX, CLMIN, CL_ALF, &
+            & CL_W, CMOM, CM_AL, CM_W, DCL_STALL, DELBGAM, DR, &
+            & DVAIND, PHI, REY, RLX, SECSIG, SECSTAGR, SI, &
+            & TSUM, VAIND, VHSQ, VTIN, W, WSQ, WWA, WWT, XI
+    INTEGER :: I, IG, ITERG, NR
+    INTEGER, SAVE :: NITERG
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Sets reasonable initial circulation using current
     !     rotor blade geometry (chord, beta).
@@ -185,7 +235,7 @@ SUBROUTINE ROTINITBLD
     !     induced axial velocity
     !----------------------------------------------------------
     !
-    DATA NITERG / 10 /
+    DATA NITERG/10/
     !
     !---- Set up to accumulate blade/disk circulations
     CALL CLRGRDFLW
@@ -193,10 +243,10 @@ SUBROUTINE ROTINITBLD
     !---- This initialization assumes blade disks are in streamwise order <- FIX THIS!
     DO NR = 1, NROTOR
         !
-        IF(IRTYPE(NR).EQ.1) THEN
+        IF (IRTYPE(NR)==1) THEN
             CALL ROTBG2GRD(NR)
             !
-        ELSEIF(IRTYPE(NR).EQ.2) THEN
+        ELSEIF (IRTYPE(NR)==2) THEN
             IG = IGROTOR(NR)
             !
             !---- Initialize section circulation neglecting induced swirl velocity
@@ -204,12 +254,12 @@ SUBROUTINE ROTINITBLD
             VAIND = VAVGINIT - QINF
             DO I = 1, NRC
                 BGAM(I, NR) = 0.0
-            END DO
+            ENDDO
             BLDS = FLOAT(NRBLD(NR))
             !---- Under-relaxation to reduce transients in CL
             RLX = 0.5
             !
-            DO 100 ITERG = 1, NITERG
+            DO ITERG = 1, NITERG
                 !
                 TSUM = 0.0
                 DO I = 1, NRC
@@ -217,7 +267,7 @@ SUBROUTINE ROTINITBLD
                     DR = YRP(I + 1, NR) - YRP(I, NR)
                     !
                     !---- Use upstream circulation to calculate inflow
-                    IF(IG.LE.1) THEN
+                    IF (IG<=1) THEN
                         VTIN = 0.0
                     ELSE
                         VTIN = BGAMG(IG - 1, I) * PI2I / YRC(I, NR)
@@ -233,11 +283,10 @@ SUBROUTINE ROTINITBLD
                     REY = CHR(I, NR) * ABS(W) * RHO / RMU
                     SECSIG = BLDS * CHR(I, NR) / (2.0 * PI * YRC(I, NR))
                     SECSTAGR = 0.5 * PI - BETAR(I, NR)
-                    CALL GETCLCDCM(NR, I, XI, ALF, W, REY, SECSIG, SECSTAGR, &
-                            CLB, CL_ALF, CL_W, &
-                            CLMAX, CLMIN, DCL_STALL, LSTALLR(I, NR), &
-                            CDRAG, CD_ALF, CD_W, CD_REY, &
-                            CMOM, CM_AL, CM_W)
+                    CALL GETCLCDCM(NR, I, XI, ALF, W, REY, SECSIG, SECSTAGR, CLB, &
+                            & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, &
+                            & LSTALLR(I, NR), CDRAG, CD_ALF, CD_W, CD_REY, &
+                            & CMOM, CM_AL, CM_W)
                     CLR(I, NR) = CLB
                     !c        CLALF(I,NR) = CL_ALF
                     !
@@ -256,17 +305,15 @@ SUBROUTINE ROTINITBLD
                     !---- Set rotor slipstream velocities from estimates
                     VIND(1, I, NR) = VAIND
                     VIND(2, I, NR) = 0.0
-                    VIND(3, I, NR) = CI + YRC(I, NR) * OMEGA(NR)&
-                            + BGAM(I, NR) * PI2I / YRC(I, NR)
+                    VIND(3, I, NR) = CI + YRC(I, NR) * OMEGA(NR) + BGAM(I, NR)  &
+                            & * PI2I / YRC(I, NR)
                 ENDDO
-                IF(TGAP.GT.0.0) THEN
-                    BGAM(NRC, NR) = 0.0
-                ENDIF
+                IF (TGAP>0.0) BGAM(NRC, NR) = 0.0
                 !
                 !---- use momentum theory estimate of duct induced axial velocity to set VA
                 VHSQ = TSUM / (RHO * ADISK(NR))
                 DVAIND = 0.0
-                IF(NR.EQ.1) THEN
+                IF (NR==1) THEN
                     VAIND = -0.5 * QINF + SQRT((0.5 * QINF)**2 + VHSQ)
                 ELSE
                     DVAIND = -0.5 * SI + SQRT((0.5 * SI)**2 + VHSQ)
@@ -277,7 +324,7 @@ SUBROUTINE ROTINITBLD
                 !       WRITE(*,*) 'ROTINITBLD noVind TSUM,VA ',TSUM,VAIND,DVAIND
                 !       WRITE(8,*) 'ROTINITBLD noVind TSUM,VA ',TSUM,VAIND,DVAIND
                 !
-            100  CONTINUE
+            ENDDO
             !
             !---- Set average velocity in duct
             VAVGINIT = VAIND + QINF
@@ -286,21 +333,34 @@ SUBROUTINE ROTINITBLD
             !
         ENDIF
         !
-    END DO
+    ENDDO
     !
     CALL SETROTVEL
     LVMAV = .FALSE.
     !c      CALL VMAVGINIT(VAVGINIT)
     !
-    997  format(A, ' ', i4, i4, 5(1x, f10.5))
-    99   format(i5, 5(1x, f12.6))
+    997  FORMAT (A, ' ', i4, i4, 5(1x, f10.5))
+    99   FORMAT (i5, 5(1x, f12.6))
     !      WRITE(*,*) 'ROTINITBLD No convergence'
     !
-    RETURN
-END
+END SUBROUTINE ROTINITBLD
+!*==SETROTVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE SETROTVEL
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: IR, NR
+    REAL :: PHIA, PHIR, VFAC, VMA, VMR, VVA, VVR, WM, WR, &
+            & WT, WWA, WWT, WX
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Sets absolute and relative frame rotor velocities from
     !     induced velocities
@@ -308,21 +368,20 @@ SUBROUTINE SETROTVEL
     !----------------------------------------------------------------
     !     Blade blockage code, Esotec Developments, Sept 2013
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     DO NR = 1, NROTOR
-        IF(LBLBL.AND..NOT.LBBLOFT(NR)) THEN
-            WRITE(*, 1200) NR
+        IF (LBLBL .AND. .NOT.LBBLOFT(NR)) THEN
+            WRITE (*, 1200) NR
             LBLBL = .FALSE.
         ENDIF
     ENDDO
     !
-    1200 FORMAT(/, 'No blade blockage factors for Disk', I2)
+    1200 FORMAT (/, 'No blade blockage factors for Disk', I2)
     !
     DO NR = 1, NROTOR
         DO IR = 1, NRC
             !
-            IF(LBLBL) THEN
+            IF (LBLBL) THEN
                 VFAC = BBVFAC(IR, NR)
             ELSE
                 VFAC = 1.0
@@ -331,12 +390,12 @@ SUBROUTINE SETROTVEL
             CALL UVINFL(YRC(IR, NR), WWA, WWT)
             !---- Absolute frame velocities
             VABS(3, IR, NR) = VIND(3, IR, NR) + WWT
-            VABS(1, IR, NR) = (VIND(1, IR, NR) + QINF + WWA) * VFAC  ! BB entry
+            VABS(1, IR, NR) = (VIND(1, IR, NR) + QINF + WWA) * VFAC            ! BB entry
             !        VABS(1,IR,NR) = VIND(1,IR,NR) + QINF + WWA      ! v0.70
             VABS(2, IR, NR) = VIND(2, IR, NR)
             VMA = SQRT(VABS(1, IR, NR)**2 + VABS(2, IR, NR)**2)
             VVA = SQRT(VMA**2 + VABS(3, IR, NR)**2)
-            IF(VABS(3, IR, NR).NE.0.0) THEN
+            IF (VABS(3, IR, NR)/=0.0) THEN
                 PHIA = ATAN2(VMA, -VABS(3, IR, NR))
             ELSE
                 PHIA = 0.5 * PI
@@ -347,66 +406,83 @@ SUBROUTINE SETROTVEL
             VREL(2, IR, NR) = VABS(2, IR, NR)
             VMR = SQRT(VREL(1, IR, NR)**2 + VREL(2, IR, NR)**2)
             VVR = SQRT(VMR**2 + VREL(3, IR, NR)**2)
-            IF(VREL(3, IR, NR).NE.0.0) THEN
+            IF (VREL(3, IR, NR)/=0.0) THEN
                 PHIR = ATAN2(VMR, -VREL(3, IR, NR))
             ELSE
                 PHIR = 0.5 * PI
             ENDIF
             !
-            IF(LDBG) THEN
-                WRITE(*, 1400)
+            IF (LDBG) THEN
+                WRITE (*, 1400)
                 WX = VREL(1, IR, NR)
                 WR = VREL(2, IR, NR)
                 WT = VREL(3, IR, NR)
                 WM = SQRT(WX * WX + WR * WR)
-                IF(WT.NE.0.0) THEN
+                IF (WT/=0.0) THEN
                     PHIR = ATAN2(WM, -WT)
                 ELSE
                     PHIR = 0.5 * PI
                 ENDIF
-                WRITE(*, 1401) YRC(IR, NR), WX, WR, WM, WT, PHIR / DTR, BGAM(IR, NR)
+                WRITE (*, 1401) YRC(IR, NR), WX, WR, WM, WT, &
+                        & PHIR / DTR, BGAM(IR, NR)
             ENDIF
-        END DO
+        ENDDO
         !
-    END DO
+    ENDDO
     !
-    1400 FORMAT(/'Blade slipstream velocities set...'&
-            /'     r          Wx         Wr         Wm', &
-            '         Wt        Phi       BGam')
-    1401 FORMAT(1X, 8G11.4)
+    1400 FORMAT (/'Blade slipstream velocities set...'/                    &
+            &'     r          Wx         Wr         Wm', &
+            &'         Wt        Phi       BGam')
+    1401 FORMAT (1X, 8G11.4)
     !
-    RETURN
-END
+END SUBROUTINE SETROTVEL
+!*==CONVGTH.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE CONVGTH(NITER, RLXF, WXEPS)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: NITER
+    REAL :: RLXF, WXEPS
+    !
+    ! Local variables
+    !
+    REAL :: DG, DGTHMAX, RLX, RLXG
+    REAL, DIMENSION(IPX) :: DGOLD, GAMTH
+    INTEGER :: IP, IPMAX, ITR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Basic solver for GTH,
     !     Uses underrelaxed iteration for fixed BGAM to converge GTH
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    DIMENSION GAMTH(IPX), DGOLD(IPX)
     !
     RLX = RLXF
-    IF(RLX.LE.0.0) RLX = 0.5
+    IF (RLX<=0.0) RLX = 0.5
     !
     !---- check for valid solution before iterating
-    IF(.NOT.LGAMA) THEN
-        IF(.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+    IF (.NOT.LGAMA) THEN
+        IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
         !---- Generate GTH solution for current wakes
         CALL GTHCALC(GAMTH)
         !---- Update wake gamma from initial solution
         DO IP = 1, NPTOT
             GTH(IP) = GAMTH(IP)
-        END DO
+        ENDDO
         !---- Generate GAM solution for current RHS
         CALL GAMSOLV
     ENDIF
     !
     DO IP = 1, NPTOT
         DGOLD(IP) = 0.0
-    END DO
+    ENDDO
     !
     !----- do specified cycles of under-relaxed iteration
     DO ITR = 1, NITER
@@ -422,70 +498,87 @@ SUBROUTINE CONVGTH(NITER, RLXF, WXEPS)
         RLX = RLXF
         DO IP = 1, NPTOT
             DG = GAMTH(IP) - GTH(IP)
-            IF(ABS(DG).GT.ABS(DGTHMAX)) THEN
+            IF (ABS(DG)>ABS(DGTHMAX)) THEN
                 DGTHMAX = DG
                 IPMAX = IP
             ENDIF
             RLXG = RLX
-            IF(DG * DGOLD(IP).LT.0.0) RLXG = 0.6 * RLX
-            IF(DG * DGOLD(IP).GT.0.0) RLXG = 1.2 * RLX
+            IF (DG * DGOLD(IP)<0.0) RLXG = 0.6 * RLX
+            IF (DG * DGOLD(IP)>0.0) RLXG = 1.2 * RLX
             DGOLD(IP) = DG * RLXG
             GTH(IP) = GTH(IP) + RLXG * DG
-        END DO
+        ENDDO
         !---- Generate GAM solution for current RHS
         LGAMA = .FALSE.
         CALL GAMSOLV
         !
         !c         IF(LDBG)
-        WRITE(*, 100) ITR, DGTHMAX, IPMAX, RLX
-        IF(ABS(DGTHMAX).LT.WXEPS * QREF) THEN
+        WRITE (*, 100) ITR, DGTHMAX, IPMAX, RLX
+        IF (ABS(DGTHMAX)<WXEPS * QREF) THEN
             LCONV = .TRUE.
-            GO TO 20
+            GOTO 20
         ENDIF
-    END DO
+    ENDDO
     LCONV = .FALSE.
     !
-    100  FORMAT(I3, ' dGTHmax=', F9.5, ' @IP=', I5, ' RLX=', F8.5)
-    120  FORMAT(1X, 7G11.4)
+    100  FORMAT (I3, ' dGTHmax=', F9.5, ' @IP=', I5, ' RLX=', F8.5)
+    120  FORMAT (1X, 7G11.4)
     !
     !---- Update rotor velocities
     20   CALL UPDROTVEL
     !
-    RETURN
-END
+END SUBROUTINE CONVGTH
+!*==CONVGTHT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: ISPEC, NITER
+    REAL :: RLXF, TSPEC, WXEPS
+    !
+    ! Local variables
+    !
+    REAL :: BGAV, BGMAG, BGMAX, BGMIN, BLDS, DA, DBG, &
+            & DBGMAX, DG, DGTHMAX, DR, FDBG, RLX, RLXB, RLXG, &
+            & THR, TSCL
+    REAL, DIMENSION(IPX) :: DGOLD, GAMTH
+    INTEGER :: IP, IPMAX, IR, ITR, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Basic solver for B*GAM,GTH for design mode (fixed thrust)
     !     Uses underrelaxed iteration for fixed BGAM to converge GTH
     !     Input:  TSPEC   thrust specification
     !             ISPEC   1 for rotor thrust spec, 2 for total thrust spec
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    DIMENSION GAMTH(IPX), DGOLD(IPX)
-    DIMENSION BGX(IRX)
     !
     RLX = RLXF
-    IF(RLX.LE.0.0) RLX = 0.5
+    IF (RLX<=0.0) RLX = 0.5
     !
     !---- check for valid solution before iterating
-    IF(.NOT.LGAMA) THEN
-        IF(.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+    IF (.NOT.LGAMA) THEN
+        IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
         !---- Generate GTH solution for current wakes
         CALL GTHCALC(GAMTH)
         !---- Update wake gamma from initial solution
         DO IP = 1, NPTOT
             GTH(IP) = GAMTH(IP)
-        END DO
+        ENDDO
         !---- Generate GAM solution for current RHS
         CALL GAMSOLV
     ENDIF
     !
     DO IP = 1, NPTOT
         DGOLD(IP) = 0.0
-    END DO
+    ENDDO
     !
     !----- Iteration loop for driving thrust using B*GAM
     NR = 1
@@ -504,21 +597,21 @@ SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
             BGAV = BGAV + BGAM(IR, NR)
             BGMAX = MAX(BGMAX, BGAM(IR, NR))
             BGMIN = MIN(BGMIN, BGAM(IR, NR))
-        END DO
+        ENDDO
         BGAV = BGAV / FLOAT(NRC)
         BGMAG = MAX(ABS(BGAV), BGMIN, BGMAX, 0.1)
         !
         !---- Calculate current rotor thrust
         CALL TQCALC(1)
         !---- Drive thrust from rotor for ISPEC=1, total thrust for ISPEC=2
-        IF(ISPEC.EQ.1) THEN
+        IF (ISPEC==1) THEN
             THR = TTOT
         ELSE
             THR = TTOT + TDUCT
         ENDIF
         !---- Scale factor for BGAM from current value to get desired rotor thrust
         TSCL = 1.0
-        IF(THR.NE.0.0)  TSCL = TSPEC / THR
+        IF (THR/=0.0) TSCL = TSPEC / THR
         !
         !---- Check for rational relaxation factors based on BGAM changes
         DBGMAX = 0.0
@@ -526,18 +619,18 @@ SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
         DO IR = 1, NRC
             DBG = (TSCL - 1.0) * BGAM(IR, NR)
             DBGMAX = MAX(DBGMAX, ABS(DBG))
-            IF(BGMAG.NE.0.0) THEN
+            IF (BGMAG/=0.0) THEN
                 FDBG = ABS(DBG) / BGMAG
-                IF(FDBG * RLXB.GT.0.3) RLXB = 0.3 / FDBG
+                IF (FDBG * RLXB>0.3) RLXB = 0.3 / FDBG
             ENDIF
-        END DO
+        ENDDO
         !
         DO IR = 1, NRC
             DBG = (TSCL - 1.0) * BGAM(IR, NR)
             !---- Update BGAM
             BGAM(IR, NR) = BGAM(IR, NR) + RLXB * DBG
-        END DO
-        IF(TGAP.GT.0.0) BGAM(NRC, NR) = 0.0
+        ENDDO
+        IF (TGAP>0.0) BGAM(NRC, NR) = 0.0
         !
         !---- Set VMavg velocities at wake points
         CALL VMAVGCALC
@@ -547,17 +640,17 @@ SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
         DGTHMAX = 0.0
         DO IP = 1, NPTOT
             DG = GAMTH(IP) - GTH(IP)
-            IF(ABS(DG).GT.ABS(DGTHMAX)) THEN
+            IF (ABS(DG)>ABS(DGTHMAX)) THEN
                 DGTHMAX = DG
                 IPMAX = IP
             ENDIF
             RLXG = RLXB
-            IF(DG * DGOLD(IP).LT.0.0) RLXG = 0.6 * RLXB
-            IF(DG * DGOLD(IP).GT.0.0) RLXG = 1.2 * RLXB
+            IF (DG * DGOLD(IP)<0.0) RLXG = 0.6 * RLXB
+            IF (DG * DGOLD(IP)>0.0) RLXG = 1.2 * RLXB
             DGOLD(IP) = DG * RLXG
             !---- Update GTH wake gamma using CSOR
             GTH(IP) = GTH(IP) + RLXG * DG
-        END DO
+        ENDDO
         !
         !---- Generate GAM solution for current RHS
         LGAMA = .FALSE.
@@ -565,62 +658,82 @@ SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
         !
         !c       IF(LDBG) THEN
         !c         WRITE(*,*) ' '
-        WRITE(*, 100) ITR, DGTHMAX, IPMAX, DBGMAX, RLXB
-        IF(ABS(DGTHMAX).LT.WXEPS * QREF .AND.&
-                ABS(DBGMAX).LE.0.001 * BGMAG) THEN
+        WRITE (*, 100) ITR, DGTHMAX, IPMAX, DBGMAX, RLXB
+        IF (ABS(DGTHMAX)<WXEPS * QREF .AND. ABS(DBGMAX)<=0.001 * BGMAG)  &
+                & THEN
             LCONV = .TRUE.
-            GO TO 20
+            GOTO 20
         ENDIF
         LGAMA = .FALSE.
-    END DO
+    ENDDO
     LCONV = .FALSE.
     !
-    100  FORMAT(I3, ' dGTHmax=', F9.5, ' @IP=', I5, &
-            '  dBGmax=', F9.5, ' RLX=', F8.5)
-    110  FORMAT(/'Blade velocities on iteration ', I5, &
-            /'     r          Wx         Wr', &
-            '         Wt        Phi       CL       BGam')
-    120  FORMAT(1X, 7G11.4)
+    100  FORMAT (I3, ' dGTHmax=', F9.5, ' @IP=', I5, '  dBGmax=', F9.5, ' RLX=', &
+            & F8.5)
+    110  FORMAT (/'Blade velocities on iteration ', I5, &
+            &/'     r          Wx         Wr', &
+            &'         Wt        Phi       CL       BGam')
+    120  FORMAT (1X, 7G11.4)
     !
     !---- Update rotor velocities
     20   CALL UPDROTVEL
     !
-    RETURN
-END
+END SUBROUTINE CONVGTHT
+!*==CONVGTHBG.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: NITER
+    REAL :: RLXF, WXEPS
+    !
+    ! Local variables
+    !
+    REAL :: ALF, BGAV, BGMAG, BGMAX, BGMIN, BLDS, CD_ALF, &
+            & CD_REY, CD_W, CLB, CLMAX, CLMIN, CL_ALF, CL_W, &
+            & CMOM, CM_AL, CM_W, DBG, DBGMAX, DCL_STALL, DG, &
+            & DGTHMAX, FDBG, PHIB, REY, RLX, RLXB, RLXBG, &
+            & RLXG, SECSIG, SECSTAGR, VTBG, WTB, WWB, XI
+    REAL, DIMENSION(IRX) :: BGX, DBGOLD
+    REAL, DIMENSION(IPX) :: DGOLD, GAMTH
+    INTEGER :: IG, IP, IPMAX, IR, IRMAX, ITR, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Basic solver for GTH for a defined blade geometry
     !     Uses underrelaxed iteration to converge GTH, BGAM
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    DIMENSION GAMTH(IPX), DGOLD(IPX)
-    DIMENSION BGX(IRX), DBGOLD(IRX)
     !
     RLX = RLXF
-    IF(RLX.LE.0.0) RLX = 0.5
+    IF (RLX<=0.0) RLX = 0.5
     !
     !---- check for valid solution before iterating
-    IF(.NOT.LGAMA) THEN
-        IF(.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+    IF (.NOT.LGAMA) THEN
+        IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
         !---- Generate GTH solution for current wakes
         CALL GTHCALC(GAMTH)
         !---- Update wake gamma from initial solution
         DO IP = 1, NPTOT
             GTH(IP) = GAMTH(IP)
-        END DO
+        ENDDO
         !---- Generate GAM solution for current RHS
         CALL GAMSOLV
     ENDIF
     !
     DO IP = 1, NPTOT
         DGOLD(IP) = 0.0
-    END DO
+    ENDDO
     DO IR = 1, NRC
         DBGOLD(IR) = 0.0
-    END DO
+    ENDDO
     !
     !c      write(15,*) 'new solution '
     !----- do several cycles of under-relaxed iteration to converge
@@ -640,7 +753,7 @@ SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
         DGTHMAX = 0.0
         !
         DO NR = 1, NROTOR
-            IF(IRTYPE(NR).EQ.2) THEN
+            IF (IRTYPE(NR)==2) THEN
                 IG = IGROTOR(NR)
                 !
                 BLDS = FLOAT(NRBLD(NR))
@@ -676,10 +789,9 @@ SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
                     SECSIG = BLDS * CHR(IR, NR) / (2.0 * PI * YRC(IR, NR))
                     SECSTAGR = 0.5 * PI - BETAR(IR, NR)
                     CALL GETCLCDCM(NR, IR, XI, ALF, WWB, REY, SECSIG, SECSTAGR, &
-                            CLB, CL_ALF, CL_W, &
-                            CLMAX, CLMIN, DCL_STALL, LSTALLR(IR, NR), &
-                            CDR(IR, NR), CD_ALF, CD_W, CD_REY, &
-                            CMOM, CM_AL, CM_W)
+                            & CLB, CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, &
+                            & LSTALLR(IR, NR), CDR(IR, NR), CD_ALF, CD_W, &
+                            & CD_REY, CMOM, CM_AL, CM_W)
                     CLR(IR, NR) = CLB
                     CLALF(IR, NR) = CL_ALF
                     ALFAR(IR, NR) = ALF
@@ -689,22 +801,20 @@ SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
                     BGMAX = MAX(BGMAX, BGAM(IR, NR))
                     BGMIN = MIN(BGMIN, BGAM(IR, NR))
                     !
-                    IF(LDBG) THEN
-                        !            WRITE(*,120) YRC(IR,NR),
-                        !     &                   VREL(1,IR,NR),VREL(2,IR,NR),WTB,
-                        !     &                   PHIB/DTR,CLR(IR,NR),BGX(IR),CLALF(IR,NR)
-                        WRITE(*, 120) YRC(IR, NR), &
-                                VREL(1, IR, NR), VREL(2, IR, NR), WTB, &
-                                PHIB / DTR, CLR(IR, NR), BGX(IR), CLALF(IR, NR)
-                    ENDIF
-                END DO
+                    !            WRITE(*,120) YRC(IR,NR),
+                    !     &                   VREL(1,IR,NR),VREL(2,IR,NR),WTB,
+                    !     &                   PHIB/DTR,CLR(IR,NR),BGX(IR),CLALF(IR,NR)
+                    IF (LDBG) WRITE (*, 120) YRC(IR, NR), VREL(1, IR, NR), &
+                            & VREL(2, IR, NR), WTB, PHIB / DTR, &
+                            & CLR(IR, NR), BGX(IR), CLALF(IR, NR)
+                ENDDO
                 BGAV = BGAV / FLOAT(NRC)
-                IF(BGAV.GE.0.0) THEN
+                IF (BGAV>=0.0) THEN
                     BGMAG = MAX(BGAV, BGMAX, 0.1)
                 ELSE
                     BGMAG = MIN(BGAV, BGMIN, -0.1)
                 ENDIF
-                IF(TGAP.GT.0.0 .AND. OMEGA(NR).NE.0.0) THEN
+                IF (TGAP>0.0 .AND. OMEGA(NR)/=0.0) THEN
                     BGX(NRC) = 0.0
                     CLR(NRC, NR) = 0.0
                     ALFAR(NRC, NR) = 0.0
@@ -716,35 +826,35 @@ SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
                 DBGMAX = 0.0
                 DO IR = 1, NRC
                     DBG = (BGX(IR) - BGAM(IR, NR))
-                    IF(ABS(DBG).GT.ABS(DBGMAX)) THEN
+                    IF (ABS(DBG)>ABS(DBGMAX)) THEN
                         DBGMAX = DBG
                         IRMAX = IR
                     ENDIF
-                    IF(BGMAG.NE.0.0) THEN
+                    IF (BGMAG/=0.0) THEN
                         !             FDBG = ABS(DBG)/BGAM(IR,NR)
                         !             IF(FDBG*RLXB.GT.0.5) RLXB = 0.5/FDBG
                         !             FDBG = DBG/BGAM(IR,NR)
                         FDBG = DBG / BGMAG
-                        IF(FDBG * RLXB.LT.-0.2) RLXB = -0.2 / FDBG
-                        IF(FDBG * RLXB.GT. 0.4) RLXB = 0.4 / FDBG
+                        IF (FDBG * RLXB<-0.2) RLXB = -0.2 / FDBG
+                        IF (FDBG * RLXB>0.4) RLXB = 0.4 / FDBG
                     ENDIF
-                END DO
+                ENDDO
                 !
                 !---- Update blade circulation using CSOR
                 DO IR = 1, NRC
                     DBG = (BGX(IR) - BGAM(IR, NR))
                     RLXBG = 0.5 * RLXB
-                    IF(DBG * DBGOLD(IR).LT.0.0) RLXBG = 0.6 * RLXB
+                    IF (DBG * DBGOLD(IR)<0.0) RLXBG = 0.6 * RLXB
                     !            IF(DBG*DBGOLD(IR).GT.0.0) RLXBG = 1.2*RLXB
                     DBGOLD(IR) = DBG * RLXBG
                     BGAM(IR, NR) = BGAM(IR, NR) + RLXBG * DBG
-                END DO
-                IF(TGAP.GT.0.0 .AND. OMEGA(NR).NE.0.0) BGAM(NRC, NR) = 0.0
+                ENDDO
+                IF (TGAP>0.0 .AND. OMEGA(NR)/=0.0) BGAM(NRC, NR) = 0.0
                 !---- Update grid flowfield
                 CALL SETGRDFLW
             ENDIF
             !
-        END DO ! loop over NROTOR
+        ENDDO ! loop over NROTOR
         !
         !---- Set VMavg velocities at wake points
         CALL VMAVGCALC
@@ -754,17 +864,17 @@ SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
         DGTHMAX = 0.0
         DO IP = 1, NPTOT
             DG = GAMTH(IP) - GTH(IP)
-            IF(ABS(DG).GT.ABS(DGTHMAX)) THEN
+            IF (ABS(DG)>ABS(DGTHMAX)) THEN
                 DGTHMAX = DG
                 IPMAX = IP
             ENDIF
             RLXG = RLX
-            IF(DG * DGOLD(IP).LT.0.0) RLXG = 0.6 * RLX
-            IF(DG * DGOLD(IP).GT.0.0) RLXG = 1.2 * RLX
+            IF (DG * DGOLD(IP)<0.0) RLXG = 0.6 * RLX
+            IF (DG * DGOLD(IP)>0.0) RLXG = 1.2 * RLX
             DGOLD(IP) = DG * RLXG
             !---- Update GTH wake gamma using CSOR
             GTH(IP) = GTH(IP) + RLXG * DG
-        END DO
+        ENDDO
         !
         !---- Generate GAM solution for current RHS
         LGAMA = .FALSE.
@@ -772,57 +882,74 @@ SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
         !
         !c       IF(LDBG) THEN
         !c         WRITE(*,*) ' '
-        IF(RLXBG.NE.0.0) THEN
-            WRITE(*, 100) ITR, DGTHMAX, IPMAX, DBGMAX, IRMAX, RLXBG
+        IF (RLXBG/=0.0) THEN
+            WRITE (*, 100) ITR, DGTHMAX, IPMAX, DBGMAX, IRMAX, RLXBG
             !c           WRITE(*,100) ITR,DGTHMAX,IPMAX,DBGMAX,IRMAX,RLXBG,BGMAG
         ELSE
-            WRITE(*, 105) ITR, DGTHMAX, IPMAX, RLXG
+            WRITE (*, 105) ITR, DGTHMAX, IPMAX, RLXG
         ENDIF
-        IF(ABS(DGTHMAX).LT.WXEPS * QREF .AND.&
-                ABS(DBGMAX).LE.0.001 * ABS(BGMAG)) THEN
+        IF (ABS(DGTHMAX)<WXEPS * QREF .AND. ABS(DBGMAX)                 &
+                & <=0.001 * ABS(BGMAG)) THEN
             LCONV = .TRUE.
-            GO TO 20
+            GOTO 20
         ENDIF
         LGAMA = .FALSE.
-    END DO
+    ENDDO
     LCONV = .FALSE.
     !
-    100  FORMAT(I3, ' dGTHmax=', F10.5, ' @IP=', I4, &
-            '  dBGmax=', F10.5, ' @IR=', I4, ' RLX=', F8.5)
+    100  FORMAT (I3, ' dGTHmax=', F10.5, ' @IP=', I4, '  dBGmax=', F10.5, ' @IR=', &
+            & I4, ' RLX=', F8.5)
     !c     &          '  dBGmax=',F10.5,' @IR=',I4,' RLX=',F8.5,' BGMG=',F8.5)
-    105  FORMAT(I3, ' dGTHmax=', F10.5, ' @IP=', I4, ' RLX=', F8.5)
-    110  FORMAT(/'Disk velocities on iteration ', I4, &
-            /'     r          Wx         Wr', &
-            '         Wt        Phi       CL       BGam      CLalf')
-    120  FORMAT(1X, 8G10.4)
+    105  FORMAT (I3, ' dGTHmax=', F10.5, ' @IP=', I4, ' RLX=', F8.5)
+    110  FORMAT (/'Disk velocities on iteration ', I4, &
+            &/'     r          Wx         Wr', &
+            &'         Wt        Phi       CL       BGam      CLalf')
+    120  FORMAT (1X, 8G10.4)
     !
     !---- Update rotor velocities
     20   CALL UPDROTVEL
     !
-    RETURN
-END
+END SUBROUTINE CONVGTHBG
+!*==CONVGTHBGT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE CONVGTHBGT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: ISPEC, NITER
+    REAL :: RLXF, TSPEC, WXEPS
+    !
+    ! Local variables
+    !
+    REAL :: ALF, BGAV, BGEPS, BGFAC, BGMAG, BGMAX, BGMIN, &
+            & BLDS, CD_ALF, CD_REY, CD_W, CLB, CLMAX, CLMIN, &
+            & CL_ALF, CL_W, CMOM, CM_AL, CM_W, DA, DBETA, DBG, &
+            & DBGMAX, DCL_STALL, DR, DTDALF, FDBG, PHIB, REY, &
+            & RLX, RLXB, SECSIG, SECSTAGR, THR, TSCL, VTBG, &
+            & WTB, WWB, XI
+    INTEGER :: IR, ITR, NITER0, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Basic solver for BETA, GTH for analysis mode (fixed thrust)
     !     Uses underrelaxed iteration for blade pitch to converge BGAM,GTH
     !     Input:  TSPEC   thrust specification
     !             ISPEC   1 for rotor thrust spec, 2 for total thrust spec
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    DIMENSION GAMTH(IPX)
-    DIMENSION BGX(IRX)
     !
     RLX = RLXF
-    IF(RLX.LE.0.0) RLX = 0.5
+    IF (RLX<=0.0) RLX = 0.5
     !
     !---- check for valid solution before iterating
-    IF(.NOT.LGAMA) THEN
-        !---- Generate GAM solution for current RHS
-        CALL GAMSOLV
-    ENDIF
+    !---- Generate GAM solution for current RHS
+    IF (.NOT.LGAMA) CALL GAMSOLV
     !
     !----- do several cycles of under-relaxed iteration to converge
     !      BGAM and GTH from specified CL and chord
@@ -838,14 +965,14 @@ SUBROUTINE CONVGTHBGT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
         !
         CALL TQCALC(1)
         !---- Drive thrust from rotor for ISPEC=1, total thrust for ISPEC=2
-        IF(ISPEC.EQ.1) THEN
+        IF (ISPEC==1) THEN
             THR = TTOT
         ELSE
             THR = TTOT + TDUCT
         ENDIF
         !
         !---- Check for disk type (actuator disk or bladed)
-        IF(IRTYPE(NR).EQ.1) THEN
+        IF (IRTYPE(NR)==1) THEN
             !---- Actuator disk
             BGAV = 0.0
             BGMAX = BGAM(1, NR)
@@ -856,38 +983,38 @@ SUBROUTINE CONVGTHBGT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
                 BGAV = BGAV + BGAM(IR, NR)
                 BGMAX = MAX(BGMAX, BGAM(IR, NR))
                 BGMIN = MIN(BGMIN, BGAM(IR, NR))
-            END DO
+            ENDDO
             BGAV = BGAV / FLOAT(NRC)
             BGMAG = MAX(ABS(BGAV), BGMIN, BGMAX, 0.1)
             !---- Scale factor for BGAM from current value to get desired rotor thrust
             TSCL = 1.0
-            IF(THR.NE.0.0)  TSCL = TSPEC / THR
+            IF (THR/=0.0) TSCL = TSPEC / THR
             !---- Check for rational relaxation factors based on BGAM changes
             DBGMAX = 0.0
             RLXB = RLX
             DO IR = 1, NRC
                 DBG = (TSCL - 1.0) * BGAM(IR, NR)
                 DBGMAX = MAX(DBGMAX, ABS(DBG))
-                IF(BGMAG.NE.0.0) THEN
+                IF (BGMAG/=0.0) THEN
                     FDBG = ABS(DBG) / BGMAG
-                    IF(FDBG * RLXB.GT.0.3) RLXB = 0.3 / FDBG
+                    IF (FDBG * RLXB>0.3) RLXB = 0.3 / FDBG
                 ENDIF
-            END DO
+            ENDDO
             !---- Update BGAM
             DO IR = 1, NRC
                 BGFAC = (TSCL - 1.0) * BGAM(IR, NR)
                 BGAM(IR, NR) = BGAM(IR, NR) + RLXB * BGFAC
-            END DO
-            IF(TGAP.GT.0.0 .AND. OMEGA(NR).NE.0.0) BGAM(NRC, NR) = 0.0
+            ENDDO
+            IF (TGAP>0.0 .AND. OMEGA(NR)/=0.0) BGAM(NRC, NR) = 0.0
             !
-            WRITE(*, 110) ITR, RLXB, DBGMAX * RLXB
-            IF(ABS(DBGMAX * RLXB).LE.0.001 * BGMAG) THEN
+            WRITE (*, 110) ITR, RLXB, DBGMAX * RLXB
+            IF (ABS(DBGMAX * RLXB)<=0.001 * BGMAG) THEN
                 LCONV = .TRUE.
-                GO TO 20
+                GOTO 20
             ENDIF
             LGAMA = .FALSE.
             !
-        ELSEIF(IRTYPE(NR).EQ.2) THEN
+        ELSEIF (IRTYPE(NR)==2) THEN
             !---- Bladed disk
             DTDALF = 0.0
             DO IR = 1, NRC
@@ -902,59 +1029,70 @@ SUBROUTINE CONVGTHBGT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
                 REY = WWB * CHR(IR, NR) * RHO / RMU
                 SECSIG = BLDS * CHR(IR, NR) / (2.0 * PI * YRC(IR, NR))
                 SECSTAGR = 0.5 * PI - BETAR(IR, NR)
-                CALL GETCLCDCM(NR, IR, XI, ALF, WWB, REY, SECSIG, SECSTAGR, &
-                        CLB, CL_ALF, CL_W, &
-                        CLMAX, CLMIN, DCL_STALL, LSTALLR(IR, NR), &
-                        CDR(IR, NR), CD_ALF, CD_W, CD_REY, &
-                        CMOM, CM_AL, CM_W)
+                CALL GETCLCDCM(NR, IR, XI, ALF, WWB, REY, SECSIG, SECSTAGR, CLB, &
+                        & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, &
+                        & LSTALLR(IR, NR), CDR(IR, NR), CD_ALF, CD_W, &
+                        & CD_REY, CMOM, CM_AL, CM_W)
                 CLR(IR, NR) = CLB
                 CLALF(IR, NR) = CL_ALF
                 ALFAR(IR, NR) = ALF
                 !
-                IF(IR.EQ.NRC .AND. TGAP.GT.0.0 .AND. OMEGA(NR).NE.0.0) THEN
+                IF (IR==NRC .AND. TGAP>0.0 .AND. OMEGA(NR)/=0.0) THEN
                     CLR(IR, NR) = 0.0
                     CLALF(IR, NR) = 0.0
                     ALFAR(IR, NR) = 0.0
                 ENDIF
                 !
                 DTDALF = DTDALF + TI_GAM(IR, NR) * 0.5 * WWB * CHR(IR, NR) * CL_ALF
-            END DO
+            ENDDO
             !---- Change blade pitch to drive thrust
             RLXB = RLXF
             DBETA = 0.0
-            IF(DTDALF.NE.0.0) DBETA = (TSPEC - THR) / DTDALF
+            IF (DTDALF/=0.0) DBETA = (TSPEC - THR) / DTDALF
             !---- Limit DBETA changes in iteration to get desired rotor thrust
-            IF(ABS(DBETA) * RLXB.GT.0.1) RLXB = 0.1 / ABS(DBETA)
+            IF (ABS(DBETA) * RLXB>0.1) RLXB = 0.1 / ABS(DBETA)
             !---- update BETA by estimate
             DO IR = 1, NRC
                 BETAR(IR, NR) = BETAR(IR, NR) + RLXB * DBETA
-            END DO
+            ENDDO
             !
-            WRITE(*, 100) ITR, RLXB, DBETA / DTR
-            IF(ABS(DBETA).LT.0.001) THEN
+            WRITE (*, 100) ITR, RLXB, DBETA / DTR
+            IF (ABS(DBETA)<0.001) THEN
                 LCONV = .TRUE.
-                GO TO 20
+                GOTO 20
             ENDIF
             LGAMA = .FALSE.
             !
         ENDIF
         !
-    END DO
+    ENDDO
     LCONV = .FALSE.
     !
-    100  FORMAT(I3, ' RLX=', F8.5, ' dBeta=', F9.5)
-    110  FORMAT(I3, ' RLX=', F8.5, ' dBGmax=', F9.5)
+    100  FORMAT (I3, ' RLX=', F8.5, ' dBeta=', F9.5)
+    110  FORMAT (I3, ' RLX=', F8.5, ' dBGmax=', F9.5)
     !
     !---- Final iterations to converge case
     20   CALL CONVGTHBG(NITER, RLXF, WXEPS)
     !---- Update rotor velocities
     CALL UPDROTVEL
     !
-    RETURN
-END
+END SUBROUTINE CONVGTHBGT
+!*==UPDROTVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE UPDROTVEL
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: AINT, DA, DR, US, VAINT
+    INTEGER :: IR, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Update blade or disk velocities based on current solution
     !     Velocities updated include:
@@ -962,12 +1100,11 @@ SUBROUTINE UPDROTVEL
     !         absolute frame velocities  VABS
     !         relative frame velocities  VREL
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     !---- get induced velocities upstream and downstream of disk
     DO N = 1, NROTOR
         CALL ROTORVABS(N, VIND(1, 1, N))
-    END DO
+    ENDDO
     !
     !---- set disk downstream velocities in absolute and relative frames
     CALL SETROTVEL
@@ -982,18 +1119,28 @@ SUBROUTINE UPDROTVEL
             US = VABS(1, IR, N)
             AINT = AINT + DA
             VAINT = VAINT + US * DA
-        END DO
+        ENDDO
         VAAVG(N) = VAINT / AINT
         !c       write(*,*) 'n,vaavg ',n,vaavg(n)
-    END DO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE UPDROTVEL
+!*==VABS2VREL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-SUBROUTINE VABS2VREL(OMEG, YA, &
-        VXA, VRA, VTA, &
-        VXR, VRR, VTR, VTR_VTA, VTR_OMG)
+SUBROUTINE VABS2VREL(OMEG, YA, VXA, VRA, VTA, VXR, VRR, VTR, VTR_VTA, &
+        & VTR_OMG)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: OMEG, VRA, VRR, VTA, VTR, VTR_OMG, VTR_VTA, VXA, &
+            & VXR, YA
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------------------
     !     Calculates relative frame induced velocities from
     !     absolute frame velocities at radius YA with rotational
@@ -1007,17 +1154,32 @@ SUBROUTINE VABS2VREL(OMEG, YA, &
     VTR_VTA = 1.0
     VTR_OMG = -YA
     !
-    RETURN
-END
+END SUBROUTINE VABS2VREL
+!*==ROTORVABS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE ROTORVABS(N, VEL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N
+    REAL, DIMENSION(3, *) :: VEL
+    !
+    ! Local variables
+    !
+    REAL :: BGAVE, CIRC
+    INTEGER :: IC, IC1, IC2, IEL, IG, IR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------------------
     !     Get absolute frame induced velocities downstream of rotor
     !     line center points
     !--------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION VEL(3, *)
     !
     !---- get velocities on rotor source line
     IEL = IELROTOR(N)
@@ -1038,32 +1200,47 @@ SUBROUTINE ROTORVABS(N, VEL)
         !        ENDIF
         CIRC = BGAVE
         VEL(3, IR) = CIRC * PI2I / YC(IC)
-    END DO
+    ENDDO
     !
-    98   FORMAT(A, I5, 6(1X, F10.6))
-    99   FORMAT(A, 2I5, 6(1X, F10.6))
-    97   FORMAT(A, 3I5, 6(1X, F10.6))
+    98   FORMAT (A, I5, 6(1X, F10.6))
+    99   FORMAT (A, 2I5, 6(1X, F10.6))
+    97   FORMAT (A, 3I5, 6(1X, F10.6))
     !
-    RETURN
-END
+END SUBROUTINE ROTORVABS
+!*==GETVELABS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE GETVELABS(NF, XF, YF, VEL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! PARAMETER definitions
+    !
+    INTEGER, PARAMETER :: NFX = IRX
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: NF
+    REAL, DIMENSION(3, *) :: VEL
+    REAL, DIMENSION(*) :: XF, YF
+    !
+    ! Local variables
+    !
+    INTEGER :: IF, IR
+    INTEGER, DIMENSION(NFX) :: IFTYPE, IPFO, IPFP
+    REAL, DIMENSION(2, NFX) :: QF
+    REAL, DIMENSION(2, IPX, NFX) :: QF_GAM, QF_GTH, QF_SIG
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !--------------------------------------------------------------
     !     Get absolute frame induced velocities at NF points XF,YF
     !     by potential flow survey
     !--------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION XF(*), YF(*)
-    DIMENSION VEL(3, *)
     !
     !---- local arrays for calling QFCALC
-    PARAMETER (NFX = IRX)
-    DIMENSION QF(2, NFX), &
-            QF_GAM(2, IPX, NFX), &
-            QF_SIG(2, IPX, NFX), &
-            QF_GTH(2, IPX, NFX)
-    DIMENSION IPFO(NFX), IPFP(NFX), IFTYPE(NFX)
     !
     !---- get velocities on specified points
     !---- assume the pointa are not on a panel
@@ -1072,23 +1249,41 @@ SUBROUTINE GETVELABS(NF, XF, YF, VEL)
         IPFO(IR) = 0
         IPFP(IR) = 0
         IFTYPE(IR) = 0
-    END DO
+    ENDDO
     !
     !------ evaluate velocity components at points
-    CALL QFCALC(1, NF, XF, YF, IPFO, IPFP, IFTYPE, &
-            QF, QF_GAM, QF_SIG, QF_GTH)
+    CALL QFCALC(1, NF, XF, YF, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, QF_GTH)
     !
     DO IF = 1, NF
         VEL(1, IF) = QF(1, IF)
         VEL(2, IF) = QF(2, IF)
         VEL(3, IF) = 0.0
-    END DO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE GETVELABS
+!*==PRTVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    LOGICAL :: LABS, LIND, LREL
+    CHARACTER(*) :: LINE
+    INTEGER :: LU, NR
+    !
+    ! Local variables
+    !
+    REAL :: ANG, PHIB, PHIR, RPM, VMA, VRA, VTA, VTBG, VVA, &
+            & VXA, WMR, WRR, WTR, WWR, WXR, YY
+    INTEGER :: I
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------
     !     Print out velocities just downstream of rotor
     !     Prints either:
@@ -1105,19 +1300,16 @@ SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
     !     Takes VABS from current solution for absolute frame
     !     Takes VREL from current solution for relative frame
     !----------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    CHARACTER*(*) LINE
-    LOGICAL LIND, LABS, LREL
     !
     !---- Print velocity data
-    WRITE(LU, 20) LINE
+    WRITE (LU, 20) LINE
     !
     RPM = 30.0 * OMEGA(NR) / PI
-    WRITE(LU, 25) QINF, QREF, OMEGA(NR), RPM
+    WRITE (LU, 25) QINF, QREF, OMEGA(NR), RPM
     !
     !---- Absolute frame induced velocities
-    IF(LIND) THEN
-        WRITE(LU, 30)
+    IF (LIND) THEN
+        WRITE (LU, 30)
         DO I = 1, NRC
             YY = YRC(I, NR)
             VXA = VIND(1, I, NR)
@@ -1127,13 +1319,13 @@ SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
             VVA = SQRT(VMA**2 + VTA**2)
             !c          ANG = ATAN2(VTA,VMA)
             ANG = ATAN2(VTA, VXA)
-            WRITE(LU, 50) YY, VXA, VRA, VMA, VTA, VVA, ANG / DTR
-        END DO
+            WRITE (LU, 50) YY, VXA, VRA, VMA, VTA, VVA, ANG / DTR
+        ENDDO
     ENDIF
     !
     !---- Absolute frame velocities
-    IF(LABS) THEN
-        WRITE(LU, 35)
+    IF (LABS) THEN
+        WRITE (LU, 35)
         DO I = 1, NRC
             YY = YRC(I, NR)
             VXA = VABS(1, I, NR)
@@ -1143,13 +1335,13 @@ SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
             VVA = SQRT(VMA**2 + VTA**2)
             !c          ANG = ATAN2(VTA,VMA)
             ANG = ATAN2(VTA, VXA)
-            WRITE(LU, 50) YY, VXA, VRA, VMA, VTA, VVA, ANG / DTR
-        END DO
+            WRITE (LU, 50) YY, VXA, VRA, VMA, VTA, VVA, ANG / DTR
+        ENDDO
     ENDIF
     !
     !---- Relative frame velocities
-    IF(LREL) THEN
-        WRITE(LU, 40)
+    IF (LREL) THEN
+        WRITE (LU, 40)
         DO I = 1, NRC
             YY = YRC(I, NR)
             WXR = VREL(1, I, NR)
@@ -1158,23 +1350,23 @@ SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
             !---- Blade relative velocity includes rotational speed
             WTR = VREL(3, I, NR)
             WWR = SQRT(WMR**2 + WTR**2)
-            IF(WTR.NE.0.0) THEN
+            IF (WTR/=0.0) THEN
                 !c            PHIR = ATAN2(WMR,-WTR)
                 PHIR = ATAN2(WXR, -WTR)
             ELSE
                 PHIR = 0.5 * PI
             ENDIF
             ANG = PHIR
-            WRITE(LU, 50) YY, WXR, WRR, WMR, WTR, WWR, ANG / DTR
-        END DO
+            WRITE (LU, 50) YY, WXR, WRR, WMR, WTR, WWR, ANG / DTR
+        ENDDO
     ENDIF
     !
     !---- Relative frame velocities on blade lifting line
     !     this assumes that the radial component of velocity is parallel
     !     to the blade span and is ignored in velocity magnitude and angle
     !     for the blade.  Radial components are printed however.
-    IF(LREL) THEN
-        WRITE(LU, 60)
+    IF (LREL) THEN
+        WRITE (LU, 60)
         DO I = 1, NRC
             YY = YRC(I, NR)
             WXR = VREL(1, I, NR)
@@ -1185,64 +1377,69 @@ SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
             VTBG = BGAM(I, NR) * PI2I / YRC(I, NR)
             WTR = VREL(3, I, NR) - 0.5 * VTBG
             WWR = SQRT(WMR**2 + WTR**2)
-            IF(WTR.NE.0.0) THEN
+            IF (WTR/=0.0) THEN
                 PHIB = ATAN2(WXR, -WTR)
             ELSE
                 PHIB = 0.5 * PI
             ENDIF
             ANG = PHIB
-            WRITE(LU, 50) YY, WXR, WRR, WMR, WTR, WWR, ANG / DTR
-        END DO
+            WRITE (LU, 50) YY, WXR, WRR, WMR, WTR, WWR, ANG / DTR
+        ENDDO
     ENDIF
     !
-    20   FORMAT(/, A)
-    25   FORMAT(' QINF  =', F12.4, &
-            /' QREF  =', F12.4, &
-            /' OMEGA =', F12.4, &
-            /' RPM   =', F12.4)
-    30   FORMAT(/'Induced vel, flow angles in absolute frame', &
-            ' (downstream of disk)', &
-            /'     r          Vxi        Vri', &
-            '        Vmi        Vti        Vi     Swirl(deg)')
-    35   FORMAT(/'Velocities, flow angles in absolute frame', &
-            ' (downstream of disk)', &
-            /'     r          Vx         Vr', &
-            '         Vm         Vt         V     Swirl(deg)')
-    40   FORMAT(/'Velocities, flow angles relative to blade frame', &
-            ' (downstream of disk)', &
-            /'     r          Wx         Wr', &
-            '         Wm         Wt         W       Phi(deg)')
-    60   FORMAT(/'Velocities in blade frame,', &
-            ' on blade lifting line', &
-            /'flow angle from plane of rotation', &
-            /'     r          Wx         Wr', &
-            '         Wm         Wt         W       Phi(deg)')
+    20   FORMAT (/, A)
+    25   FORMAT (' QINF  =', F12.4, /' QREF  =', F12.4, /' OMEGA =', F12.4, &
+            &/' RPM   =', F12.4)
+    30   FORMAT (/'Induced vel, flow angles in absolute frame', &
+            &' (downstream of disk)', /'     r          Vxi        Vri', &
+            &'        Vmi        Vti        Vi     Swirl(deg)')
+    35   FORMAT (/'Velocities, flow angles in absolute frame', &
+            &' (downstream of disk)', /'     r          Vx         Vr', &
+            &'         Vm         Vt         V     Swirl(deg)')
+    40   FORMAT (/'Velocities, flow angles relative to blade frame', &
+            &' (downstream of disk)', /'     r          Wx         Wr', &
+            &'         Wm         Wt         W       Phi(deg)')
+    60   FORMAT (/'Velocities in blade frame,', ' on blade lifting line', &
+            &/'flow angle from plane of rotation', &
+            &/'     r          Wx         Wr', &
+            &'         Wm         Wt         W       Phi(deg)')
     !                  12345678901123456789011234567890112345678901
-    50   FORMAT(7G11.4)
+    50   FORMAT (7G11.4)
     !
-    RETURN
-END
+END SUBROUTINE PRTVEL
+!*==SHOWDUCT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE SHOWDUCT(LU)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    INTEGER :: N, NR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Displays duct geometric data
     !-------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     NR = 1
-    WRITE(LU, 100) NAME
-    WRITE(LU, 125) QINF, QREF, VSO, RHO, RMU
-    WRITE(LU, 150) ANAME, NBEL
+    WRITE (LU, 100) NAME
+    WRITE (LU, 125) QINF, QREF, VSO, RHO, RMU
+    WRITE (LU, 150) ANAME, NBEL
     !
     DO N = 1, NBEL
-        WRITE(LU, 300) XBLE(N), YBLE(N), &
-                XBTE(N), YBTE(N), &
-                XBREFE(N), YBREFE(N), &
-                VOLUMV(N), ASURFV(N), &
-                XBCENV(N), YBCENV(N), &
-                RGYRXV(N), RGYRYV(N)
-    END DO
+        WRITE (LU, 300) XBLE(N), YBLE(N), XBTE(N), YBTE(N), &
+                & XBREFE(N), YBREFE(N), VOLUMV(N), ASURFV(N), &
+                & XBCENV(N), YBCENV(N), RGYRXV(N), RGYRYV(N)
+    ENDDO
     !
     !     &  AREA2DA(NEX),XBCEN2DA(NEX),YBCEN2DA(NEX),
     !     &  EIXX2DA(NEX),EIYY2DA(NEX), EIXY2DA(NEX),
@@ -1254,162 +1451,213 @@ SUBROUTINE SHOWDUCT(LU)
     !     &  VOLUMVT(NEX),ASURFVT(NEX),XBCENVT(NEX),YBCENVT(NEX),
     !     &  RGYRXVT(NEX), RGYRYVT(NEX),
     !
-    100 FORMAT(/, ' DFDC Case: ', A30, /, 1X, 55('-'))
-    125 FORMAT('  Qinf  ', F9.4, '     Qref  ', F9.4, &
-            /, '  Speed of sound (m/s)     ', F10.3, &
-            /, '  Air density   (kg/m^3)   ', F10.5, &
-            /, '  Air viscosity (kg/m-s)    ', E11.4)
+    100  FORMAT (/, ' DFDC Case: ', A30, /, 1X, 55('-'))
+    125  FORMAT ('  Qinf  ', F9.4, '     Qref  ', F9.4, /, &
+            &'  Speed of sound (m/s)     ', F10.3, /, &
+            &'  Air density   (kg/m^3)   ', F10.5, /, &
+            &'  Air viscosity (kg/m-s)    ', E11.4)
     !
-    150 FORMAT(/, ' Geometry name: ', A30, &
-            /, ' Current duct geometry with', I2, ' elements:')
+    150  FORMAT (/, ' Geometry name: ', A30, /, ' Current duct geometry with', &
+            & I2, ' elements:')
     !
-    300 FORMAT(/, '  Xle   ', F12.5, '     Rle   ', F12.5, &
-            /, '  Xte   ', F12.5, '     Rte   ', F12.5, &
-            /, '  Xref  ', F12.5, '     Rref  ', F12.5, &
-            /, '  Vol   ', F12.6, '     Asurf ', F12.6, &
-            /, '  Xcent ', F12.6, '     Rcent ', F12.6, &
-            /, '  rGYRx ', F12.6, '     rGYRr ', F12.6)
+    300  FORMAT (/, '  Xle   ', F12.5, '     Rle   ', F12.5, /, '  Xte   ', F12.5, &
+            &'     Rte   ', F12.5, /, '  Xref  ', F12.5, '     Rref  ', &
+            & F12.5, /, '  Vol   ', F12.6, '     Asurf ', F12.6, /, '  Xcent ', &
+            & F12.6, '     Rcent ', F12.6, /, '  rGYRx ', F12.6, &
+            & '     rGYRr ', F12.6)
     !
-    RETURN
-END
+END SUBROUTINE SHOWDUCT
+!*==SHOWACTDSK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SHOWDUCT
 
 
 SUBROUTINE SHOWACTDSK(LU)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    INTEGER :: IR, N
+    REAL :: RPM
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Displays parameters on actuator disk
     !-------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     DO N = 1, NROTOR
         !
-        IF(IRTYPE(N).EQ.1) THEN
+        IF (IRTYPE(N)==1) THEN
             !        WRITE(LU,100) NAME
             RPM = 30.0 * OMEGA(N) / PI
             !
-            WRITE(LU, 120) N, OMEGA(N), RPM, RHUB(N), RTIP(N), ADISK(N)
-            WRITE(LU, 200)
+            WRITE (LU, 120) N, OMEGA(N), RPM, RHUB(N), RTIP(N), &
+                    & ADISK(N)
+            WRITE (LU, 200)
             !
             DO IR = 1, NRC
-                WRITE(LU, 210) YRC(IR, N), YRC(IR, N) / RTIP(N), BGAM(IR, N)
-            END DO
+                WRITE (LU, 210) YRC(IR, N), YRC(IR, N) / RTIP(N), BGAM(IR, N)
+            ENDDO
         ENDIF
         !
-    END DO
+    ENDDO
     !
-    100 FORMAT(/A)
+    100  FORMAT (/A)
     !
-    120 FORMAT(/' Current Actuator Disk at Disk', I3, &
-            / '  Omega  ', F12.4, '    Rpm    ', F11.2, &
-            / '  Rhub   ', F12.5, '    Rtip   ', F11.5, &
-            / '  Aswept ', F12.5)
+    120  FORMAT (/' Current Actuator Disk at Disk', I3, /'  Omega  ', F12.4, &
+            &'    Rpm    ', F11.2, /'  Rhub   ', F12.5, '    Rtip   ', &
+            & F11.5, /'  Aswept ', F12.5)
 
-    200 FORMAT('     r        r/R       B*Gamma')
-    210 FORMAT(1X, 7G11.4)
+    200  FORMAT ('     r        r/R       B*Gamma')
+    210  FORMAT (1X, 7G11.4)
     !
-    RETURN
-END
+END SUBROUTINE SHOWACTDSK
+!*==SHOWBLADE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SHOWACTDSK
 
 
 SUBROUTINE SHOWBLADE(LU)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    REAL :: BLDS, RPM, SIGROT
+    INTEGER :: IR, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Displays chord, blade angle and solidity distribution
     !     on rotor blade
     !-------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     DO N = 1, NROTOR
         !
-        IF(IRTYPE(N).EQ.2) THEN
+        IF (IRTYPE(N)==2) THEN
             RPM = 30.0 * OMEGA(N) / PI
             !
-            WRITE(LU, 120) N, OMEGA(N), RPM, RHUB(N), &
-                    RTIP(N), NRBLD(N), ADISK(N)
+            WRITE (LU, 120) N, OMEGA(N), RPM, RHUB(N), RTIP(N), &
+                    & NRBLD(N), ADISK(N)
             BLDS = FLOAT(NRBLD(N))
-            WRITE(LU, 200)
+            WRITE (LU, 200)
             !
             DO IR = 1, NRC
                 SIGROT = BLDS * CHR(IR, N) / (2.0 * PI * YRC(IR, N))
-                WRITE(LU, 210) YRC(IR, N), YRC(IR, N) / RTIP(N), &
-                        CHR(IR, N), BETAR(IR, N) / DTR, SIGROT
-            END DO
+                WRITE (LU, 210) YRC(IR, N), YRC(IR, N) / RTIP(N), CHR(IR, N) &
+                        &, BETAR(IR, N) / DTR, SIGROT
+            ENDDO
         ENDIF
         !
-    END DO
+    ENDDO
     !
-    100 FORMAT(/A)
+    100  FORMAT (/A)
     !
-    120 FORMAT(/ ' Current Rotor at Disk', I3, &
-            / '  Omega  ', F12.4, '    Rpm    ', F11.2, &
-            / '  Rhub   ', F12.5, '    Rtip   ', F11.5, &
-            / '  #blades', I6, 6X, '    Aswept ', F11.5)
-    200 FORMAT('     r         r/R        Ch      Beta(deg)   Solidity')
-    210 FORMAT(1X, 7G11.4)
+    120  FORMAT (/' Current Rotor at Disk', I3, /'  Omega  ', F12.4, &
+            &'    Rpm    ', F11.2, /'  Rhub   ', F12.5, '    Rtip   ', &
+            & F11.5, /'  #blades', I6, 6X, '    Aswept ', F11.5)
+    200  FORMAT ('     r         r/R        Ch      Beta(deg)   Solidity')
+    210  FORMAT (1X, 7G11.4)
     !
 
-    RETURN
-END
+END SUBROUTINE SHOWBLADE
+!*==SHOWDRAGOBJ.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SHOWBLADE
 
 
 SUBROUTINE SHOWDRAGOBJ(ND, LU)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU, ND
+    !
+    ! Local variables
+    !
+    INTEGER :: ID, N, ND1, ND2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Displays parameters on drag objects
     !-------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(NDOBJ.LE.0) THEN
-        WRITE(LU, *)
-        WRITE(LU, *) 'No drag objects defined'
+    IF (NDOBJ<=0) THEN
+        WRITE (LU, *)
+        WRITE (LU, *) 'No drag objects defined'
         RETURN
     ENDIF
     !
-    IF(ND.LE.0) THEN
+    IF (ND<=0) THEN
         ND1 = 1
         ND2 = NDOBJ
-        WRITE(LU, 120) NDOBJ
+        WRITE (LU, 120) NDOBJ
     ELSE
         ND1 = ND
         ND2 = ND
     ENDIF
     !
     DO N = ND1, ND2
-        WRITE(LU, 130) N
-        WRITE(LU, 200)
+        WRITE (LU, 130) N
+        WRITE (LU, 200)
         !
         DO ID = 1, NDDEF(N)
-            WRITE(LU, 210) ID, XDDEF(ID, N), YDDEF(ID, N), CDADEF(ID, N)
-        END DO
+            WRITE (LU, 210) ID, XDDEF(ID, N), YDDEF(ID, N), CDADEF(ID, N)
+        ENDDO
         !
-    END DO
+    ENDDO
     !
-    100 FORMAT(/A)
-    110 FORMAT(' QINF  =', F12.4, &
-            /' QREF  =', F12.4, &
-            /' OMEGA =', F12.4, &
-            /' RPM   =', F12.4)
+    100  FORMAT (/A)
+    110  FORMAT (' QINF  =', F12.4, /' QREF  =', F12.4, /' OMEGA =', F12.4, &
+            &/' RPM   =', F12.4)
     !
-    120 FORMAT(/, I2, ' Drag Area objects defined:', /)
-    130 FORMAT(' Drag Area', I3)
-    200 FORMAT('    i        x          r        CDave')
+    120  FORMAT (/, I2, ' Drag Area objects defined:', /)
+    130  FORMAT (' Drag Area', I3)
+    200  FORMAT ('    i        x          r        CDave')
     !             a1234567890112345678901123456789011234567890112345678901
-    210 FORMAT(I5, F11.4, F11.4, 3X, G11.4)
+    210  FORMAT (I5, F11.4, F11.4, 3X, G11.4)
     !
-    RETURN
-END
+END SUBROUTINE SHOWDRAGOBJ
+!*==SETDRGOBJSRC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SHOWDRAGOBJ
 
 
 SUBROUTINE SETDRGOBJSRC
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: CDAV, VRR, VXX, YY
+    INTEGER :: I, IC, IC1, IC2, ID, IEL, IP, IP1, IP2, N
+    REAL, DIMENSION(IRX) :: T1, T1S, VDM
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Sets source strength for rotor drag and drag objects
     !-------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION VDM(IRX), T1(IRX), T1S(IRX)
     !
     !---- Set sources for drag objects
-    IF(NDOBJ.LE.0) THEN
+    IF (NDOBJ<=0) THEN
         !c        WRITE(*,*) 'Drag objects not defined'
         RETURN
         !
@@ -1417,84 +1665,93 @@ SUBROUTINE SETDRGOBJSRC
         !---- step through all defined drag objects
         DO N = 1, NDOBJ
             !
-            IF(IELDRGOBJ(N).LE.0) THEN
-                WRITE(*, *) 'Source element not defined for drag object ', N
+            IF (IELDRGOBJ(N)<=0) THEN
+                WRITE (*, *) 'Source element not defined for drag object '&
+                        &, N
                 STOP
             ENDIF
             !
             !---- if drag objects are turned off clear the source strengths
-            IF(.NOT.LDRGOBJ) THEN
+            IF (.NOT.LDRGOBJ) THEN
                 IEL = IELDRGOBJ(N)
                 IP1 = IPFRST(IEL)
                 IP2 = IPLAST(IEL)
                 DO IP = IP1, IP2
                     SIGVSP(IP) = 0.0
-                END DO
+                ENDDO
                 !
-            ELSE
                 !
                 !---- Set up spline arrays for drag object
-                IF(NDDEF(N).GE.2) THEN
-                    DO I = 1, NDDEF(N)
-                        T1(I) = CDADEF(I, N)
-                    END DO
-                    !---- Spline drag definition array
-                    CALL SEGSPL(T1, T1S, YDDEF(1, N), NDDEF(N))
-                    !
-                    IEL = IELDRGOBJ(N)
-                    IC1 = ICFRST(IEL)
-                    IC2 = ICLAST(IEL)
-                    IP1 = IPFRST(IEL)
-                    IP2 = IPLAST(IEL)
-                    !
-                    DO IC = IC1, IC2
-                        VXX = QC(1, IC)
-                        VRR = QC(2, IC)
-                        ID = IC - IC1 + 1
-                        VDM(ID) = SQRT(VXX**2 + VRR**2)
-                    END DO
-                    !
-                    DO IP = IP1, IP2
-                        YY = YP(IP)
-                        CDAV = SEVAL(YY, T1, T1S, YDDEF(1, N), NDDEF(N))
-                        ID = IP - IP1 + 1
-                        IF(IP.EQ.IP1) THEN
-                            SIGVSP(IP) = 0.5 * VDM(ID) * CDAV
-                        ELSEIF(IP.EQ.IP2) THEN
-                            SIGVSP(IP) = 0.5 * VDM(ID - 1) * CDAV
-                        ELSE
-                            SIGVSP(IP) = 0.25 * (VDM(ID) + VDM(ID - 1)) * CDAV
-                        ENDIF
-                        !c          WRITE(*,99) 'IP,CDAV,SIGVSP ',IP,CDAV,SIGVSP(IP)
-                    END DO
-                ENDIF
+            ELSEIF (NDDEF(N)>=2) THEN
+                DO I = 1, NDDEF(N)
+                    T1(I) = CDADEF(I, N)
+                ENDDO
+                !---- Spline drag definition array
+                CALL SEGSPL(T1, T1S, YDDEF(1, N), NDDEF(N))
+                !
+                IEL = IELDRGOBJ(N)
+                IC1 = ICFRST(IEL)
+                IC2 = ICLAST(IEL)
+                IP1 = IPFRST(IEL)
+                IP2 = IPLAST(IEL)
+                !
+                DO IC = IC1, IC2
+                    VXX = QC(1, IC)
+                    VRR = QC(2, IC)
+                    ID = IC - IC1 + 1
+                    VDM(ID) = SQRT(VXX**2 + VRR**2)
+                ENDDO
+                !
+                DO IP = IP1, IP2
+                    YY = YP(IP)
+                    CDAV = SEVAL(YY, T1, T1S, YDDEF(1, N), NDDEF(N))
+                    ID = IP - IP1 + 1
+                    IF (IP==IP1) THEN
+                        SIGVSP(IP) = 0.5 * VDM(ID) * CDAV
+                    ELSEIF (IP==IP2) THEN
+                        SIGVSP(IP) = 0.5 * VDM(ID - 1) * CDAV
+                    ELSE
+                        SIGVSP(IP) = 0.25 * (VDM(ID) + VDM(ID - 1)) * CDAV
+                    ENDIF
+                    !c          WRITE(*,99) 'IP,CDAV,SIGVSP ',IP,CDAV,SIGVSP(IP)
+                ENDDO
                 !
             ENDIF
             !
-        END DO
+        ENDDO
     ENDIF
     !
-    99   FORMAT(A, I4, 5(1X, F11.5))
+    99   FORMAT (A, I4, 5(1X, F11.5))
     !
-    RETURN
-END
+END SUBROUTINE SETDRGOBJSRC
+!*==SETROTORSRC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SETDRGOBJSRC
 
 
 
 SUBROUTINE SETROTORSRC
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: BLDS, CDAVE, CHAVE, VAVE, VMM, VRR, VTT, VXX
+    INTEGER :: IC, IC1, IC2, IEL, IP, IP1, IP2, IR, N
+    REAL, DIMENSION(IRX) :: VDM
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !-------------------------------------------------------
     !     Sets source strength for rotor profile drag
     !-------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION VDM(IRX), T1(IRX), T1S(IRX)
     !
     DO N = 1, NROTOR
         !---- Set sources for rotor drag
-        IF(IELROTOR(N).LE.0) THEN
+        IF (IELROTOR(N)>0) THEN
             !c        WRITE(*,*) 'Rotor source line not defined'
             !c         RETURN
-        ELSE
             !
             IEL = IELROTOR(N)
             IC1 = ICFRST(IEL)
@@ -1510,16 +1767,17 @@ SUBROUTINE SETROTORSRC
                 IR = IC - IC1 + 1
                 VTT = 0.5 * BGAM(IR, N) * PI2I / YC(IC) - OMEGA(N) * YC(IC)
                 VDM(IR) = SQRT(VMM**2 + VTT**2)
-            END DO
+            ENDDO
             !
             DO IP = IP1, IP2
                 IR = IP - IP1 + 1
-                IF(IP.EQ.IP1) THEN
+                IF (IP==IP1) THEN
                     SIGVSP(IP) = 0.5 * BLDS * PI2I * VDM(IR) * CHR(IR, N) * CDR(IR, N)
                     !c         WRITE(*,99) 'IP,W,CD,SIGVSP ',IP,VDM(IR),CDR(IR),SIGVSP(IP)
-                ELSEIF(IP.EQ.IP2) THEN
+                ELSEIF (IP==IP2) THEN
                     !---- NOTE: should set tip source to 0.0 for tip gap (no blade defined here)
-                    SIGVSP(IP) = 0.5 * BLDS * PI2I * VDM(IR - 1) * CHR(IR - 1, N) * CDR(IR - 1, N)
+                    SIGVSP(IP) = 0.5 * BLDS * PI2I * VDM(IR - 1) * CHR(IR - 1, N)      &
+                            & * CDR(IR - 1, N)
                     !c         WRITE(*,99) 'IP,W,CD,SIGVSP ',IP,VDM(IR-1),CDR(IR-1),SIGVSP(IP)
                 ELSE
                     VAVE = 0.5 * (VDM(IR) + VDM(IR - 1))
@@ -1528,28 +1786,42 @@ SUBROUTINE SETROTORSRC
                     SIGVSP(IP) = 0.5 * BLDS * PI2I * VAVE * CHAVE * CDAVE
                     !c         WRITE(*,99) 'IP,W,CD,SIGVSP ',IP,VAVE,CDAVE,SIGVSP(IP)
                 ENDIF
-            END DO
+            ENDDO
         ENDIF
         !
-    END DO
+    ENDDO
     !
-    99   FORMAT(A, I4, 5(1X, F11.5))
+    99   FORMAT (A, I4, 5(1X, F11.5))
     !
-    RETURN
-END
+END SUBROUTINE SETROTORSRC
+!*==VMAVGINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SETROTORSRC
 
 
 
 SUBROUTINE VMAVGINIT(VAXIAL)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: VAXIAL
+    !
+    ! Local variables
+    !
+    INTEGER :: IC, IC1, IC2, IEL, IP, IP1, IP2, IR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Initializes VMAVG using axial velocity estimate
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(LDBG) THEN
-        WRITE(*, *)      'VMAVGINIT called with VA=', VAXIAL
-        WRITE(LUNDBG, *) 'VMAVGINIT called with VA=', VAXIAL
+    IF (LDBG) THEN
+        WRITE (*, *) 'VMAVGINIT called with VA=', VAXIAL
+        WRITE (LUNDBG, *) 'VMAVGINIT called with VA=', VAXIAL
     ENDIF
     !
     !---- Set VMAVG on all wake element points
@@ -1560,15 +1832,15 @@ SUBROUTINE VMAVGINIT(VAXIAL)
         IP1 = IPFRST(IEL)
         IP2 = IPLAST(IEL)
         DO IP = IP1, IP2
-            IF(IR.EQ.1) THEN
+            IF (IR==1) THEN
                 VMAVG(IP) = 0.5 * (VAXIAL + QINF)
-            ELSEIF(IR.EQ.NRP) THEN
+            ELSEIF (IR==NRP) THEN
                 VMAVG(IP) = 0.5 * (VAXIAL + QINF)
             ELSE
                 VMAVG(IP) = VAXIAL
             ENDIF
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
     !---- Set VMAVG on CB body wake points
     !      IEL = 1
@@ -1596,47 +1868,58 @@ SUBROUTINE VMAVGINIT(VAXIAL)
     !        ENDIF
     !      END DO
     !
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *)  'At end of VMAVGINIT'
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) 'At end of VMAVGINIT'
         DO IEL = 1, NEL
             !         IF(NETYPE(IEL).EQ.7) THEN
             IC1 = ICFRST(IEL)
             IC2 = ICLAST(IEL)
-            WRITE(LUNDBG, *)  IEL, IC1, IC2
+            WRITE (LUNDBG, *) IEL, IC1, IC2
             DO IC = IC1, IC2
                 IP1 = IPCO(IC)
                 IP2 = IPCP(IC)
-                WRITE(LUNDBG, *)  'IP1,VMavg ', IP1, VMAVG(IP1)
-                WRITE(LUNDBG, *)  'IP2,VMavg ', IP2, VMAVG(IP2)
-            END DO
+                WRITE (LUNDBG, *) 'IP1,VMavg ', IP1, VMAVG(IP1)
+                WRITE (LUNDBG, *) 'IP2,VMavg ', IP2, VMAVG(IP2)
+            ENDDO
             !        ENDIF
-        END DO
+        ENDDO
     ENDIF
-    20   FORMAT(A, I5, 5(1X, F10.4))
+    20   FORMAT (A, I5, 5(1X, F10.4))
     !
     LVMAV = .TRUE.
     !
-    RETURN
-END
+END SUBROUTINE VMAVGINIT
+!*==VMAVGCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! VMAVGINIT
 
 
 SUBROUTINE VMAVGCALC
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    INTEGER :: IC, IC1, IC2, IEL, IP1, IP2
+    REAL :: QCX, QCY, VMAV
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Calculates VMAVG at rotor wake points using current
     !     center point velocities QC(1,.), QC(2,.)
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
-    IF(LDBG) THEN
-        WRITE(*, *)      'Entering VMAVGCALC'
-        WRITE(LUNDBG, *) 'Entering VMAVGCALC'
+    IF (LDBG) THEN
+        WRITE (*, *) 'Entering VMAVGCALC'
+        WRITE (LUNDBG, *) 'Entering VMAVGCALC'
     ENDIF
     !
     !---- Set VMAVG on all wake points, first and last set from centers
     !     intermediate points get average from nearby panel centers
     DO IEL = 1, NEL
-        IF(NETYPE(IEL).EQ.7) THEN
+        IF (NETYPE(IEL)==7) THEN
             IC1 = ICFRST(IEL)
             IC2 = ICLAST(IEL)
             DO IC = IC1, IC2
@@ -1652,15 +1935,15 @@ SUBROUTINE VMAVGCALC
                 VMAV = SQRT(QCX**2 + QCY**2)
                 !---- limiter to keep VMAV positive (to fraction of QREF)
                 VMAV = MAX(0.1 * QREF, VMAV)
-                IF(IC.EQ.IC1) THEN
+                IF (IC==IC1) THEN
                     VMAVG(IP1) = VMAV
                 ELSE
                     VMAVG(IP1) = 0.5 * (VMAVG(IP1) + VMAV)
                 ENDIF
                 VMAVG(IP2) = VMAV
-            END DO
+            ENDDO
         ENDIF
-    END DO
+    ENDDO
     !
     !---- Set VMAVG on CB body vortex wake points
     !      IEL = 1
@@ -1720,35 +2003,51 @@ SUBROUTINE VMAVGCALC
     !      VMAVG(IPW) = VMAV
     !
 
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *)  'At end of VMAVGCALC'
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) 'At end of VMAVGCALC'
         DO IEL = 1, NEL
             !          IF(NETYPE(IEL).EQ.7) THEN
             IC1 = ICFRST(IEL)
             IC2 = ICLAST(IEL)
-            WRITE(LUNDBG, *) 'IEL,IC1,IC2,IPFRST(IEL),IPLAST(IEL)'
-            WRITE(LUNDBG, *)  IEL, IC1, IC2, IPFRST(IEL), IPLAST(IEL)
+            WRITE (LUNDBG, *) 'IEL,IC1,IC2,IPFRST(IEL),IPLAST(IEL)'
+            WRITE (LUNDBG, *) IEL, IC1, IC2, IPFRST(IEL), IPLAST(IEL)
             DO IC = IC1, IC2
                 IP1 = IPCO(IC)
                 IP2 = IPCP(IC)
-                WRITE(LUNDBG, *)  'IP1,VMavg ', IP1, VMAVG(IP1)
-                WRITE(LUNDBG, *)  'IP2,VMavg ', IP2, VMAVG(IP2)
-            END DO
+                WRITE (LUNDBG, *) 'IP1,VMavg ', IP1, VMAVG(IP1)
+                WRITE (LUNDBG, *) 'IP2,VMavg ', IP2, VMAVG(IP2)
+            ENDDO
             !          ENDIF
-        END DO
+        ENDDO
     ENDIF
-    20   FORMAT(A, I5, 5(1X, F10.4))
+    20   FORMAT (A, I5, 5(1X, F10.4))
     !
     !c      LVMAV = .TRUE.
     !
-    RETURN
-END
+END SUBROUTINE VMAVGCALC
+!*==GTHCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! VMAVGCALC
 
 
 
 
 SUBROUTINE GTHCALC(GAMTH)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL, DIMENSION(IPX) :: GAMTH
+    !
+    ! Local variables
+    !
+    REAL :: DG, DH, FRAC, GTH1, Y1
+    INTEGER :: IC, IC1, IC2, IEL, IG, IP, IP1, IP2, IR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Calculates GTH at rotor wake points using zero
     !     pressure jump relation
@@ -1756,14 +2055,12 @@ SUBROUTINE GTHCALC(GAMTH)
     !         center velocity (not averaged VM at endpoints)
     !
     !---------------------------------------------------------
-    INCLUDE 'DFDC.inc'
-    DIMENSION GAMTH(IPX)
     !
-    IF(LDBG) WRITE(*, *) 'Entering GTHCALC'
+    IF (LDBG) WRITE (*, *) 'Entering GTHCALC'
     !
     DO IP = 1, NPTOT
         GAMTH(IP) = 0.0
-    END DO
+    ENDDO
     !
     !---- Set GAMTH on intermediate wakes
     DO IR = 2, NRP - 1
@@ -1776,20 +2073,20 @@ SUBROUTINE GTHCALC(GAMTH)
             IG = IC2IG(IC)
             DH = DHG(IG, IR) - DHG(IG, IR - 1)
             DG = 0.5 * PI2I**2 * (BGAMG(IG, IR)**2 - BGAMG(IG, IR - 1)**2)
-            IF(VMAVG(IP1).NE.0.0) THEN
+            IF (VMAVG(IP1)/=0.0) THEN
                 GAMTH(IP1) = (DH - DG / (YP(IP1)**2)) / VMAVG(IP1)
             ELSE
                 !            WRITE(*,*) 'Zero VMavg on IP1 =',IP1,VMAVG(IP1)
                 GAMTH(IP1) = 0.
             ENDIF
-            IF(VMAVG(IP2).NE.0.0) THEN
+            IF (VMAVG(IP2)/=0.0) THEN
                 GAMTH(IP2) = (DH - DG / (YP(IP2)**2)) / VMAVG(IP2)
             ELSE
                 !            WRITE(*,*) 'Zero VMavg on IP2 =',IP2,VMAVG(IP2)
                 GAMTH(IP2) = 0.
             ENDIF
-        END DO
-    END DO
+        ENDDO
+    ENDDO
     !
     !---- Set GAMTH on CB wake
     IR = 1
@@ -1803,19 +2100,19 @@ SUBROUTINE GTHCALC(GAMTH)
         DH = 0.0
         !c        DH =                DHG(IG,IR)
         DG = 0.5 * PI2I**2 * (BGAMG(IG, IR)**2)
-        IF(VMAVG(IP1).NE.0.0) THEN
+        IF (VMAVG(IP1)/=0.0) THEN
             GAMTH(IP1) = (DH - DG / (YP(IP1)**2)) / VMAVG(IP1)
         ELSE
-            WRITE(*, *) 'Zero VMavg on CB wake IP1 =', IP1, VMAVG(IP1)
+            WRITE (*, *) 'Zero VMavg on CB wake IP1 =', IP1, VMAVG(IP1)
             GAMTH(IP1) = 0.
         ENDIF
-        IF(VMAVG(IP2).NE.0.0) THEN
+        IF (VMAVG(IP2)/=0.0) THEN
             GAMTH(IP2) = (DH - DG / (YP(IP2)**2)) / VMAVG(IP2)
         ELSE
-            WRITE(*, *) 'Zero VMavg on CB wake IP2 =', IP2, VMAVG(IP2)
+            WRITE (*, *) 'Zero VMavg on CB wake IP2 =', IP2, VMAVG(IP2)
             GAMTH(IP2) = 0.
         ENDIF
-    END DO
+    ENDDO
     !
     !---- Set GTH on CB to value at first wake point
     IR = 1
@@ -1829,7 +2126,7 @@ SUBROUTINE GTHCALC(GAMTH)
     DO IC = IC1, IC2
         IP1 = IPCO(IC)
         IP2 = IPCP(IC)
-        IF(IP2IR(IP1).EQ.IR .AND. IP2IR(IP2).EQ.IR) THEN
+        IF (IP2IR(IP1)==IR .AND. IP2IR(IP2)==IR) THEN
             GAMTH(IP1) = 0.0
             GAMTH(IP2) = 0.0
             !---- taper off the GTH on CB from GTH at TE to 0.0 at rotor
@@ -1839,7 +2136,7 @@ SUBROUTINE GTHCALC(GAMTH)
             GAMTH(IP2) = GTH1 * FRAC
         ENDIF
         !
-    END DO
+    ENDDO
     !
     !---- Set GAMTH on DUCT wake
     IR = NRP
@@ -1850,21 +2147,23 @@ SUBROUTINE GTHCALC(GAMTH)
         IP1 = IPCO(IC)
         IP2 = IPCP(IC)
         IG = IC2IG(IC)
-        DH = - DHG(IG, IR - 1)
-        DG = 0.5 * PI2I**2 * (- BGAMG(IG, IR - 1)**2)
-        IF(VMAVG(IP1).NE.0.0) THEN
+        DH = -DHG(IG, IR - 1)
+        DG = 0.5 * PI2I**2 * (-BGAMG(IG, IR - 1)**2)
+        IF (VMAVG(IP1)/=0.0) THEN
             GAMTH(IP1) = (DH - DG / (YP(IP1)**2)) / VMAVG(IP1)
         ELSE
-            WRITE(*, *) 'Zero VMavg on duct wake IP1 =', IP1, VMAVG(IP1)
+            WRITE (*, *) 'Zero VMavg on duct wake IP1 =', IP1, &
+                    & VMAVG(IP1)
             GAMTH(IP1) = 0.
         ENDIF
-        IF(VMAVG(IP2).NE.0.0) THEN
+        IF (VMAVG(IP2)/=0.0) THEN
             GAMTH(IP2) = (DH - DG / (YP(IP2)**2)) / VMAVG(IP2)
         ELSE
-            WRITE(*, *) 'Zero VMavg on duct wake IP2 =', IP2, VMAVG(IP2)
+            WRITE (*, *) 'Zero VMavg on duct wake IP2 =', IP2, &
+                    & VMAVG(IP2)
             GAMTH(IP2) = 0.
         ENDIF
-    END DO
+    ENDDO
     !
     !---- Set GAMTH on DUCT from first wake GAMTH
     IR = NRP
@@ -1878,42 +2177,42 @@ SUBROUTINE GTHCALC(GAMTH)
     DO IC = IC1, IC2
         IP1 = IPCO(IC)
         IP2 = IPCP(IC)
-        IF(IP2IR(IP1).EQ.IR .AND. IP2IR(IP2).EQ.IR) THEN
+        IF (IP2IR(IP1)==IR .AND. IP2IR(IP2)==IR) THEN
             !          GAMTH(IP1) = 0.0
             !          GAMTH(IP2) = 0.0
             !          GAMTH(IP1) = GTH1
             !          GAMTH(IP2) = GTH1
             !---- taper off the GTH on duct from GTH at TE to 0.0 at rotor
-            FRAC = 1.0 - FLOAT(IPLAST(IEL) - IP1) / &
-                    FLOAT(IPLAST(IEL) - IPROTDW(1) + 1)
+            FRAC = 1.0 - FLOAT(IPLAST(IEL) - IP1)                         &
+                    & / FLOAT(IPLAST(IEL) - IPROTDW(1) + 1)
             GAMTH(IP1) = GTH1 * FRAC
-            FRAC = 1.0 - FLOAT(IPLAST(IEL) - IP2) / &
-                    FLOAT(IPLAST(IEL) - IPROTDW(1) + 1)
+            FRAC = 1.0 - FLOAT(IPLAST(IEL) - IP2)                         &
+                    & / FLOAT(IPLAST(IEL) - IPROTDW(1) + 1)
             GAMTH(IP2) = GTH1 * FRAC
         ENDIF
         !
-    END DO
+    ENDDO
     !
     !
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *)  'At end of GTHCALC'
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) 'At end of GTHCALC'
         DO IEL = 1, NEL
             IC1 = ICFRST(IEL)
             IC2 = ICLAST(IEL)
-            WRITE(LUNDBG, *) 'IEL,IC1,IC2,IPFRST(IEL),IPLAST(IEL)'
-            WRITE(LUNDBG, *)  IEL, IC1, IC2, IPFRST(IEL), IPLAST(IEL)
+            WRITE (LUNDBG, *) 'IEL,IC1,IC2,IPFRST(IEL),IPLAST(IEL)'
+            WRITE (LUNDBG, *) IEL, IC1, IC2, IPFRST(IEL), IPLAST(IEL)
             DO IC = IC1, IC2
                 IP1 = IPCO(IC)
                 IP2 = IPCP(IC)
-                WRITE(LUNDBG, *)  'IP1,GAMTH ', IP1, GAMTH(IP1)
-                WRITE(LUNDBG, *)  'IP2,GAMTH ', IP2, GAMTH(IP2)
-            END DO
-        END DO
+                WRITE (LUNDBG, *) 'IP1,GAMTH ', IP1, GAMTH(IP1)
+                WRITE (LUNDBG, *) 'IP2,GAMTH ', IP2, GAMTH(IP2)
+            ENDDO
+        ENDDO
     ENDIF
-    20   FORMAT(A, I5, 5(1X, F10.4))
+    20   FORMAT (A, I5, 5(1X, F10.4))
     !
-    RETURN
-END
+END SUBROUTINE GTHCALC
+!*==TQCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! GTHCALC
 
 
@@ -1921,7 +2220,39 @@ END
 
 
 SUBROUTINE TQCALC(ITYPE)
-    INCLUDE 'DFDC.inc'
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: ITYPE
+    !
+    ! Local variables
+    !
+    REAL :: ALFA, AL_CL, AL_DBE, AL_GI, AL_OMG, AL_P, AL_QNF, &
+            & AL_VA, AL_VT, AL_W, BDR, BLDS, BRDR, CD_AL, &
+            & CD_ALF, CD_DBE, CD_GI, CD_OMG, CD_QNF, CD_RE, &
+            & CD_REY, CD_VA, CD_VT, CD_W, CHNEW, CH_GI, CH_OMG, &
+            & CH_QNF, CH_VA, CH_VT, CI, CI_OMG, CI_VT, CLMAX, &
+            & CLMIN, CL_AL, CL_DBE, CL_GI, CL_OMG, CL_QNF, &
+            & CL_VA, CL_VT, CL_W, CM_AL, CM_W, DA, DCLSTALL, &
+            & DQI, DQI_GI, DQI_QNF, DQI_SI, DQI_VA, DQV, &
+            & DQV_CD, DQV_CH, DQV_CI, DQV_DBE, DQV_GI, DQV_OM, &
+            & DQV_OMG, DQV_QNF, DQV_VA, DQV_VT, DQV_W, DR, DTI, &
+            & DTI_CI, DTI_GI, DTI_OMG, DTI_VT, DTV, DTV_CD, &
+            & DTV_CH, DTV_DBE, DTV_GI, DTV_OMG, DTV_QNF, DTV_SI, &
+            & DTV_VA, DTV_VT
+    REAL :: DTV_W, HRWC, HRWC_CH, HRWC_W, PHIB, P_OMG, P_QNF, &
+            & P_VA, P_VT, RA, RDR, REY, RE_CH, RE_GI, RE_OMG, &
+            & RE_QNF, RE_VA, RE_VT, RE_W, SECSIG, SECSTAGR, SI, &
+            & SI_QNF, SI_VA, VAA, VAINF, VTINF, VTT, W, W_OMG, &
+            & W_QNF, W_VA, W_VT, XI
+    INTEGER :: I, J, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------
     !     Sets Thrust, Torque and their sensitivities
     !     wrt  QINF, OMEGA, BETA, chord(i), VA,VT, BGAM
@@ -1935,7 +2266,7 @@ SUBROUTINE TQCALC(ITYPE)
     PTOT = 0.
     PVIS = 0.
     !
-    DO 2000 N = 1, NROTOR
+    DO N = 1, NROTOR
         !
         !---- forces on blade row
         TINVR(N) = 0.
@@ -1956,17 +2287,17 @@ SUBROUTINE TQCALC(ITYPE)
         !
         DO I = 1, NRC
             TI_GAM(I, N) = 0.
-            TI_VA (I, N) = 0.
-            TI_VT (I, N) = 0.
+            TI_VA(I, N) = 0.
+            TI_VT(I, N) = 0.
             QI_GAM(I, N) = 0.
-            QI_VA (I, N) = 0.
-            QI_VT (I, N) = 0.
+            QI_VA(I, N) = 0.
+            QI_VT(I, N) = 0.
             TV_GAM(I, N) = 0.
-            TV_VA (I, N) = 0.
-            TV_VT (I, N) = 0.
+            TV_VA(I, N) = 0.
+            TV_VT(I, N) = 0.
             QV_GAM(I, N) = 0.
-            QV_VA (I, N) = 0.
-            QV_VT (I, N) = 0.
+            QV_VA(I, N) = 0.
+            QV_VT(I, N) = 0.
         ENDDO
         !
         !c      write(*,*) 'LBLDEF ',LBLDEF
@@ -1977,14 +2308,14 @@ SUBROUTINE TQCALC(ITYPE)
         !---- NOTE: should only go over blade stations to NRC-1 for tip gap case
         !
         BLDS = FLOAT(NRBLD(N))
-        DO 1000 I = 1, NRC
+        DO I = 1, NRC
             !
             !---- Skip forces for tip gap (only on rotor)
-            IF(I.EQ.NRC .AND. TGAP.GT.0.0 .AND. OMEGA(N).NE.0.0) THEN
+            IF (I==NRC .AND. TGAP>0.0 .AND. OMEGA(N)/=0.0) THEN
                 CLR(NRC, N) = 0.0
                 CDR(NRC, N) = 0.0
                 ALFAR(NRC, N) = 0.0
-                GO TO 1000
+                CYCLE
             ENDIF
             !
             XI = YRC(I, N) / RTIP(N)
@@ -1996,13 +2327,9 @@ SUBROUTINE TQCALC(ITYPE)
             DA = PI * RA * DR
             !
             !------ set  W(Qinf,Omeg,Va,Vt)  and  Phi(Qinf,Omeg,Va,Vt)  sensitivities
-            CALL WCALC(N, I, VAINF, VTINF, &
-                    VTT, &
-                    VAA, &
-                    CI, CI_OMG, CI_VT, &
-                    SI, SI_QNF, SI_VA, &
-                    W, W_OMG, W_QNF, W_VT, W_VA, &
-                    PHIB, P_OMG, P_QNF, P_VT, P_VA)
+            CALL WCALC(N, I, VAINF, VTINF, VTT, VAA, CI, CI_OMG, CI_VT, SI, &
+                    & SI_QNF, SI_VA, W, W_OMG, W_QNF, W_VT, W_VA, PHIB, P_OMG, &
+                    & P_QNF, P_VT, P_VA)
             !
             ALFA = BETAR(I, N) - PHIB
             AL_DBE = 1.0
@@ -2018,9 +2345,9 @@ SUBROUTINE TQCALC(ITYPE)
             !     Otherwise blade element theory will be used to calculate forces
             !     on the blades using aerodynamic characteristics for the blade elements.
             !
-            IF(IRTYPE(N).EQ.2) THEN
+            IF (IRTYPE(N)==2) THEN
                 !
-                IF(ITYPE.EQ.1) THEN
+                IF (ITYPE==1) THEN
                     !------- analysis case:  fix local Beta (except for pitch change)
                     !------- set alfa(Gi,dBeta,Qinf,Omeg,Va,Vt) sensitivites
                     ALFA = BETAR(I, N) - PHIB
@@ -2037,10 +2364,9 @@ SUBROUTINE TQCALC(ITYPE)
                     SECSIG = BLDS * CHR(I, N) / (2.0 * PI * YRC(I, N))
                     SECSTAGR = 0.5 * PI - BETAR(I, N)
                     CALL GETCLCDCM(N, I, XI, ALFA, W, REY, SECSIG, SECSTAGR, &
-                            CLR(I, N), CL_AL, CL_W, &
-                            CLMAX, CLMIN, DCLSTALL, LSTALLR(I, N), &
-                            CDR(I, N), CD_ALF, CD_W, CD_REY, &
-                            CMR(I, N), CM_AL, CM_W)
+                            & CLR(I, N), CL_AL, CL_W, CLMAX, CLMIN, &
+                            & DCLSTALL, LSTALLR(I, N), CDR(I, N), CD_ALF, &
+                            & CD_W, CD_REY, CMR(I, N), CM_AL, CM_W)
                     CLALF(I, N) = CL_AL
                     CL_GI = CL_AL * AL_GI
                     CL_DBE = CL_AL * AL_DBE
@@ -2056,11 +2382,11 @@ SUBROUTINE TQCALC(ITYPE)
                     CH_VT = 0.
                     CH_VA = 0.
                     !
-                ELSE IF(ITYPE.EQ.2) THEN
+                ELSEIF (ITYPE==2) THEN
                     !---- design case:  fix local CL and set chord based on circulation
                     !---- update design CL arrays
                     !
-                    IF(OMEGA(N).GT.0.0)THEN
+                    IF (OMEGA(N)>0.0) THEN
                         DO J = 1, NRC
                             CLDES(J) = CLPOS(J)
                         ENDDO
@@ -2075,8 +2401,8 @@ SUBROUTINE TQCALC(ITYPE)
                     !
                     SECSIG = BLDS * CHR(I, N) / (2.0 * PI * YRC(I, N))
                     SECSTAGR = 0.5 * PI - BETAR(I, N)
-                    CALL GETALF(N, I, XI, SECSIG, SECSTAGR, &
-                            CLR(I, N), W, ALFA, AL_CL, AL_W, LSTALLR(I, N))
+                    CALL GETALF(N, I, XI, SECSIG, SECSTAGR, CLR(I, N), W, ALFA, &
+                            & AL_CL, AL_W, LSTALLR(I, N))
                     !c         write(*,*) 'tq2 getalf i,cl,w,alf ',i,clr(i),w,alfa/dtr
                     !
                     AL_GI = 0.
@@ -2098,11 +2424,11 @@ SUBROUTINE TQCALC(ITYPE)
                     CHNEW = 2.0 * BGAM(I, N) / (BLDS * W * CLR(I, N))
                     !--- Check for chord going zero or negative and use nearby station data
                     !    for this iteration
-                    IF(CHNEW.LE.0.0) THEN
+                    IF (CHNEW<=0.0) THEN
                         !c           write(*,*) 'TQCALC negative chord @I = ',I,CHNEW
-                        IF(I.EQ.1) THEN
+                        IF (I==1) THEN
                             CHR(I, N) = CHR(I + 1, N)
-                        ELSEIF(I.EQ.II) THEN
+                        ELSEIF (I==II) THEN
                             CHR(I, N) = CHR(I - 1, N)
                         ELSE
                             CHR(I, N) = 0.5 * (CHR(I - 1, N) + CHR(I + 1, N))
@@ -2125,7 +2451,7 @@ SUBROUTINE TQCALC(ITYPE)
                     BETAR(I, N) = ALFA + PHIB
                     ALFAR(I, N) = ALFA
                     !
-                ELSE IF(ITYPE.EQ.3) THEN
+                ELSEIF (ITYPE==3) THEN
                     !------- design case:  fix local chord and set angles based on CL
                     !
                     !------- set CL(Gi,dBeta,Adv,Adw,Vt) sensitivites
@@ -2140,8 +2466,8 @@ SUBROUTINE TQCALC(ITYPE)
                     !------- set alfa(Gi,dBeta,Adv,Adw,Vt) sensitivites
                     SECSIG = BLDS * CHR(I, N) / (2.0 * PI * YRC(I, N))
                     SECSTAGR = 0.5 * PI - BETAR(I, N)
-                    CALL GETALF(N, I, XI, SECSIG, SECSTAGR, &
-                            CLR(I, N), W, ALFA, AL_CL, AL_W, LSTALLR(I, N))
+                    CALL GETALF(N, I, XI, SECSIG, SECSTAGR, CLR(I, N), W, ALFA, &
+                            & AL_CL, AL_W, LSTALLR(I, N))
                     !c         write(*,*) 'tq3 i,cl,ch,w,alf ',i,clr(i),chr(i),w,alfa/dtr
                     AL_GI = AL_CL * CL_GI
                     AL_DBE = AL_CL * CL_DBE
@@ -2181,13 +2507,12 @@ SUBROUTINE TQCALC(ITYPE)
                 SECSIG = BLDS * CHR(I, N) / (2.0 * PI * YRC(I, N))
                 SECSTAGR = 0.5 * PI - BETAR(I, N)
                 CALL GETCLCDCM(N, I, XI, ALFA, W, RER(I, N), SECSIG, SECSTAGR, &
-                        CLR(I, N), CL_AL, CL_W, &
-                        CLMAX, CLMIN, DCLSTALL, LSTALLR(I, N), &
-                        CDR(I, N), CD_AL, CD_W, CD_RE, &
-                        CMR(I, N), CM_AL, CM_W)
+                        & CLR(I, N), CL_AL, CL_W, CLMAX, CLMIN, DCLSTALL, &
+                        & LSTALLR(I, N), CDR(I, N), CD_AL, CD_W, CD_RE, &
+                        & CMR(I, N), CM_AL, CM_W)
                 CLALF(I, N) = CL_AL
                 !c        write(*,97) 'tqcalc alfa,cl,cd,cm ',i,alfa,clr(i),cdr(i)
-                97     format(A, I5, 5(1x, F12.6))
+                97            FORMAT (A, I5, 5(1x, F12.6))
                 CD_GI = CD_AL * AL_GI + CD_RE * RE_GI
                 CD_OMG = CD_AL * AL_OMG + CD_RE * RE_OMG + CD_W * W_OMG
                 CD_QNF = CD_AL * AL_QNF + CD_RE * RE_QNF + CD_W * W_QNF
@@ -2214,14 +2539,11 @@ SUBROUTINE TQCALC(ITYPE)
                 !------ set Tv(Gi,dBeta,Adv,Vt) sensitivites using chain rule
                 DTV_GI = DTV_CD * CD_GI + DTV_CH * CH_GI
                 DTV_DBE = DTV_CD * CD_DBE
-                DTV_OMG = DTV_CD * CD_OMG + DTV_CH * CH_OMG&
-                        + DTV_W * W_OMG
-                DTV_QNF = DTV_CD * CD_QNF + DTV_CH * CH_QNF&
-                        + DTV_W * W_QNF
-                DTV_VT = DTV_CD * CD_VT + DTV_CH * CH_VT&
-                        + DTV_W * W_VT
-                DTV_VA = DTV_CD * CD_VA + DTV_CH * CH_VA&
-                        + DTV_SI * SI_VA + DTV_W * W_VA
+                DTV_OMG = DTV_CD * CD_OMG + DTV_CH * CH_OMG + DTV_W * W_OMG
+                DTV_QNF = DTV_CD * CD_QNF + DTV_CH * CH_QNF + DTV_W * W_QNF
+                DTV_VT = DTV_CD * CD_VT + DTV_CH * CH_VT + DTV_W * W_VT
+                DTV_VA = DTV_CD * CD_VA + DTV_CH * CH_VA + DTV_SI * SI_VA + &
+                        & DTV_W * W_VA
                 !
                 !------ accumulate viscous Thrust and sensitivities
                 TVISR(N) = TVISR(N) + DTV
@@ -2230,8 +2552,8 @@ SUBROUTINE TQCALC(ITYPE)
                 TV_DBE(N) = TV_DBE(N) + DTV_DBE
                 !
                 TV_GAM(I, N) = DTV_GI
-                TV_VA (I, N) = DTV_VA
-                TV_VT (I, N) = DTV_VT
+                TV_VA(I, N) = DTV_VA
+                TV_VT(I, N) = DTV_VT
                 !
                 !
                 !------ dQv( Cd , C , W , c )
@@ -2246,15 +2568,12 @@ SUBROUTINE TQCALC(ITYPE)
                 !------ set Pv(Gi,dBeta,Adv,Vt) sensitivites using chain rule
                 DQV_GI = DQV_CD * CD_GI + DQV_CH * CH_GI
                 DQV_DBE = DQV_CD * CD_DBE
-                DQV_OMG = DQV_OM&
-                        + DQV_CD * CD_OMG + DQV_CH * CH_OMG&
-                        + DQV_CI * CI_OMG + DQV_W * W_OMG
-                DQV_QNF = DQV_CD * CD_QNF + DQV_CH * CH_QNF&
-                        + DQV_W * W_QNF
-                DQV_VT = DQV_CD * CD_VT + DQV_CH * CH_VT&
-                        + DQV_CI * CI_VT + DQV_W * W_VT
-                DQV_VA = DQV_CD * CD_VA + DQV_CH * CH_VA&
-                        + DQV_W * W_VA
+                DQV_OMG = DQV_OM + DQV_CD * CD_OMG + DQV_CH * CH_OMG + &
+                        & DQV_CI * CI_OMG + DQV_W * W_OMG
+                DQV_QNF = DQV_CD * CD_QNF + DQV_CH * CH_QNF + DQV_W * W_QNF
+                DQV_VT = DQV_CD * CD_VT + DQV_CH * CH_VT + DQV_CI * CI_VT + &
+                        & DQV_W * W_VT
+                DQV_VA = DQV_CD * CD_VA + DQV_CH * CH_VA + DQV_W * W_VA
                 !
                 !------ accumulate viscous Power and sensitivities
                 QVISR(N) = QVISR(N) + DQV
@@ -2263,8 +2582,8 @@ SUBROUTINE TQCALC(ITYPE)
                 QV_DBE(N) = QV_DBE(N) + DQV_DBE
                 !
                 QV_GAM(I, N) = DQV_GI
-                QV_VA (I, N) = DQV_VA
-                QV_VT (I, N) = DQV_VT
+                QV_VA(I, N) = DQV_VA
+                QV_VT(I, N) = DQV_VT
                 !
             ENDIF ! end of check for IRTYPE=2 (blade defined)
             !
@@ -2287,8 +2606,8 @@ SUBROUTINE TQCALC(ITYPE)
             TI_OMG(N) = TI_OMG(N) + DTI_OMG
             !------ Resolve dTi dependencies ( Vt ) to Gamma
             TI_GAM(I, N) = DTI_GI
-            TI_VA (I, N) = 0.0
-            TI_VT (I, N) = DTI_VT
+            TI_VA(I, N) = 0.0
+            TI_VT(I, N) = DTI_VT
             !
             !
             !------ dQi( S(V Va) , Gi )
@@ -2307,12 +2626,12 @@ SUBROUTINE TQCALC(ITYPE)
             QI_QNF(N) = QI_QNF(N) + DQI_QNF
             !------ Save dQi dependencies to BGAM,VA,VT
             QI_GAM(I, N) = DQI_GI
-            QI_VA (I, N) = DQI_VA
-            QI_VT (I, N) = 0.0
+            QI_VA(I, N) = DQI_VA
+            QI_VT(I, N) = 0.0
             !
             !*******************************************************
             !------ Save blade thrust and torque distributions (per blade, per span)
-            IF(BLDS.NE.0.0) THEN
+            IF (BLDS/=0.0) THEN
                 DTII(I, N) = DTI / BDR
                 DQII(I, N) = DQI / BDR
                 DTVI(I, N) = DTV / BDR
@@ -2327,7 +2646,7 @@ SUBROUTINE TQCALC(ITYPE)
             !------ static pressure rise at this radial station
             DPSI(I, N) = (DTI + DTV) / DA
             !
-        1000 CONTINUE
+        ENDDO
         !
         !---- forces for this rotor
         TTOTR(N) = TINVR(N) + TVISR(N)
@@ -2343,7 +2662,7 @@ SUBROUTINE TQCALC(ITYPE)
         PVIS = PVIS + QVISR(N) * OMEGA(N)
         PTOT = PTOT + QTOTR(N) * OMEGA(N)
         !
-    2000 CONTINUE
+    ENDDO
     !
     !      write(*,99) 'TQcalc '
     !      write(*,99) ' Tinv,Ti_qnf,Ti_omg       ',tinv,ti_qnf,ti_omg
@@ -2352,26 +2671,39 @@ SUBROUTINE TQCALC(ITYPE)
     !      write(*,99) ' Qvis,Qv_qnf,Qv_omg,Pv_be ',qvis,qv_qnf,qv_omg,qv_dbe
     !      write(*,99) ' Pinv,Pvis,Ptot           ',pinv,pvis,ptot
     !
-    99   format(A, 4(1x, F12.3))
+    99   FORMAT (A, 4(1x, F12.3))
     !
-    RETURN
-END
+END SUBROUTINE TQCALC
+!*==WCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! TQCALC
 
 
-SUBROUTINE WCALC(N, I, VAIN, VTIN, &
-        VTT, &
-        VAA, &
-        CI, CI_OMG, CI_VT, &
-        SI, SI_QNF, SI_VA, &
-        W, W_OMG, W_QNF, W_VT, W_VA, &
-        PHIB, P_OMG, P_QNF, P_VT, P_VA)
+SUBROUTINE WCALC(N, I, VAIN, VTIN, VTT, VAA, CI, CI_OMG, CI_VT, SI, SI_QNF, &
+        & SI_VA, W, W_OMG, W_QNF, W_VT, W_VA, PHIB, P_OMG, P_QNF, &
+        & P_VT, P_VA)
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    REAL :: CI, CI_OMG, CI_VT, PHIB, P_OMG, P_QNF, P_VA, &
+            & P_VT, SI, SI_QNF, SI_VA, VAA, VAIN, VTIN, VTT, &
+            & W, W_OMG, W_QNF, W_VA, W_VT
+    INTEGER :: I, N
+    !
+    ! Local variables
+    !
+    REAL :: VFAC, VTBG, WSQ
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !
     !---- Calculate velocity components at radial station I on rotor blade
     !
-    INCLUDE 'DFDC.inc'
     !
-    IF(LBLBL)THEN
+    IF (LBLBL) THEN
         VFAC = BBVFAC(I, N)
     ELSE
         VFAC = 1.0
@@ -2390,7 +2722,7 @@ SUBROUTINE WCALC(N, I, VAIN, VTIN, &
     CI_VT = 1.0
     !
     !      SI     = QINF          + VAIN + VAA         ! v0.70
-    SI = (QINF + VAA + VAIN) * VFAC          ! BB entry
+    SI = (QINF + VAA + VAIN) * VFAC              ! BB entry
     SI_QNF = 1.0
     SI_VA = 1.0
     !
@@ -2407,42 +2739,62 @@ SUBROUTINE WCALC(N, I, VAIN, VTIN, &
     P_VT = (SI * CI_VT) / WSQ
     P_VA = (-CI * SI_VA) / WSQ
     !
-    IF(LDBG) THEN
-        WRITE(LUNDBG, *)  'WCALC @I= ', I
-        WRITE(LUNDBG, 99) 'QINF YRC  ', QINF, YRC(I, N)
-        WRITE(LUNDBG, 99) 'OMEG      ', OMEGA(N)
-        WRITE(LUNDBG, 99) 'VT,VA     ', VTT, VAA
-        WRITE(LUNDBG, 99) 'VTIN,VAIN ', VTIN, VAIN
-        WRITE(LUNDBG, 99) 'CI,SI,W   ', CI, SI, W
-        WRITE(LUNDBG, 99) 'PHI       ', PHIB / DTR
+    IF (LDBG) THEN
+        WRITE (LUNDBG, *) 'WCALC @I= ', I
+        WRITE (LUNDBG, 99) 'QINF YRC  ', QINF, YRC(I, N)
+        WRITE (LUNDBG, 99) 'OMEG      ', OMEGA(N)
+        WRITE (LUNDBG, 99) 'VT,VA     ', VTT, VAA
+        WRITE (LUNDBG, 99) 'VTIN,VAIN ', VTIN, VAIN
+        WRITE (LUNDBG, 99) 'CI,SI,W   ', CI, SI, W
+        WRITE (LUNDBG, 99) 'PHI       ', PHIB / DTR
     ENDIF
     !
-    99   FORMAT(A, 5(1X, f11.6))
+    99   FORMAT (A, 5(1X, f11.6))
     !
-    RETURN
-END
+END SUBROUTINE WCALC
+!*==ROTRPRT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! WCALC
 
 
 SUBROUTINE ROTRPRT(LU)
-    INCLUDE 'DFDC.inc'
-    DIMENSION W1(IRX)
-    CHARACTER SCHAR*1, RTYPE*30
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: LU
+    !
+    ! Local variables
+    !
+    REAL :: ADV, ALDEG, AREF, BDEG, CH34, CHI, CP, CP0, CT, &
+            & CT0, CTOS, DIA, DREF, EFFIND, EFFTOT, EIDEAL, &
+            & EN, OMEGREF, PC, PDIM, PINV, PVDIM, QDIM, QINV, &
+            & REEXP, REMAX, RPM, RREF, SIGMA, TC, TCLIM, TDIM, &
+            & TINV, TVDIM, VTIP, XI, XRE
+    INTEGER :: I, IADD, N
+    CHARACTER(30) :: RTYPE
+    CHARACTER(1) :: SCHAR
+    REAL, DIMENSION(IRX) :: W1
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------
     !     Dumps operating state of case to unit LU
     !---------------------------------------------
     !
     WRITE (LU, 1000)
-    WRITE(LU, 1001) NAME
-    IF(.NOT.LCONV) WRITE(LU, 1002)
-    IF(NINFL.GT.0) WRITE(LU, 1005)
+    WRITE (LU, 1001) NAME
+    IF (.NOT.LCONV) WRITE (LU, 1002)
+    IF (NINFL>0) WRITE (LU, 1005)
     !
-    1000 FORMAT(/1X, 76('-'))
-    1001 FORMAT(' DFDC  Case:  ', A32)
-    1002 FORMAT(/19X, '********** NOT CONVERGED **********', /)
-    1003 FORMAT(1X, 76('-'))
-    1004 FORMAT(50X)
-    1005 FORMAT(' (External slipstream present)')
+    1000 FORMAT (/1X, 76('-'))
+    1001 FORMAT (' DFDC  Case:  ', A32)
+    1002 FORMAT (/19X, '********** NOT CONVERGED **********', /)
+    1003 FORMAT (1X, 76('-'))
+    1004 FORMAT (50X)
+    1005 FORMAT (' (External slipstream present)')
     !
     !---- dimensional thrust, power, torque, rpm
     TDIM = TTOT + TDUCT
@@ -2462,7 +2814,7 @@ SUBROUTINE ROTRPRT(LU)
     !---- standard thrust/power coefficients based on rotational speed
     DREF = 2.0 * RREF
     EN = ABS(OMEGREF * PI2I)
-    IF(EN.EQ.0.0) THEN
+    IF (EN==0.0) THEN
         CT = 0.0
         CP = 0.0
     ELSE
@@ -2470,7 +2822,7 @@ SUBROUTINE ROTRPRT(LU)
         CP = PDIM / (RHO * EN**3 * DREF**5)
     ENDIF
     !---- standard thrust/power coefficients based on forward speed
-    IF(QINF.GT.0.0) THEN
+    IF (QINF>0.0) THEN
         TC = TDIM / (0.5 * RHO * QINF**2 * PI * RREF**2)
         PC = PDIM / (0.5 * RHO * QINF**3 * PI * RREF**2)
     ELSE
@@ -2481,25 +2833,25 @@ SUBROUTINE ROTRPRT(LU)
     !     uses helicopter nomenclature for CT0,CP0,FOM
     VTIP = ABS(OMEGREF * RREF)
     ADV = QINF / VTIP
-    IF(VTIP.NE.0.0) THEN
+    IF (VTIP/=0.0) THEN
         CT0 = TDIM / (RHO * AREF * VTIP**2)
         CP0 = PDIM / (RHO * AREF * VTIP**3)
     ELSE
         CT0 = 0.0
         CP0 = 0.0
     ENDIF
-    IF(CT0.GE.0.0 .AND. CP0.NE.0.0) THEN
+    IF (CT0>=0.0 .AND. CP0/=0.0) THEN
         FOM = ABS(CT0)**1.5 / CP0 / 2.0
     ELSE
         FOM = 0.0
     ENDIF
     !
     !---- overall efficiency (all thrust components)
-    IF(PDIM.NE.0.0) EFFTOT = QINF * TDIM / PDIM
+    IF (PDIM/=0.0) EFFTOT = QINF * TDIM / PDIM
     !---- induced efficiency (all thrust components)
-    IF(PINV.NE.0.0) EFFIND = QINF * (TINV + TDUCT) / PINV
+    IF (PINV/=0.0) EFFIND = QINF * (TINV + TDUCT) / PINV
     !---- ideal (actuator disk) efficiency
-    IF(TC.EQ.0) THEN
+    IF (TC==0) THEN
         EIDEAL = 0.0
     ELSE
         TCLIM = MAX(-1.0, TC)
@@ -2508,57 +2860,51 @@ SUBROUTINE ROTRPRT(LU)
     !
     !---- Dump overall case data
     !
-    WRITE(LU, 1003)
-    IF(IRTYPE(1).EQ.2) THEN
-        IF(LBLBL) THEN
-            WRITE(LU, 1010)
-        ELSE
-            WRITE(LU, 1011)
-        ENDIF
+    WRITE (LU, 1003)
+    IF (IRTYPE(1)/=2) THEN
+        WRITE (LU, 1008)
+    ELSEIF (LBLBL) THEN
+        WRITE (LU, 1010)
     ELSE
-        WRITE(LU, 1008)
+        WRITE (LU, 1011)
     ENDIF
     !
-    WRITE(LU, 1012) QINF, ALTH, DELTAT, &
-            RHO, VSO, RMU, &
-            TDIM, PDIM, EFFTOT, &
-            TVDIM, PVDIM, EFFIND, &
-            TDUCT, QDIM, EIDEAL
+    WRITE (LU, 1012) QINF, ALTH, DELTAT, RHO, VSO, RMU, TDIM, &
+            & PDIM, EFFTOT, TVDIM, PVDIM, EFFIND, TDUCT, &
+            & QDIM, EIDEAL
     !
-    WRITE(LU, 1004)
+    WRITE (LU, 1004)
     !
-    WRITE(LU, 1014) AREF, RREF, OMEGREF
+    WRITE (LU, 1014) AREF, RREF, OMEGREF
     !---- Thrust/power coefficients based on rotational speed (propeller syntax)
-    WRITE(LU, 1015) CT, CP, ADV * PI
+    WRITE (LU, 1015) CT, CP, ADV * PI
     !---- Thrust/power coefficients based on forward speed (propeller syntax)
-    WRITE(LU, 1016) TC, PC, ADV
+    WRITE (LU, 1016) TC, PC, ADV
     !---- Thrust/power coefficients based on tip speed (helicopter nomenclature)
-    WRITE(LU, 1017) CT0, CP0, FOM
+    WRITE (LU, 1017) CT0, CP0, FOM
     !
-    1008 FORMAT(' Flow Condition and total Forces')
-    1010 FORMAT(' Flow Condition and total Forces', 17X, &
-            'Corrected for blade blockage')
-    1011 FORMAT(' Flow Condition and total Forces', 17X, &
-            'No blade blockage correction')
-    1012 FORMAT(/'  Vinf(m/s) :', F10.3, 4X, 'Alt.(km)   :', F9.3, 5X, &
-            'DeltaT(dgC):', F9.4, &
-            /' rho(kg/m3) :', F11.4, 3X, 'Vsound(m/s):', F9.3, 5X, &
-            'mu(kg/m-s) :', E11.4, &
-            /' Thrust(N)  :', G11.3, 3X, 'Power(W)   :', G11.3, 3X, &
-            'Efficiency :', F9.4, &
-            /' Tvisc (N)  :', F11.4, 3X, 'Pvisc(W)   :', G11.3, 3X, &
-            'Induced Eff:', F9.4, &
-            /' Tduct(N)   :', F11.4, 3X, 'torQue(N-m):', G11.3, 3X, &
-            'Ideal Eff  :', F9.4)
+    1008 FORMAT (' Flow Condition and total Forces')
+    1010 FORMAT (' Flow Condition and total Forces', 17X, &
+            &'Corrected for blade blockage')
+    1011 FORMAT (' Flow Condition and total Forces', 17X, &
+            &'No blade blockage correction')
+    1012 FORMAT (/'  Vinf(m/s) :', F10.3, 4X, 'Alt.(km)   :', F9.3, 5X, &
+            &'DeltaT(dgC):', F9.4, /' rho(kg/m3) :', F11.4, 3X, &
+            &'Vsound(m/s):', F9.3, 5X, 'mu(kg/m-s) :', E11.4, &
+            &/' Thrust(N)  :', G11.3, 3X, 'Power(W)   :', G11.3, 3X, &
+            &'Efficiency :', F9.4, /' Tvisc (N)  :', F11.4, 3X, &
+            &'Pvisc(W)   :', G11.3, 3X, 'Induced Eff:', F9.4, &
+            &/' Tduct(N)   :', F11.4, 3X, 'torQue(N-m):', G11.3, 3X, &
+            &'Ideal Eff  :', F9.4)
     !
-    1014 FORMAT('  Area:', F11.5, '  Radius:', F11.5, ' Omega:', F11.5, &
-            '  Reference data')
-    1015 FORMAT('    Ct:', F11.5, '      Cp:', F11.5, '     J:', F11.5, &
-            '  by(Rho,N,Dia)')
-    1016 FORMAT('    Tc:', F11.5, '      Pc:', F11.5, '   adv:', F11.5, &
-            '  by(Rho,Vinf,Area)  ')
-    1017 FORMAT('   CT0:', F11.5, '     CP0:', F11.5, '   FOM:', F11.5, &
-            '  by(Rho,R*Omg,Area)')
+    1014 FORMAT ('  Area:', F11.5, '  Radius:', F11.5, ' Omega:', F11.5, &
+            &'  Reference data')
+    1015 FORMAT ('    Ct:', F11.5, '      Cp:', F11.5, '     J:', F11.5, &
+            &'  by(Rho,N,Dia)')
+    1016 FORMAT ('    Tc:', F11.5, '      Pc:', F11.5, '   adv:', F11.5, &
+            &'  by(Rho,Vinf,Area)  ')
+    1017 FORMAT ('   CT0:', F11.5, '     CP0:', F11.5, '   FOM:', F11.5, &
+            &'  by(Rho,R*Omg,Area)')
     !
     !
     !---- Display operating state for each rotor
@@ -2568,7 +2914,7 @@ SUBROUTINE ROTRPRT(LU)
         IADD = 1
         !c      IF(LU.EQ.LUWRIT) IADD = INCR
         !
-        WRITE(LU, 1003)
+        WRITE (LU, 1003)
         !
         !---- dimensional thrust, power, torque, rpm
         TDIM = TTOTR(N)
@@ -2590,7 +2936,7 @@ SUBROUTINE ROTRPRT(LU)
         !---- standard thrust/power coefficients based on rotational speed
         DIA = 2.0 * RREF
         EN = ABS(OMEGREF * PI2I)
-        IF(EN.EQ.0.0) THEN
+        IF (EN==0.0) THEN
             CT = 0.0
             CP = 0.0
         ELSE
@@ -2599,7 +2945,7 @@ SUBROUTINE ROTRPRT(LU)
         ENDIF
         !
         !---- standard thrust/power coefficients based on forward speed
-        IF(QINF.GT.0.0) THEN
+        IF (QINF>0.0) THEN
             TC = TDIM / (0.5 * RHO * QINF**2 * PI * RREF**2)
             PC = PDIM / (0.5 * RHO * QINF**3 * PI * RREF**2)
         ELSE
@@ -2609,7 +2955,7 @@ SUBROUTINE ROTRPRT(LU)
         !---- thrust/power coefficients based on tip speed
         !     uses helicopter nomenclature for CT0,CP0,FOM
         VTIP = ABS(OMEGREF * RREF)
-        IF(VTIP.NE.0.0) THEN
+        IF (VTIP/=0.0) THEN
             CT0 = TDIM / (RHO * AREF * VTIP**2)
             CP0 = PDIM / (RHO * AREF * VTIP**3)
             ADV = QINF / VTIP
@@ -2620,11 +2966,11 @@ SUBROUTINE ROTRPRT(LU)
         ENDIF
         !
         !---- efficiency for rotor
-        IF(PDIM.NE.0.0) EFFTOT = QINF * TDIM / PDIM
+        IF (PDIM/=0.0) EFFTOT = QINF * TDIM / PDIM
         !---- induced efficiency for rotor
-        IF(PINV.NE.0.0) EFFIND = QINF * TINV / PINV
+        IF (PINV/=0.0) EFFIND = QINF * TINV / PINV
         !---- ideal (actuator disk) efficiency
-        IF(TC.EQ.0) THEN
+        IF (TC==0) THEN
             EIDEAL = 0.0
         ELSE
             TCLIM = MAX(-1.0, TC)
@@ -2632,14 +2978,14 @@ SUBROUTINE ROTRPRT(LU)
         ENDIF
         !
         SIGMA = 0.0
-        IF(IRTYPE(N).EQ.1) THEN
-            IF(OMEGA(N).EQ.0.0) THEN
+        IF (IRTYPE(N)==1) THEN
+            IF (OMEGA(N)==0.0) THEN
                 RTYPE = 'Actuator Disk Stator'
             ELSE
                 RTYPE = 'Actuator Disk Rotor '
             ENDIF
-        ELSEIF(IRTYPE(N).EQ.2) THEN
-            IF(OMEGA(N).EQ.0.0) THEN
+        ELSEIF (IRTYPE(N)==2) THEN
+            IF (OMEGA(N)==0.0) THEN
                 RTYPE = 'Bladed Stator '
             ELSE
                 RTYPE = 'Bladed Rotor  '
@@ -2652,48 +2998,45 @@ SUBROUTINE ROTRPRT(LU)
             RTYPE = 'Undefined disk'
         ENDIF
         !
-        IF(SIGMA.NE.0.0) THEN
+        IF (SIGMA/=0.0) THEN
             CTOS = CT0 / SIGMA
         ELSE
             CTOS = 0.0
         ENDIF
         !
-        WRITE(LU, 1110) N, RTYPE, &
-                NRBLD(N), RPM, ADV, &
-                TDIM, PDIM, EFFTOT, &
-                TVDIM, PVDIM, EFFIND, &
-                QDIM, QINV, EIDEAL, &
-                RTIP(N), RHUB(N), VAAVG(N)
+        WRITE (LU, 1110) N, RTYPE, NRBLD(N), RPM, ADV, TDIM, &
+                & PDIM, EFFTOT, TVDIM, PVDIM, EFFIND, QDIM, &
+                & QINV, EIDEAL, RTIP(N), RHUB(N), VAAVG(N)
         !
-        WRITE(LU, 1004)
-        WRITE(LU, 1114) AREF, RREF, OMEGREF
+        WRITE (LU, 1004)
+        WRITE (LU, 1114) AREF, RREF, OMEGREF
         !---- Thrust/power coefficients based on rotational speed (propeller syntax)
-        WRITE(LU, 1115) CT, CP, ADV * PI
+        WRITE (LU, 1115) CT, CP, ADV * PI
         !---- Thrust/power coefficients based on forward speed (propeller syntax)
-        WRITE(LU, 1116) TC, PC, ADV
+        WRITE (LU, 1116) TC, PC, ADV
         !---- Thrust/power coefficients based on tip speed (helicopter nomenclature)
-        WRITE(LU, 1118) CT0, CP0
-        WRITE(LU, 1119) SIGMA, CTOS
+        WRITE (LU, 1118) CT0, CP0
+        WRITE (LU, 1119) SIGMA, CTOS
         !
-        WRITE(LU, 1003)
+        WRITE (LU, 1003)
         !
-        IF(OMEGA(N).LE.0.0 .AND. IRTYPE(N).EQ.2) THEN
-            IF(LCOORD) THEN
-                WRITE(LU, *)'                    -local coords-'
+        IF (OMEGA(N)<=0.0 .AND. IRTYPE(N)==2) THEN
+            IF (LCOORD) THEN
+                WRITE (LU, *) '                    -local coords-'
             ELSE
-                WRITE(LU, *)'                    -global coords-'
+                WRITE (LU, *) '                    -global coords-'
             ENDIF
         ENDIF
         !
         !
-        IF(IRTYPE(N).EQ.2) THEN
+        IF (IRTYPE(N)==2) THEN
             !---- Blade is defined, print blade data
             !
             !---- Overall blade solidity (measured at 3/4 Rtip)
             CALL SPLINE(CHR(1, N), W1, YRC(1, N), NRC)
             CH34 = SEVAL(0.75 * RTIP(N), CHR(1, N), W1, YRC, NRC)
             SIGMA = FLOAT(NRBLD(N)) * CH34 / RTIP(N) / PI
-            IF(SIGMA.NE.0.0) THEN
+            IF (SIGMA/=0.0) THEN
                 CTOS = CT0 / SIGMA
             ELSE
                 CTOS = 0.0
@@ -2703,17 +3046,17 @@ SUBROUTINE ROTRPRT(LU)
             REMAX = 0.0
             DO I = 1, NRC
                 REMAX = MAX(RER(I, N), REMAX)
-            END DO
+            ENDDO
             REEXP = 1.0
-            IF(REMAX.GE.1.0E6) THEN
+            IF (REMAX>=1.0E6) THEN
                 REEXP = 6.0
-            ELSEIF(REMAX.GE.1.0E3) THEN
+            ELSEIF (REMAX>=1.0E3) THEN
                 REEXP = 3.0
             ENDIF
-            IF(REEXP.EQ.1.0) THEN
-                WRITE(LU, 1120)
+            IF (REEXP==1.0) THEN
+                WRITE (LU, 1120)
             ELSE
-                WRITE(LU, 1122) IFIX(REEXP)
+                WRITE (LU, 1122) IFIX(REEXP)
             ENDIF
             !
             !---- NOTE: should only dump blade data to NRC-1 for tip gap case
@@ -2725,7 +3068,7 @@ SUBROUTINE ROTRPRT(LU)
                 CHI = CHR(I, N) / RTIP(N)
                 XRE = RER(I, N) / (10.0**REEXP)
                 !
-                IF(LCOORD .AND. OMEGA(N).LE.0.0) THEN
+                IF (LCOORD .AND. OMEGA(N)<=0.0) THEN
                     BDEG = (PI - BETAR(I, N)) / DTR
                     ALDEG = -ALFAR(I, N) / DTR
                 ELSE
@@ -2733,33 +3076,34 @@ SUBROUTINE ROTRPRT(LU)
                     ALDEG = ALFAR(I, N) / DTR
                 ENDIF
                 !
-                IF(I.EQ.NRC.AND.TGAP.GT.0.0.AND.OMEGA(N).NE.0.0) ALDEG = 0.0
+                IF (I==NRC .AND. TGAP>0.0 .AND. OMEGA(N)/=0.0)         &
+                        & ALDEG = 0.0
                 !
                 SCHAR = ' '
-                IF(LSTALLR(I, N)) THEN
-                    IF(I.EQ.NRC .AND. TGAP.GT.0.0.AND.OMEGA(N).NE.0.0) THEN
+                IF (LSTALLR(I, N)) THEN
+                    IF (I==NRC .AND. TGAP>0.0 .AND. OMEGA(N)/=0.0) THEN
                         SCHAR = ' '
                     ELSE
                         SCHAR = 's'
                     ENDIF
                 ENDIF
                 !
-                WRITE(LU, 1130) I, XI, CHI, BDEG, ALDEG, CLR(I, N), SCHAR, CDR(I, N), &
-                        XRE, MACHR(I, N), BGAM(I, N)
+                WRITE (LU, 1130) I, XI, CHI, BDEG, ALDEG, CLR(I, N), &
+                        & SCHAR, CDR(I, N), XRE, MACHR(I, N), &
+                        & BGAM(I, N)
                 !c     &    EFFI,EFFP(I)
-            END DO
+            ENDDO
             !
         ELSE
             !---- Print actuator disk datal
-            WRITE(LU, 1220)
+            WRITE (LU, 1220)
             DO I = 1, NRC, IADD
                 XI = YRC(I, N) / RTIP(N)
-                WRITE(LU, 1230)&
-                        I, XI, MACHR(I, N), BGAM(I, N)
-            END DO
+                WRITE (LU, 1230) I, XI, MACHR(I, N), BGAM(I, N)
+            ENDDO
         ENDIF
         !
-    END DO
+    ENDDO
     !
     !c      WRITE(LU,1000)
     !c      WRITE(LU,*   ) ' '
@@ -2767,41 +3111,36 @@ SUBROUTINE ROTRPRT(LU)
     RETURN
     !....................................................................
     !
-    1110 FORMAT(1X, 'Disk #', I3, 4X, A, &
-            /' # blades   :', I3, 11X, 'RPM        :', F11.3, 3X, &
-            'adv. ratio :', F9.4, &
-            /' Thrust(N)  :', G11.3, 3X, 'Power(W)   :', G11.3, 3X, &
-            'Efficiency :', F9.4, &
-            /' Tvisc (N)  :', F11.4, 3X, 'Pvisc(W)   :', G11.3, 3X, &
-            'Induced Eff:', F9.4, &
-            /' torQue(N-m):', F11.4, 3X, 'Qvisc(N-m) :', G11.3, 3X, &
-            'Ideal Eff  :', F9.4, &
-            /' radius(m)  :', F9.4, 5X, 'hub rad.(m):', F9.4, 5X, &
-            'VAavg (m/s):', F9.4)
+    1110 FORMAT (1X, 'Disk #', I3, 4X, A, /' # blades   :', I3, 11X, &
+            & 'RPM        :', F11.3, 3X, 'adv. ratio :', F9.4, &
+            &/' Thrust(N)  :', G11.3, 3X, 'Power(W)   :', G11.3, 3X, &
+            &'Efficiency :', F9.4, /' Tvisc (N)  :', F11.4, 3X, &
+            &'Pvisc(W)   :', G11.3, 3X, 'Induced Eff:', F9.4, &
+            &/' torQue(N-m):', F11.4, 3X, 'Qvisc(N-m) :', G11.3, 3X, &
+            &'Ideal Eff  :', F9.4, /' radius(m)  :', F9.4, 5X, &
+            &'hub rad.(m):', F9.4, 5X, 'VAavg (m/s):', F9.4)
     !
-    1114 FORMAT('  Area:', F11.5, '  Radius:', F11.5, ' Omega:', F11.5, &
-            '  Reference data')
-    1115 FORMAT('    Ct:', F11.5, '      Cp:', F11.5, '     J:', F11.5, &
-            '  by(Rho,N,Dia)')
-    1116 FORMAT('    Tc:', F11.5, '      Pc:', F11.5, '   adv:', F11.5, &
-            '  by(Rho,Vinf,Area)  ')
-    1118 FORMAT('   CT0:', F11.5, '     CP0:', F11.5, 18X, &
-            '  by(Rho,R*Omg,Area)')
-    1119 FORMAT(' Sigma:', F11.5, ' CT0/Sig:', F11.5)
+    1114 FORMAT ('  Area:', F11.5, '  Radius:', F11.5, ' Omega:', F11.5, &
+            &'  Reference data')
+    1115 FORMAT ('    Ct:', F11.5, '      Cp:', F11.5, '     J:', F11.5, &
+            &'  by(Rho,N,Dia)')
+    1116 FORMAT ('    Tc:', F11.5, '      Pc:', F11.5, '   adv:', F11.5, &
+            &'  by(Rho,Vinf,Area)  ')
+    1118 FORMAT ('   CT0:', F11.5, '     CP0:', F11.5, 18X, &
+            &'  by(Rho,R*Omg,Area)')
+    1119 FORMAT (' Sigma:', F11.5, ' CT0/Sig:', F11.5)
     !
     !---- Rotor data
-    1120 FORMAT('   i   r/R    c/R     beta deg alfa     CL     CD', &
-            '      RE   ', '   Mach    B*Gam')
-    1122 FORMAT('   i   r/R    c/R     beta deg alfa     CL     CD', &
-            '    REx10^', I1, '   Mach    B*Gam')
-    1130 FORMAT(2X, I2, F7.3, F8.4, F8.2, F7.2, 1X, F8.3, A1, F7.4, &
-            F8.2, F8.3, F9.3)
+    1120 FORMAT ('   i   r/R    c/R     beta deg alfa     CL     CD', &
+            &'      RE   ', '   Mach    B*Gam')
+    1122 FORMAT ('   i   r/R    c/R     beta deg alfa     CL     CD', &
+            &'    REx10^', I1, '   Mach    B*Gam')
+    1130 FORMAT (2X, I2, F7.3, F8.4, F8.2, F7.2, 1X, F8.3, A1, F7.4, F8.2, F8.3, F9.3)
     !
     !---- Actuator disk data
-    1220 FORMAT('   i   r/R    c/R     beta deg alfa     CL     CD', &
-            '      RE   ', '   Mach    B*Gam')
-    1230 FORMAT(2X, I2, F7.3, 8X, 8X, 1X, 7X, 1X, 8X, 1X, 7X, &
-            7X, F8.3, F9.3)
+    1220 FORMAT ('   i   r/R    c/R     beta deg alfa     CL     CD', &
+            &'      RE   ', '   Mach    B*Gam')
+    1230 FORMAT (2X, I2, F7.3, 8X, 8X, 1X, 7X, 1X, 8X, 1X, 7X, 7X, F8.3, F9.3)
     !
     !
     ! 1120 FORMAT(/'   i    r/R     c/R    beta(deg)',
@@ -2813,20 +3152,34 @@ SUBROUTINE ROTRPRT(LU)
     !xxiiffffff7fffffff8fffffff8xxxfffffff8xSffffff8xffffff7xxxxffffff7xfffffffff9
     !xx2i f7.3   f8.4    f8.2    3x  f8.3  x   f8.4 x  f7.2 4x    f7.3 x  f10.3
     !
-END
+END SUBROUTINE ROTRPRT
+!*==NFCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! ROTRPRT
 
 
 
 
 SUBROUTINE NFCALC
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: AREA, DA, DP, DPT, DR, DT, DTHR, OMEG, POWERM, &
+            & POWERMT, THRUST, THRUSTM, US, VS, VSQ, VTB, WS, &
+            & WTB
+    INTEGER :: IR, N
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !----------------------------------------------------------------
     !     Calculate near-field forces on rotor, momentum, power at disk
     !     Inviscid thrust is calculated from RPM and circulation
     !     This routine is approximate (inviscid only), superseded by
     !     routine TQCALC.
     !----------------------------------------------------------------
-    INCLUDE 'DFDC.inc'
     !
     DO N = 1, NROTOR
         !
@@ -2841,11 +3194,10 @@ SUBROUTINE NFCALC
             WTB = VTB - OMEG * YRC(IR, N)
             DTHR = DR * RHO * (-WTB) * BGAM(IR, N)
             THRUST = THRUST + DTHR
-        END DO
-        WRITE(*, *) 'Thrust from rotor GAM and OMEGA', THRUST
-        IF(LDBG) THEN
-            WRITE(LUNDBG, *) 'Thrust from rotor GAM and OMEGA', THRUST
-        ENDIF
+        ENDDO
+        WRITE (*, *) 'Thrust from rotor GAM and OMEGA', THRUST
+        IF (LDBG) WRITE (LUNDBG, *) 'Thrust from rotor GAM and OMEGA' &
+                &, THRUST
         !
         !---- Near-field thrust from momentum theory using rotor velocities
         AREA = 0.0
@@ -2869,25 +3221,39 @@ SUBROUTINE NFCALC
             POWERM = POWERM + DP
             POWERMT = POWERMT + DPT
             !
-        END DO
+        ENDDO
         !
-        WRITE(*, *) 'Momentum integration in near-field for rotor # ', N
-        WRITE(*, *) '       Area   = ', AREA
-        WRITE(*, *) '   mom.Thrust = ', THRUSTM
-        WRITE(*, *) '   mom.Power  = ', POWERM
-        WRITE(*, *) ' swirl Power  = ', POWERMT
+        WRITE (*, *) 'Momentum integration in near-field for rotor # ' &
+                &, N
+        WRITE (*, *) '       Area   = ', AREA
+        WRITE (*, *) '   mom.Thrust = ', THRUSTM
+        WRITE (*, *) '   mom.Power  = ', POWERM
+        WRITE (*, *) ' swirl Power  = ', POWERMT
         !
-    END DO
+    ENDDO
     !
-    RETURN
-END
+END SUBROUTINE NFCALC
+!*==FFCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! NFCALC
 
 
 
 
 SUBROUTINE FFCALC
-    INCLUDE 'DFDC.inc'
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: AREA, DA, DP, DPT, DT, DY, FM, FMR, PINT, &
+            & PINTH, PINTT, TINT, TINTH, US, USQ, VS, VSQ, &
+            & WS, XFF, YFF
+    INTEGER :: IELO, IELP, IPO, IPP, IR
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Integrates forces (thrust and power at FF boundary)
     !---------------------------------------------------------
@@ -2925,7 +3291,7 @@ SUBROUTINE FFCALC
         PINT = PINT + DP
         PINTT = PINTT + DPT
         !
-        WRITE(*, *) 'IR,FM,FMR ', IR, FM, FMR
+        WRITE (*, *) 'IR,FM,FMR ', IR, FM, FMR
         !
         !---- Use enthalpy, entropy and circulation at far-field
         USQ = QINF * QINF - WS * WS + 2.0 * (DHG(II - 1, IR) - DSG(II - 1, IR))
@@ -2936,21 +3302,32 @@ SUBROUTINE FFCALC
         TINTH = TINTH + DT
         PINTH = PINTH + DP
         !
-    END DO
+    ENDDO
     !
-    WRITE(*, *) 'FFCALC Area   = ', AREA
-    WRITE(*, *) '       Thrust = ', TINT
-    WRITE(*, *) '       Power  = ', PINT
-    WRITE(*, *) ' Swirl Power  = ', PINTT
-    WRITE(*, *) '   FF  Thrust = ', TINTH
-    WRITE(*, *) '   FF  Power  = ', PINTH
+    WRITE (*, *) 'FFCALC Area   = ', AREA
+    WRITE (*, *) '       Thrust = ', TINT
+    WRITE (*, *) '       Power  = ', PINT
+    WRITE (*, *) ' Swirl Power  = ', PINTT
+    WRITE (*, *) '   FF  Thrust = ', TINTH
+    WRITE (*, *) '   FF  Power  = ', PINTH
     !
-    RETURN
-END
+END SUBROUTINE FFCALC
+!*==STGFIND.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
 SUBROUTINE STGFIND
-    INCLUDE 'DFDC.inc'
+    USE I_DFDC
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! Local variables
+    !
+    REAL :: D1, D12, D2, DFRAC, QD, QDOLD, QFRAC
+    INTEGER :: IC, IC1, IC2, IEL, IP1, IP2
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------
     !     Find stagnation points on CB and duct
     !     The panel center index and X,Y location are saved
@@ -2980,8 +3357,8 @@ SUBROUTINE STGFIND
     DO IC = IC1, IC2
         QD = -ANC(2, IC) * QCR(1, IC) + ANC(1, IC) * QCR(2, IC)
         !c        write(*,*) 'ic,qd ',ic,qd
-        IF(IC.GT.IC1) THEN
-            IF(QD * QDOLD.LT.0.0) THEN
+        IF (IC>IC1) THEN
+            IF (QD * QDOLD<0.0) THEN
                 !c            WRITE(*,*) 'Found stagnation point at IC=',IC
                 !c            WRITE(*,*) ' QD, QDOLD ',QD,QDOLD
                 !c            write(*,*) 'xc,yc ',XC(IC),YC(IC)
@@ -2993,7 +3370,7 @@ SUBROUTINE STGFIND
                 QFRAC = QD / (QD - QDOLD)
                 !c            write(*,*) 'd1,d2,dfrac ',d1,d2,dfrac
                 !c            write(*,*) 'qfrac ',qfrac
-                IF(QFRAC.LT.DFRAC) THEN
+                IF (QFRAC<DFRAC) THEN
                     ICSTG(IEL) = IC - 1
                     XSTG(IEL) = XC(IC - 1) + (1.0 - QFRAC) * D12 * (-ANC(2, IC - 1))
                     YSTG(IEL) = YC(IC - 1) + (1.0 - QFRAC) * D12 * (ANC(1, IC - 1))
@@ -3002,21 +3379,19 @@ SUBROUTINE STGFIND
                     XSTG(IEL) = XC(IC) - (QFRAC) * D12 * (-ANC(2, IC))
                     YSTG(IEL) = YC(IC) - (QFRAC) * D12 * (ANC(1, IC))
                 ENDIF
-                GO TO 10
+                EXIT
             ENDIF
         ENDIF
         QDOLD = QD
-    END DO
+    ENDDO
     !
-    10   IF(LDBG) THEN
+    IF (LDBG) THEN
         IEL = 1
-        WRITE(*, *) 'Element 1 Stag @ IC,X,Y ', &
-                ICSTG(IEL), XSTG(IEL), YSTG(IEL)
+        WRITE (*, *) 'Element 1 Stag @ IC,X,Y ', ICSTG(IEL), XSTG(IEL)&
+                &, YSTG(IEL)
         IEL = 2
-        WRITE(*, *) 'Element 2 Stag @ IC,X,Y ', &
-                ICSTG(IEL), XSTG(IEL), YSTG(IEL)
+        WRITE (*, *) 'Element 2 Stag @ IC,X,Y ', ICSTG(IEL), XSTG(IEL)&
+                &, YSTG(IEL)
     ENDIF
     !
-    RETURN
-END
-
+END SUBROUTINE STGFIND

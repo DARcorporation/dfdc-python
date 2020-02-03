@@ -1,24 +1,26 @@
+!*==SGCURV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
+
 !=========================================================================
 ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
 ! and analysis tool for aircraft with propulsors in ducted fan
 ! configurations.
-! 
+!
 ! This software was developed under the auspices and sponsorship of the
 ! Tactical Technology Office (TTO) of the Defense Advanced Research
 ! Projects Agency (DARPA).
-! 
+!
 ! Copyright (c) 2004, 2005, Booz Allen Hamilton Inc., All Rights Reserved
 !
 ! This program is free software; you can redistribute it and/or modify it
 ! under the terms of the GNU General Public License as published by the
 ! Free Software Foundation; either version 2 of the License, or (at your
 ! option) any later version.
-! 
+!
 ! This program is distributed in the hope that it will be useful, but
 ! WITHOUT ANY WARRANTY; without even the implied warranty of
 ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ! General Public License for more details.
-! 
+!
 ! You should have received a copy of the GNU General Public License along
 ! with this program; if not, write to the Free Software Foundation, Inc.,
 ! 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -28,16 +30,39 @@
 !
 !=========================================================================
 
-SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
-        NGX, NG, SG, &
-        NPTS, CVEX, SMOF, FSL, FSR, &
-        NREF, SREF1, SREF2, CRRAT)
-    IMPLICIT REAL (A-H, M, O-Z)
-    LOGICAL LQUERY, LCPLOT
-    DIMENSION XB(NB), XPB(NB), &
-            YB(NB), YPB(NB), SB(NB)
-    DIMENSION SG(NGX)
-    DIMENSION SREF1(NREF), SREF2(NREF), CRRAT(NREF)
+SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, NGX, NG, SG, &
+        & NPTS, CVEX, SMOF, FSL, FSR, NREF, SREF1, SREF2, CRRAT)
+    IMPLICIT NONE
+    !
+    !*** Start of declarations rewritten by SPAG
+    !
+    ! PARAMETER definitions
+    !
+    INTEGER, PARAMETER :: IX = 1601, NREFX = 20
+    !
+    ! Dummy arguments
+    !
+    REAL :: CVEX, FSL, FSR, SMOF
+    LOGICAL :: LCPLOT, LQUERY
+    INTEGER :: NB, NG, NGX, NPTS, NREF
+    REAL, DIMENSION(NREF) :: CRRAT, SREF1, SREF2
+    REAL, DIMENSION(NB) :: SB, XB, XPB, YB, YPB
+    REAL, DIMENSION(NGX) :: SG
+    !
+    ! Local variables
+    !
+    REAL, DIMENSION(IX) :: AA, BB, CC, CV, CV0, CVINT, CVS, &
+            & S, SNEW
+    REAL :: CURVK, CURVL, CVASQ, CVAVG, CVLE, CVM, CVMAX, &
+            & CVO, CVTE, DLE, DSA, DSAVG, DSB, DSLE, DSM, &
+            & DSMAX, DSMIN, DSP, DSTE, DTE, FRAC, GCV, SBTOT, &
+            & SGI, SM, SO, STOT
+    REAL, DIMENSION(NREFX) :: CVR
+    INTEGER :: I, IB, IG, IPASS, IREF, K, KK, KMULT, N
+    INTEGER, SAVE :: NPASS
+    !
+    !*** End of declarations rewritten by SPAG
+    !
     !---------------------------------------------------------------------
     !     Sets spacing array SG based on curvature and a few parameters
     !
@@ -66,47 +91,34 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
     !
     !
     !---------------------------------------------------------------------
-    PARAMETER (IX = 1601)
-    DIMENSION S(IX), CV(IX), CVS(IX), CVINT(IX), SNEW(IX)
-    DIMENSION AA(IX), BB(IX), CC(IX)
-    DIMENSION CV0(IX)
     !
-    PARAMETER (NREFX = 20)
-    DIMENSION CVR(NREFX)
     !
-    CHARACTER*4 COMAND
-    CHARACTER*128 COMARG
-    CHARACTER*1 ANS
     !
-    DIMENSION IINPUT(20)
-    DIMENSION RINPUT(20)
-    LOGICAL ERROR
     !
-    CHARACTER*4 DUMMY
     !
     !---- max number of point-setting passes
-    DATA NPASS / 1 /
+    DATA NPASS/1/
     !
-    IF(NB  .GT.IX) STOP 'SGCURV: Local array overflow on IX'
-    IF(NREF.GT.NREFX) STOP 'SGCURV: Local array overflow on NREFX'
+    IF (NB>IX) STOP 'SGCURV: Local array overflow on IX'
+    IF (NREF>NREFX) STOP 'SGCURV: Local array overflow on NREFX'
     !
     !
     SBTOT = SB(NB) - SB(1)
-    IF(SBTOT.LE.0.0) THEN
-        WRITE(*, *) '? SGCURV: Zero element arc length'
+    IF (SBTOT<=0.0) THEN
+        WRITE (*, *) '? SGCURV: Zero element arc length'
         RETURN
     ENDIF
     !
     !---- if no interaction or no spacing is present, go compute it first
-    IF(.NOT.LQUERY .OR. NG.EQ.0) GO TO 100
+    IF (.NOT.LQUERY .OR. NG==0) THEN
+    ENDIF
     !================================================================
     !==== Set surface panel node distribution based on curvature
-    100  CONTINUE
     !
     NG = NPTS
     !
-    IF(NG.LT.2) THEN
-        WRITE(*, *) '? SGCURV: Must specify at least two panel nodes'
+    IF (NG<2) THEN
+        WRITE (*, *) '? SGCURV: Must specify at least two panel nodes'
         RETURN
     ENDIF
     !
@@ -119,7 +131,7 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
     DO IB = 1, NB - 1
         DSB = SB(IB + 1) - SB(IB)
         !
-        IF(DSB.GT.0.0) THEN
+        IF (DSB>0.0) THEN
             KK = KMULT
         ELSE
             KK = 1
@@ -128,7 +140,7 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
         DO K = 1, KK
             FRAC = FLOAT(K) / FLOAT(KK)
             I = I + 1
-            IF(I.GT.IX) STOP 'SGCURV:  Array overflow on IX'
+            IF (I>IX) STOP 'SGCURV:  Array overflow on IX'
             S(I) = SB(IB + 1) * FRAC + SB(IB) * (1.0 - FRAC)
         ENDDO
     ENDDO
@@ -137,7 +149,7 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
     N = I
     !
     STOT = S(N) - S(1)
-    DO 200 IPASS = 1, NPASS
+    DO IPASS = 1, NPASS
         !
         DSAVG = STOT / FLOAT(NG - 1)
         !
@@ -152,7 +164,7 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
         !
         !---- reset curvature at corner nodes from adjacent nodes
         DO I = 2, N - 2
-            IF(S(I) .EQ. S(I + 1)) THEN
+            IF (S(I)==S(I + 1)) THEN
                 CV(I) = 0.5 * (CV(I - 1) + CV(I + 2))
                 CV(I + 1) = CV(I)
             ENDIF
@@ -198,14 +210,14 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
             DSM = S(I) - S(I - 1)
             DSP = S(I + 1) - S(I)
             DSA = 0.5 * (DSM + DSP)
-            IF(DSM.EQ.0.0 .OR. DSP.EQ.0.0) THEN
+            IF (DSM==0.0 .OR. DSP==0.0) THEN
                 BB(I) = 0.0
                 AA(I) = 1.0
                 CC(I) = 0.0
             ELSE
-                BB(I) = - CURVK / (DSM * DSA)
+                BB(I) = -CURVK / (DSM * DSA)
                 AA(I) = CURVK / (DSM * DSA) + CURVK / (DSP * DSA) + 1.0
-                CC(I) = - CURVK / (DSP * DSA)
+                CC(I) = -CURVK / (DSP * DSA)
             ENDIF
         ENDDO
         AA(N) = 1.0
@@ -213,22 +225,21 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
         !
         !---- set artificial curvature at the bunching points
         DO IREF = 1, NREF
-            IF(CRRAT(IREF) .GT. 0.0) THEN
+            IF (CRRAT(IREF)>0.0) THEN
                 CVR(IREF) = CVAVG / MAX(CRRAT(IREF), 0.0001)
             ELSE
                 CVR(IREF) = 0.0
             ENDIF
             !
             DO I = 2, N - 1
-                IF(CRRAT(IREF).GT.0.0) THEN
+                IF (CRRAT(IREF)>0.0) THEN
                     !--------- set modified curvature if point is in refinement area
                     SGI = (S(I) - S(1)) / STOT
-                    IF(SGI.GT.SREF1(IREF) .AND. SGI.LT.SREF2(IREF)) THEN
-                        !c            BB(I) = 0.
-                        !c            AA(I) = 1.0
-                        !c            CC(I) = 0.
-                        CV(I) = CVR(IREF)
-                    ENDIF
+                    !c            BB(I) = 0.
+                    !c            AA(I) = 1.0
+                    !c            CC(I) = 0.
+                    IF (SGI>SREF1(IREF) .AND. SGI<SREF2(IREF)) CV(I)    &
+                            & = CVR(IREF)
                 ENDIF
             ENDDO
         ENDDO
@@ -250,18 +261,18 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
             CVO = MAX(CVO, 1.0)
             !
             CVINT(I) = CVINT(I - 1) + 0.5 * (CVO + CVM) * (SO - SM)
-        END DO
+        ENDDO
         !
         DO I = 1, N
             CVINT(I) = CVINT(I) + S(I)
-        END DO
+        ENDDO
         !
         !---- Calculate normalized surface spacing distribution arrays
         CALL SETCRV(SNEW, NG, S, CVINT, N)
         !
         DO IG = 1, NG
             SG(IG) = (SNEW(IG) - SNEW(1)) / (SNEW(NG) - SNEW(1))
-        END DO
+        ENDDO
         !
         !---- calculate actual obtained grid spacings
         DLE = ABS(SNEW(2) - SNEW(1))
@@ -271,11 +282,11 @@ SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, &
         DO IG = 2, NG
             DSMIN = MIN(DSMIN, ABS(SNEW(IG) - SNEW(IG - 1)))
             DSMAX = MAX(DSMAX, ABS(SNEW(IG) - SNEW(IG - 1)))
-        END DO
+        ENDDO
         !
-    200  CONTINUE
-    RETURN
-END
+    ENDDO
+END SUBROUTINE SGCURV
+!*==SETCRV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 ! SGCURV
 
 
@@ -293,13 +304,31 @@ SUBROUTINE SETCRV(SNEW, NPTS, SB, HH, N)
     !             LFUDGL   T if curvature was augmented al left endpoint
     !             LFUDGT   T if curvature was augmented al left endpoint
     !------------------------------------------------------------------
-    IMPLICIT REAL (A-H, O-Z)
-    DIMENSION SNEW(NPTS), SB(N), HH(N)
+    IMPLICIT NONE
     !
-    PARAMETER (NMAX = 1601)
-    DIMENSION SBP(NMAX)
+    !*** Start of declarations rewritten by SPAG
     !
-    IF(N.GT.NMAX) STOP 'SETCRV: array overflow'
+    ! PARAMETER definitions
+    !
+    INTEGER, PARAMETER :: NMAX = 1601
+    !
+    ! Dummy arguments
+    !
+    INTEGER :: N, NPTS
+    REAL, DIMENSION(N) :: HH, SB
+    REAL, DIMENSION(NPTS) :: SNEW
+    !
+    ! Local variables
+    !
+    REAL :: DH, HHI, RN
+    INTEGER :: I
+    REAL, DIMENSION(NMAX) :: SBP
+    !
+    !*** End of declarations rewritten by SPAG
+    !
+    !
+    !
+    IF (N>NMAX) STOP 'SETCRV: array overflow'
     !
     RN = FLOAT(NPTS - 1)
     !
@@ -324,6 +353,4 @@ SUBROUTINE SETCRV(SNEW, NPTS, SB, HH, N)
     ENDDO
     SNEW(NPTS) = SB(N)
     !
-    RETURN
-END
-! SETCRV
+END SUBROUTINE SETCRV
