@@ -54,8 +54,8 @@ contains
     !     Local alfa output bug fixed for neg rpm and tip gap
     !
     !=========================================================================
-    
-    
+
+
     SUBROUTINE ROTINITTHR(THR)
         use i_dfdc
         IMPLICIT NONE
@@ -111,9 +111,9 @@ contains
     END SUBROUTINE ROTINITTHR
     !*==ROTINITBGAM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTINITTHR
-    
-    
-    
+
+
+
     SUBROUTINE ROTINITBGAM
         use i_dfdc
         IMPLICIT NONE
@@ -207,14 +207,14 @@ contains
     END SUBROUTINE ROTINITBGAM
     !*==ROTINITBLD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTINITBGAM
-    
-    
-    
+
+
+
     SUBROUTINE ROTINITBLD
         use i_dfdc
-        use m_viscvel, only: uvinfl
-        use m_inigrd, only: rotbg2grd, clrgrdflw
-        use m_aero, only: getclcdcm
+        use m_viscvel, only : uvinfl
+        use m_inigrd, only : rotbg2grd, clrgrdflw
+        use m_aero, only : getclcdcm
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -351,11 +351,11 @@ contains
         !
     END SUBROUTINE ROTINITBLD
     !*==SETROTVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SETROTVEL
         use i_dfdc
-        use m_viscvel, only: uvinfl
+        use m_viscvel, only : uvinfl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -445,7 +445,7 @@ contains
     END SUBROUTINE SETROTVEL
     !*==CONVGTH.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
-    
+
     SUBROUTINE UPDROTVEL
         use i_dfdc
         IMPLICIT NONE
@@ -492,8 +492,8 @@ contains
         !
     END SUBROUTINE UPDROTVEL
     !*==VABS2VREL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE VABS2VREL(OMEG, YA, VXA, VRA, VTA, VXR, VRR, VTR, VTR_VTA, &
             & VTR_OMG)
         IMPLICIT NONE
@@ -522,8 +522,8 @@ contains
         !
     END SUBROUTINE VABS2VREL
     !*==ROTORVABS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE ROTORVABS(N, VEL)
         use i_dfdc
         IMPLICIT NONE
@@ -574,11 +574,11 @@ contains
         !
     END SUBROUTINE ROTORVABS
     !*==GETVELABS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE GETVELABS(NF, XF, YF, VEL)
         use i_dfdc
-        use m_qaic, only: qfcalc
+        use m_qaic, only : qfcalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -629,8 +629,8 @@ contains
         !
     END SUBROUTINE GETVELABS
     !*==PRTVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
         use i_dfdc
         IMPLICIT NONE
@@ -775,8 +775,8 @@ contains
         !
     END SUBROUTINE PRTVEL
     !*==SHOWDUCT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SHOWDUCT(LU)
         use i_dfdc
         IMPLICIT NONE
@@ -836,8 +836,8 @@ contains
     END SUBROUTINE SHOWDUCT
     !*==SHOWACTDSK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SHOWDUCT
-    
-    
+
+
     SUBROUTINE SHOWACTDSK(LU)
         use i_dfdc
         IMPLICIT NONE
@@ -881,15 +881,15 @@ contains
         120  FORMAT (/' Current Actuator Disk at Disk', I3, /'  Omega  ', F12.4, &
                 &'    Rpm    ', F11.2, /'  Rhub   ', F12.5, '    Rtip   ', &
                 & F11.5, /'  Aswept ', F12.5)
-    
+
         200  FORMAT ('     r        r/R       B*Gamma')
         210  FORMAT (1X, 7G11.4)
         !
     END SUBROUTINE SHOWACTDSK
     !*==SHOWBLADE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SHOWACTDSK
-    
-    
+
+
     SUBROUTINE SHOWBLADE(LU)
         use i_dfdc
         IMPLICIT NONE
@@ -939,12 +939,12 @@ contains
         200  FORMAT ('     r         r/R        Ch      Beta(deg)   Solidity')
         210  FORMAT (1X, 7G11.4)
         !
-    
+
     END SUBROUTINE SHOWBLADE
     !*==SHOWDRAGOBJ.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SHOWBLADE
-    
-    
+
+
     SUBROUTINE SHOWDRAGOBJ(ND, LU)
         use i_dfdc
         IMPLICIT NONE
@@ -1003,11 +1003,11 @@ contains
     END SUBROUTINE SHOWDRAGOBJ
     !*==SETDRGOBJSRC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SHOWDRAGOBJ
-    
-    
+
+
     SUBROUTINE SETDRGOBJSRC
         use i_dfdc
-        use m_spline, only: segspl, seval
+        use m_spline, only : segspl, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1094,9 +1094,9 @@ contains
     END SUBROUTINE SETDRGOBJSRC
     !*==SETROTORSRC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETDRGOBJSRC
-    
-    
-    
+
+
+
     SUBROUTINE SETROTORSRC
         use i_dfdc
         IMPLICIT NONE
@@ -1164,9 +1164,9 @@ contains
     END SUBROUTINE SETROTORSRC
     !*==VMAVGINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETROTORSRC
-    
-    
-    
+
+
+
     SUBROUTINE VMAVGINIT(VAXIAL)
         use i_dfdc
         IMPLICIT NONE
@@ -1259,8 +1259,8 @@ contains
     END SUBROUTINE VMAVGINIT
     !*==VMAVGCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! VMAVGINIT
-    
-    
+
+
     SUBROUTINE VMAVGCALC
         use i_dfdc
         IMPLICIT NONE
@@ -1370,7 +1370,7 @@ contains
         !      VMAVG(IPB) = VMAV
         !      VMAVG(IPW) = VMAV
         !
-    
+
         IF (LDBG) THEN
             WRITE (LUNDBG, *) 'At end of VMAVGCALC'
             DO IEL = 1, NEL
@@ -1395,10 +1395,10 @@ contains
     END SUBROUTINE VMAVGCALC
     !*==GTHCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! VMAVGCALC
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE GTHCALC(GAMTH)
         use i_dfdc
         IMPLICIT NONE
@@ -1582,14 +1582,14 @@ contains
     END SUBROUTINE GTHCALC
     !*==TQCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GTHCALC
-    
-    
-    
-    
-    
+
+
+
+
+
     SUBROUTINE TQCALC(ITYPE)
         use i_dfdc
-        use m_aero, only: getclcdcm, getalf
+        use m_aero, only : getclcdcm, getalf
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2045,13 +2045,13 @@ contains
     END SUBROUTINE TQCALC
     !*==WCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! TQCALC
-    
-    
+
+
     SUBROUTINE WCALC(N, I, VAIN, VTIN, VTT, VAA, CI, CI_OMG, CI_VT, SI, SI_QNF, &
             & SI_VA, W, W_OMG, W_QNF, W_VT, W_VA, PHIB, P_OMG, P_QNF, &
             & P_VT, P_VA)
         use i_dfdc
-        use m_viscvel, only: uvinfl
+        use m_viscvel, only : uvinfl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2124,11 +2124,11 @@ contains
     END SUBROUTINE WCALC
     !*==ROTRPRT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WCALC
-    
-    
+
+
     SUBROUTINE ROTRPRT(LU)
         use i_dfdc
-        use m_spline, only: spline, seval
+        use m_spline, only : spline, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2526,10 +2526,10 @@ contains
     END SUBROUTINE ROTRPRT
     !*==NFCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTRPRT
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE NFCALC
         use i_dfdc
         IMPLICIT NONE
@@ -2606,13 +2606,13 @@ contains
     END SUBROUTINE NFCALC
     !*==FFCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! NFCALC
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE FFCALC
         use i_dfdc
-        use m_vels, only: getuv
+        use m_vels, only : getuv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2685,8 +2685,8 @@ contains
         !
     END SUBROUTINE FFCALC
     !*==STGFIND.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE STGFIND
         use i_dfdc
         IMPLICIT NONE

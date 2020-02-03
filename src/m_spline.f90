@@ -60,8 +60,8 @@ contains
     !      CALL SEVALL(SS,X,XS,S,N, XX,XXS,XXSS)
     !
     !
-    
-    
+
+
     SUBROUTINE SPLINE(X, XS, S, N)
         IMPLICIT NONE
         !
@@ -137,9 +137,9 @@ contains
     END SUBROUTINE SPLINE
     !*==SPLIND.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SPLINE
-    
-    
-    
+
+
+
     SUBROUTINE SPLIND(X, XS, S, N, XS1, XS2)
         IMPLICIT NONE
         !
@@ -245,8 +245,8 @@ contains
     END SUBROUTINE SPLIND
     !*==SPLINA.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SPLIND
-    
-    
+
+
     SUBROUTINE SPLINA(X, XS, S, N)
         IMPLICIT NONE
         !
@@ -311,8 +311,8 @@ contains
     END SUBROUTINE SPLINA
     !*==TRISOL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SPLINA
-    
-    
+
+
     SUBROUTINE TRISOL(A, B, C, D, KK)
         IMPLICIT NONE
         !
@@ -359,8 +359,8 @@ contains
     END SUBROUTINE TRISOL
     !*==GEVAL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! TRISOL
-    
-    
+
+
     REAL FUNCTION GEVAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
@@ -427,8 +427,8 @@ contains
     END FUNCTION GEVAL
     !*==SEVAL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GEVAL
-    
-    
+
+
     REAL FUNCTION SEVAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
@@ -477,8 +477,8 @@ contains
     END FUNCTION SEVAL
     !*==DEVAL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SEVAL
-    
-    
+
+
     REAL FUNCTION DEVAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
@@ -528,8 +528,8 @@ contains
     END FUNCTION DEVAL
     !*==D2VAL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DEVAL
-    
-    
+
+
     REAL FUNCTION D2VAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
@@ -579,8 +579,8 @@ contains
     END FUNCTION D2VAL
     !*==SEVALL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! D2VAL
-    
-    
+
+
     SUBROUTINE SEVALL(SS, X, XS, S, N, XX, XXS, XXSS)
         IMPLICIT NONE
         !
@@ -642,9 +642,9 @@ contains
     END SUBROUTINE SEVALL
     !*==SEVLIN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SEVALL
-    
-    
-    
+
+
+
     SUBROUTINE SEVLIN(SS, X, S, N, XX, XXS)
         IMPLICIT NONE
         !
@@ -695,9 +695,9 @@ contains
     END SUBROUTINE SEVLIN
     !*==CURV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SEVLIN
-    
-    
-    
+
+
+
     REAL FUNCTION CURV(SS, X, XS, Y, YS, S, N)
         IMPLICIT NONE
         !
@@ -768,8 +768,8 @@ contains
     END FUNCTION CURV
     !*==CURVS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CURV
-    
-    
+
+
     REAL FUNCTION CURVS(SS, X, XS, Y, YS, S, N)
         IMPLICIT NONE
         !
@@ -832,7 +832,7 @@ contains
         YDD = (6.0 * T - 4.0) * CY1 + (6.0 * T - 2.0) * CY2
         YDDD = 6.0 * CY1 + 6.0 * CY2
         !
-    
+
         F1 = DS * XS(I - 1)
         F2 = -DS * (2.0 * XS(I - 1) + XS(I)) + 3.0 * (X(I) - X(I - 1))
         F3 = DS * (XS(I - 1) + XS(I)) - 2.0 * (X(I) - X(I - 1))
@@ -862,8 +862,8 @@ contains
     END FUNCTION CURVS
     !*==SINVRT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CURVS
-    
-    
+
+
     SUBROUTINE SINVRT(SI, XI, X, XS, S, N)
         IMPLICIT NONE
         !
@@ -908,8 +908,8 @@ contains
     END SUBROUTINE SINVRT
     !*==SCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SINVRT
-    
-    
+
+
     SUBROUTINE SCALC(X, Y, S, N)
         IMPLICIT NONE
         !
@@ -939,8 +939,8 @@ contains
     END SUBROUTINE SCALC
     !*==SEGSPL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SCALC
-    
-    
+
+
     SUBROUTINE SEGSPL(X, XS, S, N)
         IMPLICIT NONE
         !
@@ -990,8 +990,8 @@ contains
     END SUBROUTINE SEGSPL
     !*==SEGSPD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SEGSPL
-    
-    
+
+
     SUBROUTINE SEGSPD(X, XS, S, N, XS1, XS2)
         IMPLICIT NONE
         !
@@ -1038,9 +1038,9 @@ contains
     END SUBROUTINE SEGSPD
     !*==INTERS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SEGSPD
-    
-    
-    
+
+
+
     SUBROUTINE INTERS(OK, SS1, SS2, X1, XS1, Y1, YS1, S1, N1, X2, XS2, Y2, YS2, S2, &
             & N2)
         IMPLICIT NONE

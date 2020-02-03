@@ -2,12 +2,12 @@ module m_pnsubs
     implicit none
 contains
     !*==PANDEF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -37,7 +37,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE PANDEF(IELDEF)
         use i_dfdc
         IMPLICIT NONE
@@ -134,12 +134,12 @@ contains
     END SUBROUTINE PANDEF
     !*==PANCOP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANDEF
-    
-    
+
+
     SUBROUTINE PANCOP
         use i_dfdc
-        use m_geom, only: itpset, xypspl
-        use m_geutil, only: minmax
+        use m_geom, only : itpset, xypspl
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -226,13 +226,13 @@ contains
     END SUBROUTINE PANCOP
     !*==PANGEN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANCOP
-    
+
     SUBROUTINE PANGEN(LQUERY)
         use i_dfdc
-        use m_geom, only: itpset, xypspl
-        use m_spline, only: seval
-        use m_sgutil, only: sgcurv
-        use m_geutil, only: minmax
+        use m_geom, only : itpset, xypspl
+        use m_spline, only : seval
+        use m_sgutil, only : sgcurv
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -382,7 +382,7 @@ contains
             !------ centroid location
             XPCENT(IEL) = XBCEN2DT(IEL)
             YPCENT(IEL) = YBCEN2DT(IEL)
-    
+
             !------ spline and set other stuff for element IEL
             CALL XYPSPL(IEL)
             !
@@ -428,9 +428,9 @@ contains
     END SUBROUTINE PANGEN
     !*==PANWRT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANGEN
-    
-    
-    
+
+
+
     SUBROUTINE PANWRT
         use i_dfdc
         IMPLICIT NONE
@@ -483,12 +483,12 @@ contains
     END SUBROUTINE PANWRT
     !*==PANGET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANWRT
-    
-    
-    
+
+
+
     SUBROUTINE PANGET(FNAME, ERROR)
         use i_dfdc
-        use m_userio, only: asks, strip
+        use m_userio, only : asks, strip
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

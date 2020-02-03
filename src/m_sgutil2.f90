@@ -32,7 +32,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     INTEGER FUNCTION ISGFIND(SS, S, N)
         IMPLICIT NONE
         !
@@ -75,8 +75,8 @@ contains
         !
     END FUNCTION ISGFIND
     !*==SGCOPY.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGCOPY(S1, S2, N)
         !---- Copy N elements from S1 to S2
         IMPLICIT NONE
@@ -101,11 +101,11 @@ contains
         !
     END SUBROUTINE SGCOPY
     !*==SGCOPF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGCOPF(S1, S2, N, SOFF1, SWT1, SOFF2, SWT2, FOFF, F1, FX1, X1, N1, &
             & F2, FX2, X2, N2)
-        use m_spline, only: seval, deval
+        use m_spline, only : seval, deval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -149,8 +149,8 @@ contains
         !
     END SUBROUTINE SGCOPF
     !*==SGAVG.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGAVG(S1, S2, N, C1)
         IMPLICIT NONE
         !
@@ -181,8 +181,8 @@ contains
         !
     END SUBROUTINE SGAVG
     !*==SGAVG1.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGAVG1(S1, S2, N)
         IMPLICIT NONE
         !
@@ -210,8 +210,8 @@ contains
         !
     END SUBROUTINE SGAVG1
     !*==SGAVG2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGAVG2(S1, S2, N)
         IMPLICIT NONE
         !
@@ -239,8 +239,8 @@ contains
         !
     END SUBROUTINE SGAVG2
     !*==SGSHFT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGSHFT(SBEG, SEND, SOLD, SNEW, S1, S2, N)
         !
         !---- Shift S1 values between limits SBEG and SEND such that
@@ -303,8 +303,8 @@ contains
         !
     END SUBROUTINE SGSHFT
     !*==SGRENUM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SGRENUM(S, N1, N2)
         IMPLICIT NONE
         !

@@ -32,12 +32,12 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
-    
+
+
     SUBROUTINE INIGRD
         use i_dfdc
-        use m_userio, only: askr
-        use m_xutils, only: setexp
+        use m_userio, only : askr
+        use m_xutils, only : setexp
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -280,8 +280,8 @@ contains
     END SUBROUTINE INIGRD
     !*==UPDGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! INIGRD
-    
-    
+
+
     SUBROUTINE UPDGRD
         use i_dfdc
         IMPLICIT NONE
@@ -341,10 +341,10 @@ contains
     END SUBROUTINE UPDGRD
     !*==RLXGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! UPDGRD
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE RLXGRD
         use i_dfdc
         IMPLICIT NONE
@@ -392,14 +392,14 @@ contains
     END SUBROUTINE RLXGRD
     !*==SETGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! RLXGRD
-    
+
     !     &  XG(IX,JX),    YG(IX,JX),
     !     &  QG(IX,JX),    QXG(IX,JX),   QYG(IX,JX),  QTG(IX,JX),
     !     &  RG(IX,JX),    PG(IX,JX),    POG(IX,JX),
     !     &  BGAMG(IX,JX), DSG(IX,JX),   DHG(IX,JX),
     !     &  XPOS(IX),     YPOS(JX)
-    
-    
+
+
     SUBROUTINE SETGRDFLW
         use i_dfdc
         IMPLICIT NONE
@@ -424,7 +424,7 @@ contains
         !
         !---- Set B*GAM circulation, delta entropy, and delta enthalpy on gridC
         !     from rotor and drag sources
-    
+
         DO N = 1, NROTOR
             !
             IEL = IELROTOR(N)
@@ -467,8 +467,8 @@ contains
     END SUBROUTINE SETGRDFLW
     !*==CLRGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETGRDFLW
-    
-    
+
+
     SUBROUTINE CLRGRDFLW
         use i_dfdc
         IMPLICIT NONE
@@ -500,8 +500,8 @@ contains
     END SUBROUTINE CLRGRDFLW
     !*==ROTBG2GRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CLRGRDFLW
-    
-    
+
+
     SUBROUTINE ROTBG2GRD(N)
         use i_dfdc
         IMPLICIT NONE
@@ -545,12 +545,12 @@ contains
     END SUBROUTINE ROTBG2GRD
     !*==GETGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTBG2GRD
-    
-    
-    
+
+
+
     SUBROUTINE GETGRDFLW
         use i_dfdc
-        use m_grdutils, only: uvgrdc
+        use m_grdutils, only : uvgrdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -594,9 +594,9 @@ contains
     END SUBROUTINE GETGRDFLW
     !*==INLSFCN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GETGRDFLW
-    
-    
-    
+
+
+
     SUBROUTINE INLSFCN
         use i_dfdc
         IMPLICIT NONE
@@ -632,8 +632,8 @@ contains
     END SUBROUTINE INLSFCN
     !*==RLXGRD2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! INLSFCN
-    
-    
+
+
     SUBROUTINE RLXGRD2
         use i_dfdc
         IMPLICIT NONE
@@ -677,11 +677,11 @@ contains
     END SUBROUTINE RLXGRD2
     !*==AXELL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! RLXGRD2
-    
-    
+
+
     SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, KBCINL, &
             & KBCOUT, KBCBOT, KBCTOP)
-        use m_spline, only: deval, spline, seval, scalc
+        use m_spline, only : deval, spline, seval, scalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1024,7 +1024,7 @@ contains
                     X(IO, JO) = X(IO, JO) + DS * XSN
                     Y(IO, JO) = Y(IO, JO) + DS * YSN
                 ENDIF
-    
+
                 !-------- relax all points on this streamline by SLOR
                 DO IO = 2, II - 1
                     IM = IO - 1
@@ -1099,7 +1099,7 @@ contains
                     !     &                  + (XOO - XMO)/DXIM )
                     !            DYDXI = 0.5*( (YPO - YOO)/DXIP
                     !     &                  + (YOO - YMO)/DXIM )
-    
+
                     !
                     DXDET = 0.5 * (XOP - XOM) / DETAV
                     DYDET = 0.5 * (YOP - YOM) / DETAV
@@ -1119,8 +1119,8 @@ contains
                     GAM = DXDXI**2 + DYDXI**2
                     BET = DXDET * DXDXI + DYDET * DYDXI
                     AJA = DYDET * DXDXI - DXDET * DYDXI
-    
-    
+
+
                     !----------------
                     !
                     !            CXIM = 1.0/(DXIM*DXIAV)

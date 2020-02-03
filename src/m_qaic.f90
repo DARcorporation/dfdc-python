@@ -32,7 +32,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE QAIC(LXYJAC)
         use i_dfdc
         IMPLICIT NONE
@@ -72,12 +72,12 @@ contains
     END SUBROUTINE QAIC
     !*==QAIC1.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QAIC
-    
-    
-    
+
+
+
     SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
         use i_dfdc
-        use m_aic, only: pntaic, axlaic, panaic, panaicd, linaic
+        use m_aic, only : pntaic, axlaic, panaic, panaicd, linaic
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -433,9 +433,9 @@ contains
     END SUBROUTINE QAIC1
     !*==TPANSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QAIC1
-    
-    
-    
+
+
+
     SUBROUTINE TPANSET(IPTE1, IPTE2, GAM, SIG, XP, YP, XPT, XPT_XP, YPT, &
             & YPT_YP, GAMT, GAMT_GAM, GAMT_SIG, GAMT_XP, GAMT_YP, &
             & GAMT_DX, GAMT_DY, SIGT, SIGT_GAM, SIGT_SIG, SIGT_XP, &
@@ -633,12 +633,12 @@ contains
     END SUBROUTINE TPANSET
     !*==QFCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! TPANSET
-    
-    
+
+
     SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, &
             & QF_GTH)
         use i_dfdc
-        use m_aic, only: axlaic, linaic, panaic, pntaic
+        use m_aic, only : axlaic, linaic, panaic, pntaic
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -766,7 +766,7 @@ contains
                 !
             ENDIF
         ENDDO
-    
+
         !
         !---- Add contribution of all TE panels
         DO IEL = 1, NEL
@@ -839,7 +839,7 @@ contains
                     !c            QF(2,IF) = QF(2,IF) + QF_GTH(2,IP,IF)*GTH(IP)
                 ENDDO
             ENDIF
-    
+
         ENDDO
         !
         !---- Add freestream

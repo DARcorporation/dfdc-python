@@ -32,7 +32,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE MINMAX(N, X, XMIN, XMAX)
         IMPLICIT NONE
         !
@@ -64,10 +64,10 @@ contains
         !
     END SUBROUTINE MINMAX
     !*==NCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE NCALC(X, Y, S, N, XN, YN)
-        use m_spline, only: segspl
+        use m_spline, only : segspl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -116,10 +116,10 @@ contains
         !
     END SUBROUTINE NCALC
     !*==LEFIND.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE LEFIND(SLE, X, XP, Y, YP, S, N)
-        use m_spline, only: d2val, seval, deval
+        use m_spline, only : d2val, seval, deval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -207,10 +207,10 @@ contains
         SLE = S(I)
     END SUBROUTINE LEFIND
     !*==CNORM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE CNORM(X, XP, Y, YP, S, N, XTRAN, YTRAN, SCALE, ANGLE)
-        use m_spline, only: seval
+        use m_spline, only : seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -267,13 +267,13 @@ contains
     END SUBROUTINE CNORM
     !*==GEOPAR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CNORM
-    
-    
+
+
     SUBROUTINE GEOPAR(X, XP, Y, YP, S, N, T, SLE, CHORD, RADLE, ANGTE, AREA, &
             & EIXXA, EIYYA, EIXYA, ASKN, EIXXT, EIYYT, EIXYT, THICK, &
             & CAMBR, VOLM, VSKN, ASRF, RGXV, RGYV)
-        use m_spline, only: seval, curv
-        use m_xutils, only: atanc
+        use m_spline, only : seval, curv
+        use m_xutils, only : atanc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -337,8 +337,8 @@ contains
         !
     END SUBROUTINE GEOPAR
     !*==AXCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE AXCALC(N, X, Y, T, ITYPE, VOLM, AREA, XCEN, YCEN, RGX, RGY)
         IMPLICIT NONE
         !
@@ -429,7 +429,7 @@ contains
             !---- surface area
             DA = 2.0 * PI * YA * DS
             AINT = AINT + DA
-    
+
             IF (ITYPE==0) THEN
                 !-------- treat as a axisymmetric solid body (YCEN=0,intXY=0)
                 DV = PI * DX * YA**2
@@ -474,9 +474,9 @@ contains
     END SUBROUTINE AXCALC
     !*==AECALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! AXCALC
-    
-    
-    
+
+
+
     SUBROUTINE AECALC(N, X, Y, T, ITYPE, PERIM, AREA, XCEN, YCEN, EIXX, EIYY, &
             & EIXY)
         IMPLICIT NONE
@@ -551,7 +551,7 @@ contains
             !
             DS = SQRT(DX * DX + DY * DY)
             SINT = SINT + DS
-    
+
             IF (ITYPE==0) THEN
                 !-------- integrate over airfoil cross-section
                 DA = YA * DX
@@ -599,9 +599,9 @@ contains
     END SUBROUTINE AECALC
     !*==PRAXIS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! AECALC
-    
-    
-    
+
+
+
     SUBROUTINE PRAXIS(FXX, FYY, FXY, F11, F22, AP1, AP2)
         IMPLICIT NONE
         !
@@ -655,20 +655,20 @@ contains
                 AP2 = ATAN2(S2, C2)
                 AP1 = AP2 - 0.5 * PI
             ENDIF
-    
+
             IF (AP1<-0.5 * PI) AP1 = AP1 + PI
             IF (AP1>+0.5 * PI) AP1 = AP1 - PI
             IF (AP2<-0.5 * PI) AP2 = AP2 + PI
             IF (AP2>+0.5 * PI) AP2 = AP2 - PI
             !
         ENDIF
-    
+
     END SUBROUTINE PRAXIS
     !*==TEGAP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE TEGAP(X, XS, Y, YS, S, N, DOC, GAPNEW)
-        use m_spline, only: scalc, seval, segspl
+        use m_spline, only : scalc, seval, segspl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -744,12 +744,12 @@ contains
     END SUBROUTINE TEGAP
     !*==TCSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! TEGAP
-    
-    
-    
+
+
+
     SUBROUTINE TCSET(X, XP, Y, YP, S, N, TMAX, CMAX, TFAC, CFAC, XNEW, YNEW, &
             & LNEWSET)
-        use m_spline, only: deval, seval
+        use m_spline, only : deval, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -863,10 +863,10 @@ contains
         !
     END SUBROUTINE TCSET
     !*==YSYM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE YSYM(X, XP, Y, YP, S, NX, N, ISIDE, XNEW, YNEW, NNEW)
-        use m_spline, only: seval
+        use m_spline, only : seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -961,10 +961,10 @@ contains
     END SUBROUTINE YSYM
     !*==LERSCL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! YSYM
-    
-    
+
+
     SUBROUTINE LERSCL(X, XP, Y, YP, S, N, DOC, RFAC, XNEW, YNEW)
-        use m_spline, only: deval, seval
+        use m_spline, only : deval, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1059,11 +1059,11 @@ contains
         !
     END SUBROUTINE LERSCL
     !*==FLAP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE FLAP(X, XS, Y, YS, S, N, XF, YF, ADEF, INSID, XNEW, YNEW, NNEW, &
             & TOPS, ATOP, XTOP, YTOP, BOTS, ABOT, XBOT, YBOT)
-        use m_spline, only: deval, seval
+        use m_spline, only : deval, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1356,9 +1356,9 @@ contains
     END SUBROUTINE FLAP
     !*==INSIDE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! FLAP
-    
-    
-    
+
+
+
     FUNCTION INSIDE(X, Y, N, XF, YF)
         IMPLICIT NONE
         !
@@ -1401,11 +1401,11 @@ contains
         !
     END FUNCTION INSIDE
     !*==GETXYF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE GETXYF(X, XP, Y, YP, S, N, TOPS, BOTS, XF, YF)
-        use m_spline, only: seval, sinvrt
-        use m_userio, only: askr
+        use m_spline, only : seval, sinvrt
+        use m_userio, only : askr
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1457,7 +1457,7 @@ contains
     END SUBROUTINE GETXYF
     !*==SSS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     !
-    
+
     !      IF(LGPARM) THEN
     !        CALL NEWPEN(3)
     !        CALL GPARPL(XL0,YL0,0.9*CH,.TRUE.,
@@ -1474,13 +1474,13 @@ contains
     !C
     !      RETURN
     !      END
-    
-    
-    
-    
-    
+
+
+
+
+
     SUBROUTINE SSS(SS, S1, S2, DEL, XBF, YBF, X, XP, Y, YP, S, N, ISIDE)
-        use m_spline, only: d2val, seval, deval
+        use m_spline, only : d2val, seval, deval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1645,10 +1645,10 @@ contains
         !
     END SUBROUTINE SSS
     !*==CLIS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE CLIS(X, XP, Y, YP, S, N)
-        use m_spline, only: curv
+        use m_spline, only : curv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1694,8 +1694,8 @@ contains
     END SUBROUTINE CLIS
     !*==CANG.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CLIS
-    
-    
+
+
     SUBROUTINE CANG(X, Y, N, LPRINT)
         IMPLICIT NONE
         !

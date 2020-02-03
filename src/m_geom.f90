@@ -32,11 +32,11 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE XYPSPL(IEL)
         use i_dfdc
-        use m_spline, only: scalc, seval, segspl
-        use m_geutil, only: lefind
+        use m_spline, only : scalc, seval, segspl
+        use m_geutil, only : lefind
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -130,10 +130,10 @@ contains
     END SUBROUTINE XYPSPL
     !*==CVPGEN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XYPSPL
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE CVPGEN
         use i_dfdc
         IMPLICIT NONE
@@ -245,9 +245,9 @@ contains
     END SUBROUTINE CVPGEN
     !*==XYCSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CVPGEN
-    
-    
-    
+
+
+
     SUBROUTINE XYCSET(IEL)
         use i_dfdc
         IMPLICIT NONE
@@ -350,9 +350,9 @@ contains
     END SUBROUTINE XYCSET
     !*==ANPSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XYCSET
-    
-    
-    
+
+
+
     SUBROUTINE ANPSET(IEL)
         use i_dfdc
         IMPLICIT NONE
@@ -474,8 +474,8 @@ contains
     END SUBROUTINE ANPSET
     !*==ITPSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ANPSET
-    
-    
+
+
     SUBROUTINE ITPSET(IEL)
         use i_dfdc
         IMPLICIT NONE

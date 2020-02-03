@@ -2,10 +2,10 @@ module m_vels
     implicit none
 contains
     !*==QCPFOR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
-    
-    
+
+
+
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -35,12 +35,12 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
-    
+
+
     SUBROUTINE QCPFOR
         use i_dfdc
-        use m_forces, only: cpcalc, fcoeff
-        use m_system, only: qcsum
+        use m_forces, only : cpcalc, fcoeff
+        use m_system, only : qcsum
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -265,7 +265,7 @@ contains
                     !          CY(0) = CY(0) + CYTE
                     !          CM(0) = CM(0) + CMTE
                     !          CD(0) = CD(0) + CXTE
-    
+
                     !------- also set sensitivities due to freestream
                     IU = IUQINF
                     IF (LUSET(IU)) THEN
@@ -302,9 +302,9 @@ contains
     END SUBROUTINE QCPFOR
     !*==QQCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCPFOR
-    
-    
-    
+
+
+
     SUBROUTINE QQCALC(N, AN, IPO, IPP, GAM, SIG, GTH, Q, QL, QR)
         IMPLICIT NONE
         !
@@ -351,9 +351,9 @@ contains
     END SUBROUTINE QQCALC
     !*==QTCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QQCALC
-    
-    
-    
+
+
+
     SUBROUTINE QTCALC(N, AN, IPO, IPP, GAM, GTH, Q, QT)
         IMPLICIT NONE
         !
@@ -400,9 +400,9 @@ contains
     END SUBROUTINE QTCALC
     !*==QJAC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QTCALC
-    
-    
-    
+
+
+
     SUBROUTINE QJAC(DX, DY, DU, DV, QJ, QJ_DX, QJ_DY, QJ_DU, QJ_DV)
         IMPLICIT NONE
         !
@@ -462,8 +462,8 @@ contains
     END SUBROUTINE QJAC
     !*==QCURV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QJAC
-    
-    
+
+
     SUBROUTINE QCURV(U, V, QJ, CRV, CRV_U, CRV_V, CRV_QJ)
         IMPLICIT NONE
         !
@@ -526,9 +526,9 @@ contains
     END SUBROUTINE QCURV
     !*==CV2SET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCURV
-    
-    
-    
+
+
+
     SUBROUTINE CV2SET(ICM, ICO, QC, XC, YC, ANC, GAMC, SIGC, CV, CV_QC, CV_RC, &
             & CV_ANC, CV_GAMC, CV_SIGC)
         IMPLICIT NONE
@@ -620,8 +620,8 @@ contains
     END SUBROUTINE CV2SET
     !*==CV3SET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CV2SET
-    
-    
+
+
     SUBROUTINE CV3SET(ICM, ICO, ICP, QC, XC, YC, ANC, ANSGN, GAMC, SIGC, CV, &
             & CV_QC, CV_RC, CV_ANC, CV_GAMC, CV_SIGC)
         IMPLICIT NONE
@@ -734,11 +734,11 @@ contains
     END SUBROUTINE CV3SET
     !*==GETUV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CV3SET
-    
-    
+
+
     SUBROUTINE GETUV(XX, YY, US, VS)
         use i_dfdc
-        use m_qaic, only: qfcalc
+        use m_qaic, only : qfcalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

@@ -2,13 +2,13 @@ module m_viscvel
     implicit none
 contains
     !*==GETVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
-    
+
+
+
     SUBROUTINE GETVEL(FNAME1)
         use i_dfdc
-        use m_spline, only: spline
-        use m_userio, only: asks, askr
+        use m_spline, only : spline
+        use m_userio, only : asks, askr
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -76,7 +76,7 @@ contains
         !
         95   WRITE (*, *) 'File read error'
         96   WRITE (*, *) 'New wake velocities not read'
-    
+
         !....................................................
         1200 FORMAT (/' External slipstream velocity profiles:'/               &
                 &'      r (m)     Vaxi (m/s)  Vrot (m/s)')
@@ -84,11 +84,11 @@ contains
         1250 FORMAT (1X, 3F12.5)
     END SUBROUTINE GETVEL
     !*==SAVVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SAVVEL(FNAME1)
         use i_dfdc
-        use m_userio, only: asks
+        use m_userio, only : asks
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -150,11 +150,11 @@ contains
         WRITE (*, *) 'Velocities not saved.'
     END SUBROUTINE SAVVEL
     !*==UVINFL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE UVINFL(RR, WWA, WWT)
         use i_dfdc
-        use m_spline, only: seval
+        use m_spline, only : seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

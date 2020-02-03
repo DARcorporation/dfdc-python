@@ -1,6 +1,6 @@
 PROGRAM dfdc_test
     USE api
-    USE m_userio, only: asks
+    USE m_userio, only : asks
     IMPLICIT NONE
     CHARACTER(128) :: FNAME
     CALL init

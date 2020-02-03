@@ -32,7 +32,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE LAMP(X1, R1, X2, R2, XF, RF, UG1, VG1, UG2, VG2, US1, VS1, US2, VS2)
         IMPLICIT NONE
         !
@@ -217,7 +217,7 @@ contains
                 !
                 ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
                         & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
-    
+
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
                 !     &     ABS(ERRVG1),
@@ -228,13 +228,13 @@ contains
                 !     &     ABS(ERRUS2),
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
-    
+
                 IF (ERR * REFL<ROMTOL) GOTO 101
             ENDIF
         ENDDO
         WRITE (*, *) 'LAMP: Romberg convergence failed.  Error =', ERR
         !
-    
+
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
@@ -253,9 +253,9 @@ contains
     END SUBROUTINE LAMP
     !*==LAMPC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LAMP
-    
-    
-    
+
+
+
     SUBROUTINE LAMPC(X1, R1, X2, R2, UG1, VG1, UG2, VG2, US1, VS1, US2, VS2)
         IMPLICIT NONE
         !
@@ -422,9 +422,9 @@ contains
     END SUBROUTINE LAMPC
     !*==GLAMP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LAMPC
-    
-    
-    
+
+
+
     SUBROUTINE GLAMP(R1, R2, RF, QG1, QG1_RF, QG2, QG2_RF, QS1, QS1_RF, QS2, &
             & QS2_RF)
         IMPLICIT NONE
@@ -562,7 +562,7 @@ contains
                 !
                 ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
                         & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
-    
+
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
                 !     &     ABS(ERRVG1),
@@ -573,13 +573,13 @@ contains
                 !     &     ABS(ERRUS2),
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
-    
+
                 IF (ERR * REFL<ROMTOL) GOTO 101
             ENDIF
         ENDDO
         WRITE (*, *) 'GLAMP: Romberg convergence failed.  Error =', ERR
         !
-    
+
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
@@ -602,8 +602,8 @@ contains
     END SUBROUTINE GLAMP
     !*==GLAMPC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GLAMP
-    
-    
+
+
     SUBROUTINE GLAMPC(R1, R2, QG1, QG1_RF, QG2, QG2_RF, QS1, QS1_RF, QS2, &
             & QS2_RF)
         IMPLICIT NONE
@@ -780,7 +780,7 @@ contains
                 !
                 ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
                         & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
-    
+
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
                 !     &     ABS(ERRVG1),
@@ -791,13 +791,13 @@ contains
                 !     &     ABS(ERRUS2),
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
-    
+
                 IF (ERR * REFL<ROMTOL) GOTO 101
             ENDIF
         ENDDO
         WRITE (*, *) 'GLAMPC: Romberg convergence failed.  Error =', ERR
         !
-    
+
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
@@ -837,9 +837,9 @@ contains
     END SUBROUTINE GLAMPC
     !*==DLAMP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GLAMPC
-    
-    
-    
+
+
+
     SUBROUTINE DLAMP(R1, R2, RF, QG1, QG1_R1, QG1_R2, QG1_RF, QG2, QG2_R1, &
             & QG2_R2, QG2_RF, QS1, QS1_R1, QS1_R2, QS1_RF, QS2, &
             & QS2_R1, QS2_R2, QS2_RF)
@@ -1026,7 +1026,7 @@ contains
                 !
                 ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
                         & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
-    
+
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
                 !     &     ABS(ERRVG1),
@@ -1037,13 +1037,13 @@ contains
                 !     &     ABS(ERRUS2),
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
-    
+
                 IF (ERR * REFL<ROMTOL) GOTO 101
             ENDIF
         ENDDO
         WRITE (*, *) 'DLAMP: Romberg convergence failed.  Error =', ERR
         !
-    
+
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
@@ -1080,9 +1080,9 @@ contains
     END SUBROUTINE DLAMP
     !*==DLAMPC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DLAMP
-    
-    
-    
+
+
+
     SUBROUTINE DLAMPC(R1, R2, QG1, QG1_R1, QG1_R2, QG2, QG2_R1, QG2_R2, QS1, &
             & QS1_R1, QS1_R2, QS2, QS2_R1, QS2_R2)
         IMPLICIT NONE
@@ -1325,7 +1325,7 @@ contains
                 !
                 ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
                         & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
-    
+
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
                 !     &     ABS(ERRVG1),
@@ -1336,13 +1336,13 @@ contains
                 !     &     ABS(ERRUS2),
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
-    
+
                 IF (ERR * REFL<ROMTOL) GOTO 101
             ENDIF
         ENDDO
         WRITE (*, *) 'DLAMPC: Romberg convergence failed.  Error =', ERR
         !
-    
+
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
@@ -1418,10 +1418,10 @@ contains
     END SUBROUTINE DLAMPC
     !*==RING.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DLAMPC
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE RING(XV, RV, XF, RF, UX, UR, SX, SR)
         IMPLICIT NONE
         !
@@ -1509,8 +1509,8 @@ contains
         !
     END SUBROUTINE RING
     !*==DRING.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE DRING(XV, RV, XF, RF, UX, UX_XV, UX_RV, UX_XF, UX_RF, UR, UR_XV, &
             & UR_RV, UR_XF, UR_RF, SX, SX_XV, SX_RV, SX_XF, SX_RF, SR, &
             & SR_XV, SR_RV, SR_XF, SR_RF)
@@ -1674,8 +1674,8 @@ contains
         !
     END SUBROUTINE DRING
     !*==ELLEK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE ELLEK(AK, ELE, ELK)
         IMPLICIT NONE
         !
@@ -1721,8 +1721,8 @@ contains
         !
     END SUBROUTINE ELLEK
     !*==DELLEK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE DELLEK(AK, ELE, ELE_AK, ELK, ELK_AK)
         IMPLICIT NONE
         !

@@ -66,7 +66,7 @@ contains
     END SUBROUTINE ASKI1
     !*==ASKR1.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKI
-    
+
     SUBROUTINE ASKR1(PROMPT, RINPUT)
         IMPLICIT NONE
         !
@@ -98,8 +98,8 @@ contains
     END SUBROUTINE ASKR1
     !*==ASKI.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKR
-    
-    
+
+
     SUBROUTINE ASKI(PROMPT, IINPUT)
         IMPLICIT NONE
         !
@@ -138,8 +138,8 @@ contains
     END SUBROUTINE ASKI
     !*==ASKR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKI
-    
-    
+
+
     SUBROUTINE ASKR(PROMPT, RINPUT)
         IMPLICIT NONE
         !
@@ -178,8 +178,8 @@ contains
     END SUBROUTINE ASKR
     !*==ASKIN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKR
-    
-    
+
+
     SUBROUTINE ASKIN(PROMPT, IINPUT, NINP1)
         IMPLICIT NONE
         !
@@ -217,8 +217,8 @@ contains
     END SUBROUTINE ASKIN
     !*==ASKRN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKIN
-    
-    
+
+
     SUBROUTINE ASKRN(PROMPT, RINPUT, NINP1)
         IMPLICIT NONE
         !
@@ -256,9 +256,9 @@ contains
     END SUBROUTINE ASKRN
     !*==ASKL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKRN
-    
-    
-    
+
+
+
     SUBROUTINE ASKL(PROMPT, LINPUT)
         IMPLICIT NONE
         !
@@ -300,8 +300,8 @@ contains
     END SUBROUTINE ASKL
     !*==ASKS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKL
-    
-    
+
+
     SUBROUTINE ASKS(PROMPT, INPUT)
         IMPLICIT NONE
         !
@@ -334,8 +334,8 @@ contains
     END SUBROUTINE ASKS
     !*==ASKC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKS
-    
-    
+
+
     SUBROUTINE ASKC(PROMPT, COMAND, CARGS)
         IMPLICIT NONE
         !
@@ -410,8 +410,8 @@ contains
     END SUBROUTINE ASKC
     !*==LC2UC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKC
-    
-    
+
+
     SUBROUTINE LC2UC(INPUT)
         IMPLICIT NONE
         !
@@ -442,9 +442,9 @@ contains
     END SUBROUTINE LC2UC
     !*==READI.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LC2UC
-    
-    
-    
+
+
+
     SUBROUTINE READI(N, IVAR, ERROR)
         IMPLICIT NONE
         !
@@ -488,9 +488,9 @@ contains
     END SUBROUTINE READI
     !*==READR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! READI
-    
-    
-    
+
+
+
     SUBROUTINE READR(N, VAR, ERROR)
         IMPLICIT NONE
         !
@@ -534,10 +534,10 @@ contains
     END SUBROUTINE READR
     !*==GETINT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! READR
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE GETINT(INPUT, A, N, ERROR)
         IMPLICIT NONE
         !
@@ -622,8 +622,8 @@ contains
         ERROR = .TRUE.
     END SUBROUTINE GETINT
     !*==GETFLT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE GETFLT(INPUT, A, N, ERROR)
         IMPLICIT NONE
         !
@@ -708,8 +708,8 @@ contains
         ERROR = .TRUE.
     END SUBROUTINE GETFLT
     !*==STRIP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE STRIP(STRING, NS)
         IMPLICIT NONE
         !
@@ -757,7 +757,7 @@ contains
         !
     END SUBROUTINE STRIP
     !*==GETARG0.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
+
     SUBROUTINE GETARG0(IARG, ARG)
         IMPLICIT NONE
         !
@@ -792,8 +792,8 @@ contains
     END SUBROUTINE GETARG0
     !*==RDLINE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GETARG0
-    
-    
+
+
     SUBROUTINE RDLINE(LUN, LINE, ICNT)
         IMPLICIT NONE
         !

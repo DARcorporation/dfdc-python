@@ -3,8 +3,8 @@ module m_forces
 contains
     !*==CPCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DFSAVE
-    
-    
+
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -34,8 +34,8 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
-    
+
+
     SUBROUTINE CPCALC(N, Q, QINF, QREF, CP, CP_Q, CP_QINF)
         IMPLICIT NONE
         !
@@ -76,12 +76,12 @@ contains
     END SUBROUTINE CPCALC
     !*==CPADDHS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CPCALC
-    
-    
-    
+
+
+
     SUBROUTINE CPADDHS(XX, YY, CP, DHH, DSS, VTT)
         use i_dfdc
-        use m_grdutils, only: xygrdfind
+        use m_grdutils, only : xygrdfind
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -132,8 +132,8 @@ contains
         !
     END SUBROUTINE CPADDHS
     !*==FCOEFF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE FCOEFF(NC, CPL, CPR, XC, YC, ANC, DSC, CX, CY, CM)
         IMPLICIT NONE
         !

@@ -2,7 +2,7 @@ module m_wakesubs
     implicit none
 contains
     !*==WAKERESET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -32,11 +32,11 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE WAKERESET
         use i_dfdc
-        use m_dfdcsubs, only: updrotwak
-        use m_inigrd, only: updgrd
+        use m_dfdcsubs, only : updrotwak
+        use m_inigrd, only : updgrd
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -103,13 +103,13 @@ contains
     END SUBROUTINE WAKERESET
     !*==WAKMOV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WAKERESET
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE WAKMOV(IELA, ISQ)
         use i_dfdc
-        use m_geom, only: xycset, xypspl, anpset
+        use m_geom, only : xycset, xypspl, anpset
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -189,9 +189,9 @@ contains
     END SUBROUTINE WAKMOV
     !*==WAKMOVR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WAKMOV
-    
-    
-    
+
+
+
     SUBROUTINE WAKMOVR(IEL, XPNEW, YPNEW, ISQ)
         use i_dfdc
         IMPLICIT NONE

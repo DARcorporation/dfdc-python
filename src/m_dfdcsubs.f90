@@ -60,8 +60,8 @@ contains
     !
     SUBROUTINE DFINIT(LDEBUG)
         use i_dfdc
-        use m_atmo, only: atmo
-        use m_aero, only: putaero
+        use m_atmo, only : atmo
+        use m_aero, only : putaero
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -485,14 +485,14 @@ contains
     END SUBROUTINE DFINIT
     !*==GENGEOM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DFINIT
-    
-    
+
+
     SUBROUTINE GENGEOM
         use i_dfdc
-        use m_geom, only: cvpgen
-        use m_pnsubs, only: pancop, pangen, pandef
-        use m_inigrd, only: inigrd
-        use m_adjpanl, only: adjpanl
+        use m_geom, only : cvpgen
+        use m_pnsubs, only : pancop, pangen, pandef
+        use m_inigrd, only : inigrd
+        use m_adjpanl, only : adjpanl
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -596,8 +596,8 @@ contains
     END SUBROUTINE GENGEOM
     !*==PELIST.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GENGEOM
-    
-    
+
+
     SUBROUTINE PELIST(LU)
         use i_dfdc
         IMPLICIT NONE
@@ -695,12 +695,12 @@ contains
     END SUBROUTINE PELIST
     !*==GEPROC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PELIST
-    
-    
-    
+
+
+
     SUBROUTINE GEPROC
         use i_dfdc
-        use m_geutil, only: minmax
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -822,8 +822,8 @@ contains
     END SUBROUTINE GEPROC
     !*==GEPRINT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GEPROC
-    
-    
+
+
     SUBROUTINE GEPRINT(LU)
         use i_dfdc
         IMPLICIT NONE
@@ -919,13 +919,13 @@ contains
     END SUBROUTINE GEPRINT
     !*==ELPROC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GEPRINT
-    
-    
-    
+
+
+
     SUBROUTINE ELPROC(IEL)
         use i_dfdc
-        use m_spline, only: segspl, scalc, seval, sinvrt
-        use m_geutil, only: lefind, axcalc, aecalc
+        use m_spline, only : segspl, scalc, seval, sinvrt
+        use m_geutil, only : lefind, axcalc, aecalc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1112,9 +1112,9 @@ contains
     END SUBROUTINE ELPROC
     !*==WAKEBOX.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ELPROC
-    
-    
-    
+
+
+
     SUBROUTINE WAKEBOX
         use i_dfdc
         IMPLICIT NONE
@@ -1173,8 +1173,8 @@ contains
     END SUBROUTINE WAKEBOX
     !*==SETDRGOBJ.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WAKEBOX
-    
-    
+
+
     SUBROUTINE SETDRGOBJ
         use i_dfdc
         IMPLICIT NONE
@@ -1204,12 +1204,12 @@ contains
         !
     END SUBROUTINE SETDRGOBJ
     !*==ROTORINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE ROTORINIT
         use i_dfdc
-        use m_aero, only: setiaero
-        use m_spline, only: segspl, seval
+        use m_aero, only : setiaero
+        use m_spline, only : segspl, seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1468,13 +1468,13 @@ contains
     END SUBROUTINE ROTORINIT
     !*==SETROTWAK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTORINIT
-    
-    
-    
+
+
+
     SUBROUTINE SETROTWAK
         use i_dfdc
-        use m_spline, only: segspl, seval
-        use m_aero, only: setiaero
+        use m_spline, only : segspl, seval
+        use m_aero, only : setiaero
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1571,7 +1571,7 @@ contains
                 IP2IG(IP) = IG1 + IP - IP1
             ENDDO
         ENDDO
-    
+
         !----- and wake from duct TE (element 2)
         IR = NRP
         IEL = 2
@@ -1607,12 +1607,12 @@ contains
     END SUBROUTINE SETROTWAK
     !*==ADDWAKE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETROTWAK
-    
-    
+
+
     SUBROUTINE ADDWAKE(X, Y, N)
         use i_dfdc
-        use m_geom, only: xypspl
-        use m_geutil, only: minmax
+        use m_geom, only : xypspl
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1673,9 +1673,9 @@ contains
     END SUBROUTINE ADDWAKE
     !*==UPDROTWAK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ADDWAKE
-    
-    
-    
+
+
+
     SUBROUTINE UPDROTWAK
         use i_dfdc
         IMPLICIT NONE
@@ -1735,7 +1735,7 @@ contains
                 I = I + 1
             ENDDO
         ENDDO
-    
+
         !----- and wake from duct TE (element 2)
         IR = NRP
         IEL = IR2IEL(IR)
@@ -1769,8 +1769,8 @@ contains
     END SUBROUTINE UPDROTWAK
     !*==ROTPINIT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! UPDROTWAK
-    
-    
+
+
     SUBROUTINE ROTPINIT
         use i_dfdc
         IMPLICIT NONE
@@ -1870,13 +1870,13 @@ contains
     END SUBROUTINE ROTPINIT
     !*==ADDELEM5_2PT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTPINIT
-    
-    
-    
+
+
+
     SUBROUTINE ADDELEM5_2PT(X1, Y1, X2, Y2, NPTS)
         use i_dfdc
-        use m_geom, only: xypspl
-        use m_geutil, only: minmax
+        use m_geom, only : xypspl
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1953,13 +1953,13 @@ contains
     END SUBROUTINE ADDELEM5_2PT
     !*==ADDELEM5.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ADDELEM5_2PT
-    
-    
-    
+
+
+
     SUBROUTINE ADDELEM5(X, Y, N)
         use i_dfdc
-        use m_geom, only: xypspl
-        use m_geutil, only: minmax
+        use m_geom, only : xypspl
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2022,13 +2022,13 @@ contains
     END SUBROUTINE ADDELEM5
     !*==ADDELEM6.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ADDELEM5
-    
-    
-    
+
+
+
     SUBROUTINE ADDELEM6(X, Y, N)
         use i_dfdc
-        use m_geom, only: xypspl
-        use m_geutil, only: minmax
+        use m_geom, only : xypspl
+        use m_geutil, only : minmax
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2087,17 +2087,17 @@ contains
     END SUBROUTINE ADDELEM6
     !*==DFLOAD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ADDELEM6
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE DFLOAD(FNAMIN, FERROR)
         use i_dfdc
-        use m_userio, only: getflt, rdline, strip
-        use m_pnsubs, only: panget
-        use m_airio, only: areadnr
-        use m_atmo, only: atmo
-        use m_aero, only: putaero
+        use m_userio, only : getflt, rdline, strip
+        use m_pnsubs, only : panget
+        use m_airio, only : areadnr
+        use m_atmo, only : atmo
+        use m_aero, only : putaero
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2264,7 +2264,7 @@ contains
                 !
                 2100       FORMAT (' No repaneling parameters from file ', A)
                 2110       FORMAT (' Repaneling parameters from file ', A)
-    
+
                 !
                 !=======================================================================
                 !---- process current buffer geometry to identify element types and
@@ -2366,7 +2366,7 @@ contains
                         DCDCL2S = RINPUT(4)
                     ELSEIF (NINPUT>=3) THEN
                         REREF = RINPUT(1)
-    
+
                         REXP = RINPUT(2)
                         TOC = RINPUT(3)
                         DCDCL2S = 0.020
@@ -2582,14 +2582,14 @@ contains
     END SUBROUTINE DFLOAD
     !*==DFSAVE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DFLOAD
-    
-    
-    
+
+
+
     SUBROUTINE DFSAVE(FNAMEIN)
         use i_dfdc
-        use m_userio, only: asks, strip
-        use m_aero, only: getaero
-        use m_airio, only: awrite
+        use m_userio, only : asks, strip
+        use m_aero, only : getaero
+        use m_airio, only : awrite
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

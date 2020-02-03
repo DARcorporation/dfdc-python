@@ -31,10 +31,10 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE PANAIC(JFRST, JLAST, XP, YP, NF, XF, YF, JPAN1, JPAN2, IFTYPE, &
             & GAM, SIG, JDIM, QF, QF_GAM, QF_SIG)
-        use m_lamp, only: lamp, lampc
+        use m_lamp, only : lamp, lampc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -129,11 +129,11 @@ contains
         !
     END SUBROUTINE PANAIC
     !*==LINAIC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE LINAIC(JFRST, JLAST, XP, YP, NF, XF, YF, VOR, SOU, JDIM, QF, &
             & QF_VOR, QF_SOU)
-        use m_lamp, only: ring
+        use m_lamp, only : ring
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -203,9 +203,9 @@ contains
     END SUBROUTINE LINAIC
     !*==AXLAIC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LINAIC
-    
-    
-    
+
+
+
     SUBROUTINE AXLAIC(JFRST, JLAST, XP, YP, NF, XF, YF, JPAN1, JPAN2, IFTYPE, &
             & DBL, SRC, RCORE, JDIM, QF, QF_DBL, QF_SRC)
         IMPLICIT NONE
@@ -342,9 +342,9 @@ contains
     END SUBROUTINE AXLAIC
     !*==PNTAIC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! AXLAIC
-    
-    
-    
+
+
+
     SUBROUTINE PNTAIC(JFRST, JLAST, XP, YP, NF, XF, YF, DBL, SRC, JDIM, QF, &
             & QF_DBL, QF_SRC)
         IMPLICIT NONE
@@ -415,13 +415,13 @@ contains
     END SUBROUTINE PNTAIC
     !*==PANAICD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PNTAIC
-    
-    
-    
+
+
+
     SUBROUTINE PANAICD(JFRST, JLAST, XP, YP, NF, XF, YF, JPAN1, JPAN2, IFTYPE, &
             & GAM, SIG, JDIM, QF, QF_GAM, QF_SIG, QF_XP, QF_YP, &
             & QF_XF, QF_YF)
-        use m_lamp, only: dlampc, dlamp
+        use m_lamp, only : dlampc, dlamp
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -536,12 +536,12 @@ contains
     END SUBROUTINE PANAICD
     !*==LINAICD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANAICD
-    
-    
-    
+
+
+
     SUBROUTINE LINAICD(JFRST, JLAST, XP, YP, NF, XF, YF, VOR, SOU, JDIM, QF, &
             & QF_VOR, QF_SOU, QF_XP, QF_YP, QF_XF, QF_YF)
-        use m_lamp, only: dring
+        use m_lamp, only : dring
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -609,9 +609,9 @@ contains
     END SUBROUTINE LINAICD
     !*==PNTAICD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LINAICD
-    
-    
-    
+
+
+
     SUBROUTINE PNTAICD(JFRST, JLAST, XP, YP, NF, XF, YF, DBL, SRC, JDIM, QF, &
             & QF_DBL, QF_SRC, QF_XP, QF_YP, QF_XF, QF_YF)
         IMPLICIT NONE

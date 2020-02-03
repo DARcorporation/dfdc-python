@@ -5,7 +5,7 @@ MODULE api
 CONTAINS
 
     SUBROUTINE INIT()
-        use m_dfdcsubs, only: dfinit
+        use m_dfdcsubs, only : dfinit
         ! bind(c, name = 'init')
         IMPLICIT NONE
         LOGICAL :: LDEBUG
@@ -22,7 +22,7 @@ CONTAINS
 
     SUBROUTINE SET_CASE(fname)
         use i_dfdc
-        use m_dfdcsubs, only: dfload
+        use m_dfdcsubs, only : dfload
         ! bind(c, name = 'set_case')
         IMPLICIT NONE
         CHARACTER(*) :: FNAME
@@ -38,7 +38,7 @@ CONTAINS
     END SUBROUTINE SET_CASE
 
     SUBROUTINE GET_CASE(fname)
-        use m_dfdcsubs, only: dfsave
+        use m_dfdcsubs, only : dfsave
         ! bind(c, name = 'get_case')
         IMPLICIT NONE
         CHARACTER(*) :: FNAME
@@ -52,11 +52,11 @@ CONTAINS
 
     SUBROUTINE OPER()
         use i_dfdc
-        use m_inigrd, only: setgrdflw
-        use m_rotoper, only: rotinitbgam, tqcalc, rotrprt, rotinitbld
-        use m_wakesubs, only: wakereset
-        use s_rotoper, only: convgthbg
-        use m_dfdcsubs, only: gengeom
+        use m_inigrd, only : setgrdflw
+        use m_rotoper, only : rotinitbgam, tqcalc, rotrprt, rotinitbld
+        use m_wakesubs, only : wakereset
+        use s_rotoper, only : convgthbg
+        use m_dfdcsubs, only : gengeom
         ! bind(c, name = 'oper')
         IMPLICIT NONE
         REAL :: RLX, RLXF, WXEPS

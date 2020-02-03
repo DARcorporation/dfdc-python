@@ -3,7 +3,7 @@ module m_solve
 contains
     !*==GAMSOLV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SGRENUM
-    
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -33,17 +33,17 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
-    
+
+
     SUBROUTINE GAMSOLV
         use i_dfdc
-        use m_inigrd, only: setgrdflw
-        use m_gauss, only: ludcmp
-        use m_geom, only: cvpgen
-        use m_rotoper, only: vmavginit, setrotorsrc, stgfind, setdrgobjsrc
-        use m_system, only: qcsum, gsolve, gsys, sysp
-        use m_qaic, only: qaic
-        use m_vels, only: qcpfor
+        use m_inigrd, only : setgrdflw
+        use m_gauss, only : ludcmp
+        use m_geom, only : cvpgen
+        use m_rotoper, only : vmavginit, setrotorsrc, stgfind, setdrgobjsrc
+        use m_system, only : qcsum, gsolve, gsys, sysp
+        use m_qaic, only : qaic
+        use m_vels, only : qcpfor
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -101,22 +101,22 @@ contains
         CALL STGFIND
         !
         !c      write(*,*) 'Qn =', (QNDOF(IEL), IEL=1, 2)
-    
+
     END SUBROUTINE GAMSOLV
     !*==GAMSOL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GAMSOLV
-    
-    
-    
+
+
+
     SUBROUTINE GAMSOL
         use i_dfdc
-        use m_inigrd, only: setgrdflw
-        use m_gauss, only: ludcmp
-        use m_geom, only: cvpgen
-        use m_rotoper, only: vmavginit, setrotorsrc, stgfind, setdrgobjsrc
-        use m_system, only: gusum, qcsum, gucalc, gsys, sysp
-        use m_qaic, only: qaic
-        use m_vels, only: qcpfor
+        use m_inigrd, only : setgrdflw
+        use m_gauss, only : ludcmp
+        use m_geom, only : cvpgen
+        use m_rotoper, only : vmavginit, setrotorsrc, stgfind, setdrgobjsrc
+        use m_system, only : gusum, qcsum, gucalc, gsys, sysp
+        use m_qaic, only : qaic
+        use m_vels, only : qcpfor
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -225,6 +225,6 @@ contains
         CALL STGFIND
         !
         !c      write(*,*) 'Qn =', (QNDOF(IEL), IEL=1, 2)
-    
+
     END SUBROUTINE GAMSOL
 end module m_solve

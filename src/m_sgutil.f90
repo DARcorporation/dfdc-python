@@ -2,7 +2,7 @@ module m_sgutil
     implicit none
 contains
     !*==SGCURV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -32,10 +32,10 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, NGX, NG, SG, &
             & NPTS, CVEX, SMOF, FSL, FSR, NREF, SREF1, SREF2, CRRAT)
-        use m_spline, only: trisol, segspl, seval, curv
+        use m_spline, only : trisol, segspl, seval, curv
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -292,11 +292,11 @@ contains
     END SUBROUTINE SGCURV
     !*==SETCRV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SGCURV
-    
-    
-    
+
+
+
     SUBROUTINE SETCRV(SNEW, NPTS, SB, HH, N)
-        use m_spline, only: seval, splina
+        use m_spline, only : seval, splina
         !------------------------------------------------------------------
         !     Sets spacing array SNEW(i) based on surface curvature.
         !

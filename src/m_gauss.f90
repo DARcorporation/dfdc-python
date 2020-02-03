@@ -32,7 +32,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE LUDCMP(NSIZ, N, A)
         IMPLICIT NONE
         !
@@ -93,9 +93,9 @@ contains
     END SUBROUTINE LUDCMP
     !*==BAKSUB.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LUDCMP
-    
-    
-    
+
+
+
     SUBROUTINE BAKSUB(NSIZ, N, A, B)
         IMPLICIT NONE
         !

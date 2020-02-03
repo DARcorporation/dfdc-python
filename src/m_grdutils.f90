@@ -3,8 +3,8 @@ module m_grdutils
 contains
     !*==XSIETA.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CANG
-    
-    
+
+
     !      SUBROUTINE ADDXYA(IEL,DX,DY,DF,DA)
     !      INCLUDE 'AIRPAN.INC'
     !C
@@ -50,7 +50,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE XSIETA(XM, X1, X2, X3, X4, YM, Y1, Y2, Y3, Y4, XSI, ETA, XSI_X, &
             & XSI_Y, ETA_X, ETA_Y)
         IMPLICIT NONE
@@ -128,9 +128,9 @@ contains
     END SUBROUTINE XSIETA
     !*==FINT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XSIETA
-    
-    
-    
+
+
+
     FUNCTION FINT(XSI, ETA, Q1, Q2, Q3, Q4)
         IMPLICIT NONE
         !
@@ -162,9 +162,9 @@ contains
     END FUNCTION FINT
     !*==XYGRDFIND.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! FINT
-    
-    
-    
+
+
+
     SUBROUTINE XYGRDFIND(XF, YF, IX, X, Y, II, JJ, IC, JC)
         IMPLICIT NONE
         !
@@ -241,8 +241,8 @@ contains
     END SUBROUTINE XYGRDFIND
     !*==PNPOLY.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XYGRDFIND
-    
-    
+
+
     !
     !     ..................................................................
     !
@@ -314,7 +314,7 @@ contains
         !
         !*** End of declarations rewritten by SPAG
         !
-    
+
         !--- Output unit for printed messages
         IF (N>MAXDIM) THEN
             WRITE (*, 1)
@@ -356,8 +356,8 @@ contains
         !
     END SUBROUTINE PNPOLY
     !*==UVGRDC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE UVGRDC(IX, II, JJ, X, Y, XPOS, YPOS, UC, VC)
         IMPLICIT NONE
         !
@@ -462,8 +462,8 @@ contains
     END SUBROUTINE UVGRDC
     !*==UVGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! UVGRDC
-    
-    
+
+
     SUBROUTINE UVGRD(IX, II, JJ, X, Y, XPOS, YPOS, UG, VG)
         IMPLICIT NONE
         !
@@ -720,7 +720,7 @@ contains
                 !--------- backwards difference at boundary
                 DXDET = DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL)
                 DYDET = DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL)
-    
+
             ELSE
                 XOO = X(IO, JO)
                 XPO = X(IP, JO)
@@ -806,7 +806,7 @@ contains
                 !--------- backwards difference at boundary
                 DXDET = DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL)
                 DYDET = DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL)
-    
+
             ELSE
                 !
                 XOO = X(IO, JO)

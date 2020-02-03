@@ -34,7 +34,7 @@ contains
     !=========================================================================
     !
     ! This version assumes delta(B*GAM)*WT/WM defined at each rotor center
-    
+
     SUBROUTINE SYSP
         use i_dfdc
         IMPLICIT NONE
@@ -311,8 +311,8 @@ contains
     END SUBROUTINE SYSP
     !*==CLRSYS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SYSP
-    
-    
+
+
     SUBROUTINE CLRSYS
         use i_dfdc
         IMPLICIT NONE
@@ -351,8 +351,8 @@ contains
     END SUBROUTINE CLRSYS
     !*==GSYS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CLRSYS
-    
-    
+
+
     SUBROUTINE GSYS(LSYS, LQFF, LVWK, IP1, IP2, IZ1, IZ2)
         use i_dfdc
         IMPLICIT NONE
@@ -630,7 +630,7 @@ contains
             !------ zero net curvature of gamma at TE (triangular loading towards TE)
             K = KSYSGSS(IEL)
             IF (LSYS .AND. K>0) THEN
-    
+
                 JP1O = IPFRST(IEL) + 2
                 JP1M = IPFRST(IEL) + 1
                 JP1L = IPFRST(IEL)
@@ -776,7 +776,7 @@ contains
             !------ normal-velocity QNDOF constraint
             K = KSYSQNC(IEL)
             IF (LSYS .AND. K>0) THEN
-    
+
                 J = JSYSQNC(IEL)
                 RES(K) = QNDOF(IEL)
                 !CC  &          - QNDOFSP(IEL)
@@ -792,19 +792,19 @@ contains
                 IC = NCX + IEL
                 !
                 IF (LSYS) THEN
-    
+
                     !cc debug stuff to fiddle with net massflow from QNdof
                     !cc            write(*,*) 'enter Qtt'   !@@@
                     !cc            read(*,*) qttf    !@@@
                     qttf = 0.0
-    
+
                     !-------- flow-tangency residual
                     RES(K) = ANC(1, IC) * QC(1, IC) + ANC(2, IC) * QC(2, IC)         &
                             & - qttf * QINF                              !@@@
                     !
                     IF (LDBG) WRITE (LUNDBG, *) K, 'Qtt=0 ', RES(K)
                     !@@@
-    
+
                     DO JP = 1, NPTOT
                         !---------- dRES/dgamma_surface
                         !-          J = system column index of GAM(JP)  (0 if GAM is on r.h.s.)
@@ -881,9 +881,9 @@ contains
     END SUBROUTINE GSYS
     !*==SYSPQ.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GSYS
-    
-    
-    
+
+
+
     SUBROUTINE SYSPQ
         use i_dfdc
         IMPLICIT NONE
@@ -998,8 +998,8 @@ contains
     END SUBROUTINE SYSPQ
     !*==QSYS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SYSPQ
-    
-    
+
+
     SUBROUTINE QSYS
         use i_dfdc
         IMPLICIT NONE
@@ -1160,7 +1160,7 @@ contains
             !------ zero net curvature of gamma at TE (triangular loading towards TE)
             K = KSYSGSS(IEL)
             IF (K>0) THEN
-    
+
                 JP1O = IPFRST(IEL) + 2
                 JP1M = IPFRST(IEL) + 1
                 JP1L = IPFRST(IEL)
@@ -1266,7 +1266,7 @@ contains
                 !            write(*,*) 'enter Qtan/Qinf'   !@@@
                 !            read(*,*) qttf    !@@@
                 qttf = 0.0
-    
+
                 !-------- flow-tangency residual
                 RES(K) = ANC(1, IC) * QC(1, IC) + ANC(2, IC) * QC(2, IC) - qttf * QINF
                 !@@@
@@ -1330,7 +1330,7 @@ contains
         DO ISEG = 1, NSEG
             K = KSYSDNS(1, ISEG)
             IF (K>0) THEN
-    
+
                 JP = IPSEG1(ISEG)
                 !CC      RES(K) = DN(JP)
                 RES(K) = 0.
@@ -1342,7 +1342,7 @@ contains
             !
             K = KSYSDNS(2, ISEG)
             IF (K>0) THEN
-    
+
                 JP = IPSEG2(ISEG)
                 !CC      RES(K) = DN(JP)
                 RES(K) = 0.
@@ -1354,7 +1354,7 @@ contains
             !
             K = KSYSDNS(3, ISEG)
             IF (K>0) THEN
-    
+
                 !
                 !         JP = IPSEG1(ISEG) + 1
                 !CCC      RES(K) = DN(JP)
@@ -1416,10 +1416,10 @@ contains
     END SUBROUTINE QSYS
     !*==GXYLIN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QSYS
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE GXYLIN(K, JP, RES_GAM, RES_SIG, RES_XP, RES_YP)
         use i_dfdc
         IMPLICIT NONE
@@ -1463,9 +1463,9 @@ contains
     END SUBROUTINE GXYLIN
     !*==GUCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GXYLIN
-    
-    
-    
+
+
+
     SUBROUTINE GUCALC(LGUQI, LVWK, IP1, IP2)
         use i_dfdc
         IMPLICIT NONE
@@ -1538,12 +1538,12 @@ contains
     END SUBROUTINE GUCALC
     !*==GUMAKE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GUCALC
-    
-    
-    
+
+
+
     SUBROUTINE GUMAKE(IU, AIC)
         use i_dfdc
-        use m_gauss, only: baksub
+        use m_gauss, only : baksub
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1616,12 +1616,12 @@ contains
     END SUBROUTINE GUMAKE
     !*==GSOLVE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GUMAKE
-    
-    
-    
+
+
+
     SUBROUTINE GSOLVE
         use i_dfdc
-        use m_gauss, only: baksub
+        use m_gauss, only : baksub
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1708,11 +1708,11 @@ contains
     END SUBROUTINE GSOLVE
     !*==GSOLVE0.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GSOLVE
-    
-    
+
+
     SUBROUTINE GSOLVE0
         use i_dfdc
-        use m_gauss, only: baksub
+        use m_gauss, only : baksub
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1799,8 +1799,8 @@ contains
     END SUBROUTINE GSOLVE0
     !*==GUVWK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GSOLVE0
-    
-    
+
+
     SUBROUTINE GUVWK(IRADD)
         use i_dfdc
         IMPLICIT NONE
@@ -1851,9 +1851,9 @@ contains
     END SUBROUTINE GUVWK
     !*==GUSUM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GUVWK
-    
-    
-    
+
+
+
     SUBROUTINE GUSUM
         use i_dfdc
         IMPLICIT NONE
@@ -1953,9 +1953,9 @@ contains
     END SUBROUTINE GUSUM
     !*==QCSUM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GUSUM
-    
-    
-    
+
+
+
     SUBROUTINE QCSUM
         use i_dfdc
         IMPLICIT NONE
@@ -2010,10 +2010,10 @@ contains
     END SUBROUTINE QCSUM
     !*==QCUSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCSUM
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE QCUSET
         use i_dfdc
         IMPLICIT NONE
@@ -2086,9 +2086,9 @@ contains
     END SUBROUTINE QCUSET
     !*==QCUSUM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCUSET
-    
-    
-    
+
+
+
     SUBROUTINE QCUSUM
         use i_dfdc
         IMPLICIT NONE
@@ -2159,10 +2159,10 @@ contains
     END SUBROUTINE QCUSUM
     !*==SETGSTE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCUSUM
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE SETGSTE
         use i_dfdc
         IMPLICIT NONE
@@ -2240,9 +2240,9 @@ contains
     END SUBROUTINE SETGSTE
     !*==NWDOTS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETGSTE
-    
-    
-    
+
+
+
     SUBROUTINE NWDOTS(IEL, DS1NW, DS2NW, DN1NW, DN2NW)
         use i_dfdc
         IMPLICIT NONE
@@ -2288,8 +2288,8 @@ contains
     END SUBROUTINE NWDOTS
     !*==SWDOTS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! NWDOTS
-    
-    
+
+
     SUBROUTINE SWDOTS(IEL, DS1SW, DS2SW, DN1SW, DN2SW)
         use i_dfdc
         IMPLICIT NONE

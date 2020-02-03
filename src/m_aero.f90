@@ -79,7 +79,7 @@ contains
     !=========================================================================
     !
     !
-    
+
     SUBROUTINE SETIAERO
         use i_dfdc
         IMPLICIT NONE
@@ -110,8 +110,8 @@ contains
         ENDDO
     END SUBROUTINE SETIAERO
     !*==GETAERO.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
             & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
             & MCRIT, TOC, REREF, REXP)
@@ -178,8 +178,8 @@ contains
         !
     END SUBROUTINE GETAERO
     !*==PUTAERO.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
             & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
             & MCRIT, TOC, REREF, REXP)
@@ -250,8 +250,8 @@ contains
         !
     END SUBROUTINE PUTAERO
     !*==SORTAR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SORTAR(NS, S, W, NDIM)
         IMPLICIT NONE
         !
@@ -299,15 +299,15 @@ contains
     10   END SUBROUTINE SORTAR
     !*==GETCLCDCM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SORTAR
-    
-    
+
+
     !*************************************************************************
     !  Interpolated aero section properties functions
     !  These routines implement a functional representation of the
     !  blade aero properties (CL,CD,CM) vs ALFA
     !*************************************************************************
-    
-    
+
+
     SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, CLIFT, &
             & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, STALLF, &
             & CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W)
@@ -447,9 +447,9 @@ contains
     END SUBROUTINE GETCLCDCM
     !*==GETALF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     !GETCLCDCM
-    
-    
-    
+
+
+
     SUBROUTINE GETALF(NR, IS, XI, SECSIG, SECSTAGR, CLIFT, W, ALF, ALF_CL, &
             & ALF_W, STALLF)
         use i_dfdc
@@ -509,15 +509,15 @@ contains
     END SUBROUTINE GETALF
     !*==CLCDCM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GETALF
-    
-    
-    
+
+
+
     !*************************************************************************
     !  Basic aero section properties functions
     !  These routines implement a functional representation of the
     !  blade section aero properties (CL,CD,CM) vs ALF
     !*************************************************************************
-    
+
     SUBROUTINE CLCDCM(ALF, W, REY, VSO, SECSIG, SECSTAGR, CLIFT, CL_ALF, CL_W, &
             & STALLF, CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W, &
             & A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, DCL_STALL, &
@@ -727,9 +727,9 @@ contains
     END SUBROUTINE CLCDCM
     !*==CHKLIM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CLCDCM
-    
-    
-    
+
+
+
     SUBROUTINE CHKLIM(N, NSTRT, NEND, F, FMAX)
         IMPLICIT NONE
         !
@@ -763,10 +763,10 @@ contains
         !
     END SUBROUTINE CHKLIM
     !*==OPFILE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE OPFILE(LU, FNAME)
-        use m_userio, only: askc, asks
+        use m_userio, only : askc, asks
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -842,10 +842,10 @@ contains
     END SUBROUTINE OPFILE
     !*==GETCLFACTOR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! OPFILE
-    
-    
+
+
     SUBROUTINE GETCLFACTOR(SIGMA, STAGGER, CLFACTOR)
-        use m_spline, only: sevlin
+        use m_spline, only : sevlin
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

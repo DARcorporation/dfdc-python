@@ -31,9 +31,9 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE ATMO(ALSPEC, DELTAT, VSOALT, RHOALT, RMUALT)
-        use m_spline, only: seval
+        use m_spline, only : seval
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -154,8 +154,8 @@ contains
     END SUBROUTINE ATMO
     !*==FLOSHO.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ATMO
-    
-    
+
+
     SUBROUTINE FLOSHO(LU, VSO, RHO, RMU)
         IMPLICIT NONE
         !

@@ -3,8 +3,8 @@ module m_xutils
 contains
     !*==SETEXP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WAKMOVR
-    
-    
+
+
     !=========================================================================
     ! DFDC (Ducted Fan Design Code) is an aerodynamic and aeroacoustic design
     ! and analysis tool for aircraft with propulsors in ducted fan
@@ -34,7 +34,7 @@ contains
     ! Program Management: Brad Tousley, Paul Eremenko (eremenko@alum.mit.edu)
     !
     !=========================================================================
-    
+
     SUBROUTINE SETEXP(S, DS1, SMAX, NN)
         IMPLICIT NONE
         !
@@ -115,8 +115,8 @@ contains
         !
     END SUBROUTINE SETEXP
     !*==SETEX2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
-    
-    
+
+
     SUBROUTINE SETEX2(S, DS1, DSN, SMAX, N)
         !==========================================================
         !     Sets array S stretched so that a prescribed spacing is
@@ -197,9 +197,9 @@ contains
     END SUBROUTINE SETEX2
     !*==ATANC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETEX2
-    
-    
-    
+
+
+
     FUNCTION ATANC(Y, X, THOLD)
         IMPLICIT NONE
         !
@@ -261,10 +261,10 @@ contains
     END FUNCTION ATANC
     !*==HSORT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ATANC
-    
-    
-    
-    
+
+
+
+
     SUBROUTINE HSORT(N, A, INDX)
         IMPLICIT NONE
         !
