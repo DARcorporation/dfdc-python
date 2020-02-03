@@ -370,7 +370,6 @@ contains
         !
         INTEGER :: N
         REAL :: SS
-        REAL :: GEVAL
         REAL, DIMENSION(N) :: S, X, XS
         !
         ! Local variables
