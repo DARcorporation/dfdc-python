@@ -36,6 +36,7 @@ contains
     
     
     SUBROUTINE GAMSOLV
+        use i_dfdc
         use m_inigrd, only: setgrdflw
         use m_gauss, only: ludcmp
         use m_geom, only: cvpgen
@@ -108,6 +109,7 @@ contains
     
     
     SUBROUTINE GAMSOL
+        use i_dfdc
         use m_inigrd, only: setgrdflw
         use m_gauss, only: ludcmp
         use m_geom, only: cvpgen

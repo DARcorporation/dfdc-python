@@ -6,6 +6,7 @@ contains
     
     
     SUBROUTINE GETVEL(FNAME1)
+        use i_dfdc
         use m_spline, only: spline
         use m_userio, only: asks, askr
         IMPLICIT NONE
@@ -86,6 +87,7 @@ contains
     
     
     SUBROUTINE SAVVEL(FNAME1)
+        use i_dfdc
         use m_userio, only: asks
         IMPLICIT NONE
         !
@@ -151,6 +153,7 @@ contains
     
     
     SUBROUTINE UVINFL(RR, WWA, WWT)
+        use i_dfdc
         use m_spline, only: seval
         IMPLICIT NONE
         !

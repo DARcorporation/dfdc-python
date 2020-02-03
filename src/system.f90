@@ -36,6 +36,7 @@ contains
     ! This version assumes delta(B*GAM)*WT/WM defined at each rotor center
     
     SUBROUTINE SYSP
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -313,6 +314,7 @@ contains
     
     
     SUBROUTINE CLRSYS
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -352,6 +354,7 @@ contains
     
     
     SUBROUTINE GSYS(LSYS, LQFF, LVWK, IP1, IP2, IZ1, IZ2)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -882,6 +885,7 @@ contains
     
     
     SUBROUTINE SYSPQ
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -997,6 +1001,7 @@ contains
     
     
     SUBROUTINE QSYS
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1416,6 +1421,7 @@ contains
     
     
     SUBROUTINE GXYLIN(K, JP, RES_GAM, RES_SIG, RES_XP, RES_YP)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1461,6 +1467,7 @@ contains
     
     
     SUBROUTINE GUCALC(LGUQI, LVWK, IP1, IP2)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1535,6 +1542,7 @@ contains
     
     
     SUBROUTINE GUMAKE(IU, AIC)
+        use i_dfdc
         use m_gauss, only: baksub
         IMPLICIT NONE
         !
@@ -1612,6 +1620,7 @@ contains
     
     
     SUBROUTINE GSOLVE
+        use i_dfdc
         use m_gauss, only: baksub
         IMPLICIT NONE
         !
@@ -1702,6 +1711,7 @@ contains
     
     
     SUBROUTINE GSOLVE0
+        use i_dfdc
         use m_gauss, only: baksub
         IMPLICIT NONE
         !
@@ -1792,6 +1802,7 @@ contains
     
     
     SUBROUTINE GUVWK(IRADD)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1844,6 +1855,7 @@ contains
     
     
     SUBROUTINE GUSUM
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1945,6 +1957,7 @@ contains
     
     
     SUBROUTINE QCSUM
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2002,6 +2015,7 @@ contains
     
     
     SUBROUTINE QCUSET
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2076,6 +2090,7 @@ contains
     
     
     SUBROUTINE QCUSUM
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2149,6 +2164,7 @@ contains
     
     
     SUBROUTINE SETGSTE
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2228,6 +2244,7 @@ contains
     
     
     SUBROUTINE NWDOTS(IEL, DS1NW, DS2NW, DN1NW, DN2NW)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2274,6 +2291,7 @@ contains
     
     
     SUBROUTINE SWDOTS(IEL, DS1SW, DS2SW, DN1SW, DN2SW)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

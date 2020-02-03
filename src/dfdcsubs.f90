@@ -59,6 +59,7 @@ contains
     !=========================================================================
     !
     SUBROUTINE DFINIT(LDEBUG)
+        use i_dfdc
         use m_atmo, only: atmo
         use m_aero, only: putaero
         IMPLICIT NONE
@@ -457,7 +458,6 @@ contains
         LSPLT = .FALSE.
         !
         !---- plot displacement surfaces, don't use streamline integration to generate
-        LDPLT = .TRUE.
         LDINT = .FALSE.
         !
         !---- plot grid on Cp or Q plots
@@ -488,6 +488,7 @@ contains
     
     
     SUBROUTINE GENGEOM
+        use i_dfdc
         use m_geom, only: cvpgen
         use m_pnsubs, only: pancop, pangen, pandef
         use m_inigrd, only: inigrd
@@ -598,6 +599,7 @@ contains
     
     
     SUBROUTINE PELIST(LU)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -697,6 +699,7 @@ contains
     
     
     SUBROUTINE GEPROC
+        use i_dfdc
         use m_geutil, only: minmax
         IMPLICIT NONE
         !
@@ -822,6 +825,7 @@ contains
     
     
     SUBROUTINE GEPRINT(LU)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -919,6 +923,7 @@ contains
     
     
     SUBROUTINE ELPROC(IEL)
+        use i_dfdc
         use m_spline, only: segspl, scalc, seval, sinvrt
         use m_geutil, only: lefind, axcalc, aecalc
         IMPLICIT NONE
@@ -1111,6 +1116,7 @@ contains
     
     
     SUBROUTINE WAKEBOX
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1170,6 +1176,7 @@ contains
     
     
     SUBROUTINE SETDRGOBJ
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1200,6 +1207,7 @@ contains
     
     
     SUBROUTINE ROTORINIT
+        use i_dfdc
         use m_aero, only: setiaero
         use m_spline, only: segspl, seval
         IMPLICIT NONE
@@ -1464,6 +1472,7 @@ contains
     
     
     SUBROUTINE SETROTWAK
+        use i_dfdc
         use m_spline, only: segspl, seval
         use m_aero, only: setiaero
         IMPLICIT NONE
@@ -1601,6 +1610,7 @@ contains
     
     
     SUBROUTINE ADDWAKE(X, Y, N)
+        use i_dfdc
         use m_geom, only: xypspl
         use m_geutil, only: minmax
         IMPLICIT NONE
@@ -1667,6 +1677,7 @@ contains
     
     
     SUBROUTINE UPDROTWAK
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1761,6 +1772,7 @@ contains
     
     
     SUBROUTINE ROTPINIT
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1862,6 +1874,7 @@ contains
     
     
     SUBROUTINE ADDELEM5_2PT(X1, Y1, X2, Y2, NPTS)
+        use i_dfdc
         use m_geom, only: xypspl
         use m_geutil, only: minmax
         IMPLICIT NONE
@@ -1944,6 +1957,7 @@ contains
     
     
     SUBROUTINE ADDELEM5(X, Y, N)
+        use i_dfdc
         use m_geom, only: xypspl
         use m_geutil, only: minmax
         IMPLICIT NONE
@@ -2012,6 +2026,7 @@ contains
     
     
     SUBROUTINE ADDELEM6(X, Y, N)
+        use i_dfdc
         use m_geom, only: xypspl
         use m_geutil, only: minmax
         IMPLICIT NONE
@@ -2077,6 +2092,7 @@ contains
     
     
     SUBROUTINE DFLOAD(FNAMIN, FERROR)
+        use i_dfdc
         use m_userio, only: getflt, rdline, strip
         use m_pnsubs, only: panget
         use m_airio, only: areadnr
@@ -2570,6 +2586,7 @@ contains
     
     
     SUBROUTINE DFSAVE(FNAMEIN)
+        use i_dfdc
         use m_userio, only: asks, strip
         use m_aero, only: getaero
         use m_airio, only: awrite

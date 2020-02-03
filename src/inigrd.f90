@@ -35,6 +35,7 @@ contains
     
     
     SUBROUTINE INIGRD
+        use i_dfdc
         use m_userio, only: askr
         use m_xutils, only: setexp
         IMPLICIT NONE
@@ -282,6 +283,7 @@ contains
     
     
     SUBROUTINE UPDGRD
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -344,6 +346,7 @@ contains
     
     
     SUBROUTINE RLXGRD
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -398,6 +401,7 @@ contains
     
     
     SUBROUTINE SETGRDFLW
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -466,6 +470,7 @@ contains
     
     
     SUBROUTINE CLRGRDFLW
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -498,6 +503,7 @@ contains
     
     
     SUBROUTINE ROTBG2GRD(N)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -543,6 +549,7 @@ contains
     
     
     SUBROUTINE GETGRDFLW
+        use i_dfdc
         use m_grdutils, only: uvgrdc
         IMPLICIT NONE
         !
@@ -591,6 +598,7 @@ contains
     
     
     SUBROUTINE INLSFCN
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -627,6 +635,7 @@ contains
     
     
     SUBROUTINE RLXGRD2
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

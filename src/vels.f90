@@ -38,6 +38,7 @@ contains
     
     
     SUBROUTINE QCPFOR
+        use i_dfdc
         use m_forces, only: cpcalc, fcoeff
         use m_system, only: qcsum
         IMPLICIT NONE
@@ -47,11 +48,12 @@ contains
         ! Local variables
         !
         REAL, DIMENSION(2) :: ANT
-        REAL :: CIRC, CMTE, COSA, CPTL, CPTR, CXTE, CYTE, &
-                & DELTACP, DSCT, DXT, DYT, QRSQ, QUE, SINA, VTSQ, &
-                & VTT, XCT, YCT
+        REAL :: CIRC, CMTE, COSA, CXTE, CYTE, &
+                & DELTACP, DXT, DYT, QRSQ, QUE, SINA, VTSQ, &
+                & VTT
         INTEGER :: I, IC, ICT1, ICT2, IEL, IG, IP1, IP2, IPT1, &
                 & IPT2, IR, IR1, IR2, IU, JG, N
+        REAL, DIMENSION(1) :: CPTL, CPTR, DSCT, XCT, YCT
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -242,8 +244,8 @@ contains
                     DXT = XPT(1, IEL) - XPT(2, IEL)
                     DYT = YPT(1, IEL) - YPT(2, IEL)
                     DSCT = SQRT(DXT * DXT + DYT * DYT)
-                    ANT(1) = DYT / DSCT
-                    ANT(2) = -DXT / DSCT
+                    ANT(1) = DYT / DSCT(1)
+                    ANT(2) = -DXT / DSCT(1)
                     !          write(12,*) 'cptl,cptr ',cptl,cptr
                     !          write(12,*) 'xct,yct ',xct,yct
                     !          write(12,*) 'dsct ',dsct
@@ -735,6 +737,7 @@ contains
     
     
     SUBROUTINE GETUV(XX, YY, US, VS)
+        use i_dfdc
         use m_qaic, only: qfcalc
         IMPLICIT NONE
         !
@@ -746,9 +749,11 @@ contains
         !
         ! Local variables
         !
-        INTEGER :: IFTYPE, IP1, IP2, IPFO, IPFP, NF
+        INTEGER :: IP1, IP2, NF
+        INTEGER, DIMENSION(1) :: IFTYPE, IPFO, IPFP
         REAL, DIMENSION(2) :: QF
         REAL, DIMENSION(2, IPX) :: QF_GAM, QF_GTH, QF_SIG
+        REAL, DIMENSION(1) :: XX_TEMP, YY_TEMP
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -763,12 +768,14 @@ contains
         IP2 = 1
         NF = 1
         !------ assume the point is not on a panel
-        IPFO = 0
-        IPFP = 0
-        IFTYPE = 0
+        IPFO(1) = 0
+        IPFP(1) = 0
+        IFTYPE(1) = 0
         !------ evaluate velocity components
-        CALL QFCALC(IP1, IP2, XX, YY, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, &
+        CALL QFCALC(IP1, IP2, XX_TEMP, YY_TEMP, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, &
                 & QF_GTH)
+        XX = XX_TEMP(1)
+        YY = YY_TEMP(1)
         !------ add freestream
         US = QF(1) + QINF
         VS = QF(2)

@@ -1,16 +1,8 @@
 PROGRAM dfdc_test
     USE api
+    USE m_userio, only: asks
     IMPLICIT NONE
-    !
-    !*** Start of declarations rewritten by SPAG
-    !
-    ! Local variables
-    !
-    REAL :: API
     CHARACTER(128) :: FNAME
-    !
-    !*** End of declarations rewritten by SPAG
-    !
     CALL init
     CALL ASKS(' Enter filename to load)^', FNAME)
     CALL set_case(fname)

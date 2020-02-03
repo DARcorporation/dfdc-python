@@ -34,6 +34,7 @@ contains
     !
     
     SUBROUTINE ADJPANL
+        use i_dfdc
         use m_sgutil2, only: sgshft, sgrenum, isgfind, sgcopy
         use m_geom, only: itpset, xypspl
         use m_spline, only: seval, sinvrt

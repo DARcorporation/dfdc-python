@@ -2,31 +2,13 @@ MODULE api
     USE, intrinsic :: iso_c_binding, only : c_float, c_double, &
             & c_int, c_bool, c_char
     IMPLICIT NONE
-    !
-    !*** Start of declarations rewritten by SPAG
-    PRIVATE :: KIND
-    !
-    ! PARAMETER definitions
-    !
-    INTEGER, PRIVATE, PARAMETER :: DP = kind(0.D0)
-    !
-    ! Local variables
-    !
-    LOGICAL, PRIVATE :: FERROR, LDEBUG, LMODG
-    REAL, PUBLIC :: GET_CASE, OPER, SET_CASE
-    INTEGER, PUBLIC :: INIT
-    !
-    !*** End of declarations rewritten by SPAG
-    !
-    !    implicit none
-
-
 CONTAINS
 
-    SUBROUTINE init()
+    SUBROUTINE INIT()
         use m_dfdcsubs, only: dfinit
         ! bind(c, name = 'init')
         IMPLICIT NONE
+        LOGICAL :: LDEBUG
         !
         !*** Start of declarations rewritten by SPAG
         !
@@ -38,10 +20,13 @@ CONTAINS
         !        CALL LOFTINIT2(1,NRX)
     END SUBROUTINE INIT
 
-    SUBROUTINE set_case(fname)
+    SUBROUTINE SET_CASE(fname)
+        use i_dfdc
         use m_dfdcsubs, only: dfload
         ! bind(c, name = 'set_case')
         IMPLICIT NONE
+        CHARACTER(*) :: FNAME
+        LOGICAL :: FERROR
         !
         !*** Start of declarations rewritten by SPAG
         !
@@ -52,10 +37,11 @@ CONTAINS
         IF (.NOT.FERROR) LONAME = NAME
     END SUBROUTINE SET_CASE
 
-    SUBROUTINE get_case(fname)
+    SUBROUTINE GET_CASE(fname)
         use m_dfdcsubs, only: dfsave
         ! bind(c, name = 'get_case')
         IMPLICIT NONE
+        CHARACTER(*) :: FNAME
         !
         !*** Start of declarations rewritten by SPAG
         !
@@ -64,7 +50,8 @@ CONTAINS
         CALL DFSAVE(fname)
     END SUBROUTINE GET_CASE
 
-    SUBROUTINE oper()
+    SUBROUTINE OPER()
+        use i_dfdc
         use m_inigrd, only: setgrdflw
         use m_rotoper, only: rotinitbgam, tqcalc, rotrprt, rotinitbld
         use m_wakesubs, only: wakereset
@@ -72,6 +59,8 @@ CONTAINS
         use m_dfdcsubs, only: gengeom
         ! bind(c, name = 'oper')
         IMPLICIT NONE
+        REAL :: RLX, RLXF, WXEPS
+        INTEGER :: IP, IR, ITRMAX, ITYP, N
         !
         !*** Start of declarations rewritten by SPAG
         !
@@ -91,13 +80,6 @@ CONTAINS
             GAMVSP(IP) = 0.
             SIGVSP(IP) = 0.
         ENDDO
-
-        ! plot Cp(x) or Q(x)
-        ICPQXY = 1
-        ! drive total thrust (ISPEC=2), drive rotor thrust for ISPEC=1
-        ISPEC = 2
-        ! default working disk
-        NDSK = 1
 
         ! Calculate solution for current actuator or blade using new solver
         RLX = RLXSOLV

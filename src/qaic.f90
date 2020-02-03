@@ -34,6 +34,7 @@ contains
     !=========================================================================
     
     SUBROUTINE QAIC(LXYJAC)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -75,6 +76,7 @@ contains
     
     
     SUBROUTINE QAIC1(LXYJAC, IC1, IC2, IEL1, IEL2)
+        use i_dfdc
         use m_aic, only: pntaic, axlaic, panaic, panaicd, linaic
         IMPLICIT NONE
         !
@@ -635,6 +637,7 @@ contains
     
     SUBROUTINE QFCALC(IF1, IF2, XF, YF, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, &
             & QF_GTH)
+        use i_dfdc
         use m_aic, only: axlaic, linaic, panaic, pntaic
         IMPLICIT NONE
         !

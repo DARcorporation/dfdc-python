@@ -292,6 +292,7 @@ contains
                 & RGYT, TFAC, XCENA, XCENT, XCENV, XCENVT, XLE, &
                 & XNEW, XTE, YCENA, YCENT, YCENV, YCENVT, YLE, &
                 & YNEW, YTE
+        REAL, DIMENSION(1) :: XNEW_TEMP, YNEW_TEMP
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -326,7 +327,9 @@ contains
         CALL AECALC(N, X, Y, T, 2, PERIM, ASKN, XCENT, YCENT, EIXXT, EIYYT, EIXYT)
         TFAC = 1.0
         CFAC = 1.0
-        CALL TCSET(X, XP, Y, YP, S, N, THICK, CAMBR, TFAC, CFAC, XNEW, YNEW, .FALSE.)
+        CALL TCSET(X, XP, Y, YP, S, N, THICK, CAMBR, TFAC, CFAC, XNEW_TEMP, YNEW_TEMP, .FALSE.)
+        XNEW = XNEW_TEMP(1)
+        YNEW = YNEW_TEMP(1)
         !
         !---- Axisymmetric properties
         CALL AXCALC(N, X, Y, T, 0, VOLM, ASRF, XCENV, YCENV, RGXV, RGYV)

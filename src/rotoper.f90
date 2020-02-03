@@ -57,6 +57,7 @@ contains
     
     
     SUBROUTINE ROTINITTHR(THR)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -114,6 +115,7 @@ contains
     
     
     SUBROUTINE ROTINITBGAM
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -209,6 +211,7 @@ contains
     
     
     SUBROUTINE ROTINITBLD
+        use i_dfdc
         use m_viscvel, only: uvinfl
         use m_inigrd, only: rotbg2grd, clrgrdflw
         use m_aero, only: getclcdcm
@@ -351,6 +354,7 @@ contains
     
     
     SUBROUTINE SETROTVEL
+        use i_dfdc
         use m_viscvel, only: uvinfl
         IMPLICIT NONE
         !
@@ -443,6 +447,7 @@ contains
 
     
     SUBROUTINE UPDROTVEL
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -520,6 +525,7 @@ contains
     
     
     SUBROUTINE ROTORVABS(N, VEL)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -571,6 +577,7 @@ contains
     
     
     SUBROUTINE GETVELABS(NF, XF, YF, VEL)
+        use i_dfdc
         use m_qaic, only: qfcalc
         IMPLICIT NONE
         !
@@ -625,6 +632,7 @@ contains
     
     
     SUBROUTINE PRTVEL(LU, LINE, LIND, LABS, LREL, NR)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -770,6 +778,7 @@ contains
     
     
     SUBROUTINE SHOWDUCT(LU)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -830,6 +839,7 @@ contains
     
     
     SUBROUTINE SHOWACTDSK(LU)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -881,6 +891,7 @@ contains
     
     
     SUBROUTINE SHOWBLADE(LU)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -935,6 +946,7 @@ contains
     
     
     SUBROUTINE SHOWDRAGOBJ(ND, LU)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -994,6 +1006,7 @@ contains
     
     
     SUBROUTINE SETDRGOBJSRC
+        use i_dfdc
         use m_spline, only: segspl, seval
         IMPLICIT NONE
         !
@@ -1085,6 +1098,7 @@ contains
     
     
     SUBROUTINE SETROTORSRC
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1154,6 +1168,7 @@ contains
     
     
     SUBROUTINE VMAVGINIT(VAXIAL)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1247,6 +1262,7 @@ contains
     
     
     SUBROUTINE VMAVGCALC
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1384,6 +1400,7 @@ contains
     
     
     SUBROUTINE GTHCALC(GAMTH)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -1571,6 +1588,7 @@ contains
     
     
     SUBROUTINE TQCALC(ITYPE)
+        use i_dfdc
         use m_aero, only: getclcdcm, getalf
         IMPLICIT NONE
         !
@@ -2032,6 +2050,7 @@ contains
     SUBROUTINE WCALC(N, I, VAIN, VTIN, VTT, VAA, CI, CI_OMG, CI_VT, SI, SI_QNF, &
             & SI_VA, W, W_OMG, W_QNF, W_VT, W_VA, PHIB, P_OMG, P_QNF, &
             & P_VT, P_VA)
+        use i_dfdc
         use m_viscvel, only: uvinfl
         IMPLICIT NONE
         !
@@ -2108,6 +2127,7 @@ contains
     
     
     SUBROUTINE ROTRPRT(LU)
+        use i_dfdc
         use m_spline, only: spline, seval
         IMPLICIT NONE
         !
@@ -2511,6 +2531,7 @@ contains
     
     
     SUBROUTINE NFCALC
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -2590,6 +2611,7 @@ contains
     
     
     SUBROUTINE FFCALC
+        use i_dfdc
         use m_vels, only: getuv
         IMPLICIT NONE
         !
@@ -2666,6 +2688,7 @@ contains
     
     
     SUBROUTINE STGFIND
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

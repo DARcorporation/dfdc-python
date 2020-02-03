@@ -81,6 +81,7 @@ contains
     !
     
     SUBROUTINE SETIAERO
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -114,6 +115,7 @@ contains
     SUBROUTINE GETAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
             & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
             & MCRIT, TOC, REREF, REXP)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -181,6 +183,7 @@ contains
     SUBROUTINE PUTAERO(NR, N, XISECT, A0, CLMAX, CLMIN, DCLDA, DCLDA_STALL, &
             & DCL_STALL, CDMIN, CLDMIN, DCDCL2, DCDCL2S, CMCON, &
             & MCRIT, TOC, REREF, REXP)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -308,6 +311,7 @@ contains
     SUBROUTINE GETCLCDCM(NR, IS, XI, ALF, W, REY, SECSIG, SECSTAGR, CLIFT, &
             & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, STALLF, &
             & CDRAG, CD_ALF, CD_W, CD_REY, CMOM, CM_AL, CM_W)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -448,6 +452,7 @@ contains
     
     SUBROUTINE GETALF(NR, IS, XI, SECSIG, SECSTAGR, CLIFT, W, ALF, ALF_CL, &
             & ALF_W, STALLF)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -538,7 +543,7 @@ contains
         !     varying only with Mach by Prandtl-Glauert scaling
         !------------------------------------------------------------
         !
-        !C    INCLUDE 'DFDC.inc'
+        ! use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -561,7 +566,7 @@ contains
                 & DCD_ALF, DCD_W, DMDD, DMSTALL, FAC, FAC_W, &
                 & FSTALL, MACH, MACH_W, MEXP, MSQ, MSQ_W, PGRT, &
                 & PGRT_W, RCORR, RCORR_REY
-        REAL(R8KIND) :: ECMAX, ECMIN
+        REAL :: ECMAX, ECMIN
         !
         !*** End of declarations rewritten by SPAG
         !

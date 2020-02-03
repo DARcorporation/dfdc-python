@@ -42,7 +42,6 @@ contains
         !
         INTEGER :: N
         REAL :: SS
-        INTEGER :: ISGFIND
         REAL, DIMENSION(N) :: S
         !
         ! Local variables
@@ -318,7 +317,7 @@ contains
         ! Dummy arguments
         !
         INTEGER :: N1, N2
-        REAL, DIMENSION(2000) :: S
+        REAL, DIMENSION(*) :: S
         !
         ! Local variables
         !

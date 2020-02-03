@@ -34,6 +34,7 @@ contains
     !=========================================================================
     
     SUBROUTINE WAKERESET
+        use i_dfdc
         use m_dfdcsubs, only: updrotwak
         use m_inigrd, only: updgrd
         IMPLICIT NONE
@@ -107,6 +108,7 @@ contains
     
     
     SUBROUTINE WAKMOV(IELA, ISQ)
+        use i_dfdc
         use m_geom, only: xycset, xypspl, anpset
         IMPLICIT NONE
         !
@@ -191,6 +193,7 @@ contains
     
     
     SUBROUTINE WAKMOVR(IEL, XPNEW, YPNEW, ISQ)
+        use i_dfdc
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG

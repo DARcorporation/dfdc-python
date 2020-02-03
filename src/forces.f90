@@ -80,6 +80,7 @@ contains
     
     
     SUBROUTINE CPADDHS(XX, YY, CP, DHH, DSS, VTT)
+        use i_dfdc
         use m_grdutils, only: xygrdfind
         IMPLICIT NONE
         !
