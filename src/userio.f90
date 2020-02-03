@@ -114,6 +114,7 @@ contains
         !
         LOGICAL :: ERROR
         INTEGER :: NP
+        INTEGER, DIMENSION(1) :: IINPUT_TEMP
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -127,8 +128,11 @@ contains
             WRITE (*, 1010) PROMPT(1:NP), IINPUT
             1010    FORMAT (1X, A, ':  ', I6)
             !
-            CALL READI(1, IINPUT, ERROR)
-            IF (.NOT.(ERROR)) EXIT
+            CALL READI(1, IINPUT_TEMP, ERROR)
+            IF (.NOT.(ERROR)) THEN
+                IINPUT = IINPUT_TEMP(1)
+                EXIT
+            END IF
         ENDDO
         !
     END SUBROUTINE ASKI
@@ -150,6 +154,7 @@ contains
         !
         LOGICAL :: ERROR
         INTEGER :: NP
+        REAL, DIMENSION(1) :: RINPUT_TEMP
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -163,8 +168,11 @@ contains
             WRITE (*, 1010) PROMPT(1:NP), RINPUT
             1010    FORMAT (1X, A, ':  ', G12.6)
             !
-            CALL READR(1, RINPUT, ERROR)
-            IF (.NOT.(ERROR)) EXIT
+            CALL READR(1, RINPUT_TEMP, ERROR)
+            IF (.NOT.(ERROR)) THEN
+                RINPUT = RINPUT_TEMP(1)
+                EXIT
+            END IF
         ENDDO
         !
     END SUBROUTINE ASKR
