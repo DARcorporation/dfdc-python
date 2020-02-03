@@ -361,7 +361,7 @@ contains
     ! TRISOL
     
     
-    REAL FUNCTION GEVAL(SS, X, XS, S, N)
+    FUNCTION GEVAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -430,7 +430,7 @@ contains
     ! GEVAL
     
     
-    REAL FUNCTION SEVAL(SS, X, XS, S, N)
+    FUNCTION SEVAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -480,7 +480,7 @@ contains
     ! SEVAL
     
     
-    REAL FUNCTION DEVAL(SS, X, XS, S, N)
+    FUNCTION DEVAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -531,7 +531,7 @@ contains
     ! DEVAL
     
     
-    REAL FUNCTION D2VAL(SS, X, XS, S, N)
+    FUNCTION D2VAL(SS, X, XS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -699,7 +699,7 @@ contains
     
     
     
-    REAL FUNCTION CURV(SS, X, XS, Y, YS, S, N)
+    FUNCTION CURV(SS, X, XS, Y, YS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
@@ -771,7 +771,7 @@ contains
     ! CURV
     
     
-    REAL FUNCTION CURVS(SS, X, XS, Y, YS, S, N)
+    FUNCTION CURVS(SS, X, XS, Y, YS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
