@@ -33,37 +33,37 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE SGCURV(LQUERY, LCPLOT, NB, XB, XPB, YB, YPB, SB, NGX, NG, SG, &
-            & NPTS, CVEX, SMOF, FSL, FSR, NREF, SREF1, SREF2, CRRAT)
+    subroutine sgcurv(lquery, lcplot, nb, xb, xpb, yb, ypb, sb, ngx, ng, sg, &
+            & npts, cvex, smof, fsl, fsr, nref, sref1, sref2, crrat)
         use m_spline, only : trisol, segspl, seval, curv
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: IX = 1601, NREFX = 20
+        integer, parameter :: ix = 1601, nrefx = 20
         !
         ! Dummy arguments
         !
-        REAL :: CVEX, FSL, FSR, SMOF
-        LOGICAL :: LCPLOT, LQUERY
-        INTEGER :: NB, NG, NGX, NPTS, NREF
-        REAL, DIMENSION(NREF) :: CRRAT, SREF1, SREF2
-        REAL, DIMENSION(NB) :: SB, XB, XPB, YB, YPB
-        REAL, DIMENSION(NGX) :: SG
+        real :: cvex, fsl, fsr, smof
+        logical :: lcplot, lquery
+        integer :: nb, ng, ngx, npts, nref
+        real, dimension(nref) :: crrat, sref1, sref2
+        real, dimension(nb) :: sb, xb, xpb, yb, ypb
+        real, dimension(ngx) :: sg
         !
         ! Local variables
         !
-        REAL, DIMENSION(IX) :: AA, BB, CC, CV, CV0, CVINT, CVS, &
-                & S, SNEW
-        REAL :: CURVK, CURVL, CVASQ, CVAVG, CVLE, CVM, CVMAX, &
-                & CVO, CVTE, DLE, DSA, DSAVG, DSB, DSLE, DSM, &
-                & DSMAX, DSMIN, DSP, DSTE, DTE, FRAC, GCV, SBTOT, &
-                & SGI, SM, SO, STOT
-        REAL, DIMENSION(NREFX) :: CVR
-        INTEGER :: I, IB, IG, IPASS, IREF, K, KK, KMULT, N
-        INTEGER, SAVE :: NPASS
+        real, dimension(ix) :: aa, bb, cc, cv, cv0, cvint, cvs, &
+                & s, snew
+        real :: curvk, curvl, cvasq, cvavg, cvle, cvm, cvmax, &
+                & cvo, cvte, dle, dsa, dsavg, dsb, dsle, dsm, &
+                & dsmax, dsmin, dsp, dste, dte, frac, gcv, sbtot, &
+                & sgi, sm, so, stot
+        real, dimension(nrefx) :: cvr
+        integer :: i, ib, ig, ipass, iref, k, kk, kmult, n
+        integer, save :: npass
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -101,201 +101,201 @@ contains
         !
         !
         !---- max number of point-setting passes
-        DATA NPASS/1/
+        data npass/1/
         !
-        IF (NB>IX) STOP 'SGCURV: Local array overflow on IX'
-        IF (NREF>NREFX) STOP 'SGCURV: Local array overflow on NREFX'
+        if (nb>ix) stop 'SGCURV: Local array overflow on IX'
+        if (nref>nrefx) stop 'SGCURV: Local array overflow on NREFX'
         !
         !
-        SBTOT = SB(NB) - SB(1)
-        IF (SBTOT<=0.0) THEN
-            WRITE (*, *) '? SGCURV: Zero element arc length'
-            RETURN
-        ENDIF
+        sbtot = sb(nb) - sb(1)
+        if (sbtot<=0.0) then
+            write (*, *) '? SGCURV: Zero element arc length'
+            return
+        endif
         !
         !---- if no interaction or no spacing is present, go compute it first
-        IF (.NOT.LQUERY .OR. NG==0) THEN
-        ENDIF
+        if (.not.lquery .or. ng==0) then
+        endif
         !================================================================
         !==== Set surface panel node distribution based on curvature
         !
-        NG = NPTS
+        ng = npts
         !
-        IF (NG<2) THEN
-            WRITE (*, *) '? SGCURV: Must specify at least two panel nodes'
-            RETURN
-        ENDIF
+        if (ng<2) then
+            write (*, *) '? SGCURV: Must specify at least two panel nodes'
+            return
+        endif
         !
-        KMULT = MIN(8, (IX - 1) / NB)
+        kmult = min(8, (ix - 1) / nb)
         !
         !---- set up working coordinate array
-        I = 1
-        IB = 1
-        S(I) = SB(IB)
-        DO IB = 1, NB - 1
-            DSB = SB(IB + 1) - SB(IB)
+        i = 1
+        ib = 1
+        s(i) = sb(ib)
+        do ib = 1, nb - 1
+            dsb = sb(ib + 1) - sb(ib)
             !
-            IF (DSB>0.0) THEN
-                KK = KMULT
-            ELSE
-                KK = 1
-            ENDIF
+            if (dsb>0.0) then
+                kk = kmult
+            else
+                kk = 1
+            endif
             !
-            DO K = 1, KK
-                FRAC = FLOAT(K) / FLOAT(KK)
-                I = I + 1
-                IF (I>IX) STOP 'SGCURV:  Array overflow on IX'
-                S(I) = SB(IB + 1) * FRAC + SB(IB) * (1.0 - FRAC)
-            ENDDO
-        ENDDO
+            do k = 1, kk
+                frac = float(k) / float(kk)
+                i = i + 1
+                if (i>ix) stop 'SGCURV:  Array overflow on IX'
+                s(i) = sb(ib + 1) * frac + sb(ib) * (1.0 - frac)
+            enddo
+        enddo
         !
         !---- number of points in working array
-        N = I
+        n = i
         !
-        STOT = S(N) - S(1)
-        DO IPASS = 1, NPASS
+        stot = s(n) - s(1)
+        do ipass = 1, npass
             !
-            DSAVG = STOT / FLOAT(NG - 1)
+            dsavg = stot / float(ng - 1)
             !
-            DSLE = FSL * DSAVG
-            DSTE = FSR * DSAVG
+            dsle = fsl * dsavg
+            dste = fsr * dsavg
             !
             !---- set up curvature array (nondimensionalized with perimeter)
-            DO I = 1, N
-                CV(I) = CURV(S(I), XB, XPB, YB, YPB, SB, NB) * STOT
-                CV(I) = ABS(CV(I)) + 1.0
-            ENDDO
+            do i = 1, n
+                cv(i) = curv(s(i), xb, xpb, yb, ypb, sb, nb) * stot
+                cv(i) = abs(cv(i)) + 1.0
+            enddo
             !
             !---- reset curvature at corner nodes from adjacent nodes
-            DO I = 2, N - 2
-                IF (S(I)==S(I + 1)) THEN
-                    CV(I) = 0.5 * (CV(I - 1) + CV(I + 2))
-                    CV(I + 1) = CV(I)
-                ENDIF
-            ENDDO
+            do i = 2, n - 2
+                if (s(i)==s(i + 1)) then
+                    cv(i) = 0.5 * (cv(i - 1) + cv(i + 2))
+                    cv(i + 1) = cv(i)
+                endif
+            enddo
             !
             !---- raise curvature to power sqrt(CVEX), limiting to prevent overflows
-            DO I = 1, N
-                GCV = MIN(0.5 * CVEX * LOG(CV(I)), 12.0)
-                CV(I) = EXP(GCV)
-            ENDDO
+            do i = 1, n
+                gcv = min(0.5 * cvex * log(cv(i)), 12.0)
+                cv(i) = exp(gcv)
+            enddo
             !
             !---- set max and average curvature
-            CVMAX = 0.01
-            CVAVG = 0.
-            DO I = 1, N - 1
-                CVASQ = 0.5 * (CV(I)**2 + CV(I + 1)**2)
-                CVMAX = MAX(CVMAX, SQRT(CVASQ))
-                CVAVG = CVAVG + CVASQ * (S(I + 1) - S(I))
-            ENDDO
-            CVAVG = SQRT(CVAVG / (S(N) - S(1)))
+            cvmax = 0.01
+            cvavg = 0.
+            do i = 1, n - 1
+                cvasq = 0.5 * (cv(i)**2 + cv(i + 1)**2)
+                cvmax = max(cvmax, sqrt(cvasq))
+                cvavg = cvavg + cvasq * (s(i + 1) - s(i))
+            enddo
+            cvavg = sqrt(cvavg / (s(n) - s(1)))
             !
-            CVAVG = MAX(CVAVG, 1.0)
-            CVMAX = MAX(CVMAX, 1.0)
+            cvavg = max(cvavg, 1.0)
+            cvmax = max(cvmax, 1.0)
             !
             !---- set artificial curvature at ends to get approximate ds/c there
-            CVLE = CVAVG * DSAVG / DSLE
-            CVTE = CVAVG * DSAVG / DSTE
-            CV(1) = CVLE
-            CV(N) = CVTE
+            cvle = cvavg * dsavg / dsle
+            cvte = cvavg * dsavg / dste
+            cv(1) = cvle
+            cv(n) = cvte
             !
-            DO I = 1, N
-                CV0(I) = CV(I)
-            ENDDO
+            do i = 1, n
+                cv0(i) = cv(i)
+            enddo
             !
             !---- set curvature smoothing length
-            CURVL = 0.008 * STOT
+            curvl = 0.008 * stot
             !
             !---- set up implicit system for smoothed curvature array CV
-            CURVK = CURVL**2 * SMOF
-            AA(1) = 1.0
-            CC(1) = 0.
-            DO I = 2, N - 1
-                DSM = S(I) - S(I - 1)
-                DSP = S(I + 1) - S(I)
-                DSA = 0.5 * (DSM + DSP)
-                IF (DSM==0.0 .OR. DSP==0.0) THEN
-                    BB(I) = 0.0
-                    AA(I) = 1.0
-                    CC(I) = 0.0
-                ELSE
-                    BB(I) = -CURVK / (DSM * DSA)
-                    AA(I) = CURVK / (DSM * DSA) + CURVK / (DSP * DSA) + 1.0
-                    CC(I) = -CURVK / (DSP * DSA)
-                ENDIF
-            ENDDO
-            AA(N) = 1.0
-            BB(N) = 0.
+            curvk = curvl**2 * smof
+            aa(1) = 1.0
+            cc(1) = 0.
+            do i = 2, n - 1
+                dsm = s(i) - s(i - 1)
+                dsp = s(i + 1) - s(i)
+                dsa = 0.5 * (dsm + dsp)
+                if (dsm==0.0 .or. dsp==0.0) then
+                    bb(i) = 0.0
+                    aa(i) = 1.0
+                    cc(i) = 0.0
+                else
+                    bb(i) = -curvk / (dsm * dsa)
+                    aa(i) = curvk / (dsm * dsa) + curvk / (dsp * dsa) + 1.0
+                    cc(i) = -curvk / (dsp * dsa)
+                endif
+            enddo
+            aa(n) = 1.0
+            bb(n) = 0.
             !
             !---- set artificial curvature at the bunching points
-            DO IREF = 1, NREF
-                IF (CRRAT(IREF)>0.0) THEN
-                    CVR(IREF) = CVAVG / MAX(CRRAT(IREF), 0.0001)
-                ELSE
-                    CVR(IREF) = 0.0
-                ENDIF
+            do iref = 1, nref
+                if (crrat(iref)>0.0) then
+                    cvr(iref) = cvavg / max(crrat(iref), 0.0001)
+                else
+                    cvr(iref) = 0.0
+                endif
                 !
-                DO I = 2, N - 1
-                    IF (CRRAT(IREF)>0.0) THEN
+                do i = 2, n - 1
+                    if (crrat(iref)>0.0) then
                         !--------- set modified curvature if point is in refinement area
-                        SGI = (S(I) - S(1)) / STOT
+                        sgi = (s(i) - s(1)) / stot
                         !c            BB(I) = 0.
                         !c            AA(I) = 1.0
                         !c            CC(I) = 0.
-                        IF (SGI>SREF1(IREF) .AND. SGI<SREF2(IREF)) CV(I)    &
-                                & = CVR(IREF)
-                    ENDIF
-                ENDDO
-            ENDDO
+                        if (sgi>sref1(iref) .and. sgi<sref2(iref)) cv(i)    &
+                                & = cvr(iref)
+                    endif
+                enddo
+            enddo
             !
             !---- calculate smoothed curvature array
-            CALL TRISOL(AA, BB, CC, CV, N)
+            call trisol(aa, bb, cc, cv, n)
             !
             !---- spline curvature array
-            CALL SEGSPL(CV, CVS, S, N)
+            call segspl(cv, cvs, s, n)
             !
             !---- Integrate exponentiated curvature with arc length
-            CVINT(1) = 0.
-            DO I = 2, N
-                SM = S(I - 1)
-                SO = S(I)
-                CVM = SEVAL(SM, CV, CVS, S, N)
-                CVO = SEVAL(SO, CV, CVS, S, N)
-                CVM = MAX(CVM, 1.0)
-                CVO = MAX(CVO, 1.0)
+            cvint(1) = 0.
+            do i = 2, n
+                sm = s(i - 1)
+                so = s(i)
+                cvm = seval(sm, cv, cvs, s, n)
+                cvo = seval(so, cv, cvs, s, n)
+                cvm = max(cvm, 1.0)
+                cvo = max(cvo, 1.0)
                 !
-                CVINT(I) = CVINT(I - 1) + 0.5 * (CVO + CVM) * (SO - SM)
-            ENDDO
+                cvint(i) = cvint(i - 1) + 0.5 * (cvo + cvm) * (so - sm)
+            enddo
             !
-            DO I = 1, N
-                CVINT(I) = CVINT(I) + S(I)
-            ENDDO
+            do i = 1, n
+                cvint(i) = cvint(i) + s(i)
+            enddo
             !
             !---- Calculate normalized surface spacing distribution arrays
-            CALL SETCRV(SNEW, NG, S, CVINT, N)
+            call setcrv(snew, ng, s, cvint, n)
             !
-            DO IG = 1, NG
-                SG(IG) = (SNEW(IG) - SNEW(1)) / (SNEW(NG) - SNEW(1))
-            ENDDO
+            do ig = 1, ng
+                sg(ig) = (snew(ig) - snew(1)) / (snew(ng) - snew(1))
+            enddo
             !
             !---- calculate actual obtained grid spacings
-            DLE = ABS(SNEW(2) - SNEW(1))
-            DTE = ABS(SNEW(NG) - SNEW(NG - 1))
-            DSMIN = DLE
-            DSMAX = 0.0
-            DO IG = 2, NG
-                DSMIN = MIN(DSMIN, ABS(SNEW(IG) - SNEW(IG - 1)))
-                DSMAX = MAX(DSMAX, ABS(SNEW(IG) - SNEW(IG - 1)))
-            ENDDO
+            dle = abs(snew(2) - snew(1))
+            dte = abs(snew(ng) - snew(ng - 1))
+            dsmin = dle
+            dsmax = 0.0
+            do ig = 2, ng
+                dsmin = min(dsmin, abs(snew(ig) - snew(ig - 1)))
+                dsmax = max(dsmax, abs(snew(ig) - snew(ig - 1)))
+            enddo
             !
-        ENDDO
-    END SUBROUTINE SGCURV
+        enddo
+    end subroutine sgcurv
     !*==SETCRV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SGCURV
 
 
 
-    SUBROUTINE SETCRV(SNEW, NPTS, SB, HH, N)
+    subroutine setcrv(snew, npts, sb, hh, n)
         use m_spline, only : seval, splina
         !------------------------------------------------------------------
         !     Sets spacing array SNEW(i) based on surface curvature.
@@ -309,54 +309,54 @@ contains
         !             LFUDGL   T if curvature was augmented al left endpoint
         !             LFUDGT   T if curvature was augmented al left endpoint
         !------------------------------------------------------------------
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NMAX = 1601
+        integer, parameter :: nmax = 1601
         !
         ! Dummy arguments
         !
-        INTEGER :: N, NPTS
-        REAL, DIMENSION(N) :: HH, SB
-        REAL, DIMENSION(NPTS) :: SNEW
+        integer :: n, npts
+        real, dimension(n) :: hh, sb
+        real, dimension(npts) :: snew
         !
         ! Local variables
         !
-        REAL :: DH, HHI, RN
-        INTEGER :: I
-        REAL, DIMENSION(NMAX) :: SBP
+        real :: dh, hhi, rn
+        integer :: i
+        real, dimension(nmax) :: sbp
         !
         !*** End of declarations rewritten by SPAG
         !
         !
         !
-        IF (N>NMAX) STOP 'SETCRV: array overflow'
+        if (n>nmax) stop 'SETCRV: array overflow'
         !
-        RN = FLOAT(NPTS - 1)
+        rn = float(npts - 1)
         !
         !
         !---- spline  HH(i)  =  h(s)  =  s + c(s)
-        CALL SPLINA(HH, SBP, SB, N)
+        call splina(hh, sbp, sb, n)
         !
         !---- invert derivative from dh/ds to ds/dh
-        DO I = 1, N
-            SBP(I) = 1.0 / SBP(I)
-        ENDDO
+        do i = 1, n
+            sbp(i) = 1.0 / sbp(i)
+        enddo
         !
         !---- now,  SB(i),SBP(i)  =  s(h), s'(h)
         !
         !
-        DH = HH(N) / RN
+        dh = hh(n) / rn
         !
-        SNEW(1) = 0.0
-        DO I = 2, NPTS - 1
-            HHI = FLOAT(I - 1) * DH
-            SNEW(I) = SEVAL(HHI, SB, SBP, HH, N)
-        ENDDO
-        SNEW(NPTS) = SB(N)
+        snew(1) = 0.0
+        do i = 2, npts - 1
+            hhi = float(i - 1) * dh
+            snew(i) = seval(hhi, sb, sbp, hh, n)
+        enddo
+        snew(npts) = sb(n)
         !
-    END SUBROUTINE SETCRV
+    end subroutine setcrv
 end module m_sgutil

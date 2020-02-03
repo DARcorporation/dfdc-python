@@ -35,19 +35,19 @@ contains
     !
     !==== user input routines with prompting and error trapping
     !
-    SUBROUTINE ASKI1(PROMPT, IINPUT)
-        IMPLICIT NONE
+    subroutine aski1(prompt, iinput)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IINPUT
-        CHARACTER(*) :: PROMPT
+        integer :: iinput
+        character(*) :: prompt
         !
         ! Local variables
         !
-        INTEGER :: NP
+        integer :: np
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -55,31 +55,31 @@ contains
         !---- integer input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
         !
-        10   WRITE (*, 1000) PROMPT(1:NP)
-        READ (*, *, ERR = 10) IINPUT
-        RETURN
+        10   write (*, 1000) prompt(1:np)
+        read (*, *, err = 10) iinput
+        return
         !
-        1000 FORMAT (/A, '   i>  ', $)
-    END SUBROUTINE ASKI1
+        1000 format (/a, '   i>  ', $)
+    end subroutine aski1
     !*==ASKR1.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKI
 
-    SUBROUTINE ASKR1(PROMPT, RINPUT)
-        IMPLICIT NONE
+    subroutine askr1(prompt, rinput)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: PROMPT
-        REAL :: RINPUT
+        character(*) :: prompt
+        real :: rinput
         !
         ! Local variables
         !
-        INTEGER :: NP
+        integer :: np
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -87,192 +87,192 @@ contains
         !---- real input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
         !
-        10   WRITE (*, 1000) PROMPT(1:NP)
-        READ (*, *, ERR = 10) RINPUT
-        RETURN
+        10   write (*, 1000) prompt(1:np)
+        read (*, *, err = 10) rinput
+        return
         !
-        1000 FORMAT (/A, '   r>  ', $)
-    END SUBROUTINE ASKR1
+        1000 format (/a, '   r>  ', $)
+    end subroutine askr1
     !*==ASKI.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKR
 
 
-    SUBROUTINE ASKI(PROMPT, IINPUT)
-        IMPLICIT NONE
+    subroutine aski(prompt, iinput)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IINPUT
-        CHARACTER(*) :: PROMPT
+        integer :: iinput
+        character(*) :: prompt
         !
         ! Local variables
         !
-        LOGICAL :: ERROR
-        INTEGER :: NP
-        INTEGER, DIMENSION(1) :: IINPUT_TEMP
+        logical :: error
+        integer :: np
+        integer, dimension(1) :: iinput_temp
         !
         !*** End of declarations rewritten by SPAG
         !
         !---- integer input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
-        DO
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
+        do
             !
-            WRITE (*, 1010) PROMPT(1:NP), IINPUT
-            1010    FORMAT (1X, A, ':  ', I6)
+            write (*, 1010) prompt(1:np), iinput
+            1010    format (1x, a, ':  ', i6)
             !
-            CALL READI(1, IINPUT_TEMP, ERROR)
-            IF (.NOT.(ERROR)) THEN
-                IINPUT = IINPUT_TEMP(1)
-                EXIT
-            END IF
-        ENDDO
+            call readi(1, iinput_temp, error)
+            if (.not.(error)) then
+                iinput = iinput_temp(1)
+                exit
+            end if
+        enddo
         !
-    END SUBROUTINE ASKI
+    end subroutine aski
     !*==ASKR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKI
 
 
-    SUBROUTINE ASKR(PROMPT, RINPUT)
-        IMPLICIT NONE
+    subroutine askr(prompt, rinput)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: PROMPT
-        REAL :: RINPUT
+        character(*) :: prompt
+        real :: rinput
         !
         ! Local variables
         !
-        LOGICAL :: ERROR
-        INTEGER :: NP
-        REAL, DIMENSION(1) :: RINPUT_TEMP
+        logical :: error
+        integer :: np
+        real, dimension(1) :: rinput_temp
         !
         !*** End of declarations rewritten by SPAG
         !
         !---- real input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
-        DO
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
+        do
             !
-            WRITE (*, 1010) PROMPT(1:NP), RINPUT
-            1010    FORMAT (1X, A, ':  ', G12.6)
+            write (*, 1010) prompt(1:np), rinput
+            1010    format (1x, a, ':  ', g12.6)
             !
-            CALL READR(1, RINPUT_TEMP, ERROR)
-            IF (.NOT.(ERROR)) THEN
-                RINPUT = RINPUT_TEMP(1)
-                EXIT
-            END IF
-        ENDDO
+            call readr(1, rinput_temp, error)
+            if (.not.(error)) then
+                rinput = rinput_temp(1)
+                exit
+            end if
+        enddo
         !
-    END SUBROUTINE ASKR
+    end subroutine askr
     !*==ASKIN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKR
 
 
-    SUBROUTINE ASKIN(PROMPT, IINPUT, NINP1)
-        IMPLICIT NONE
+    subroutine askin(prompt, iinput, ninp1)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: NINP1
-        CHARACTER(*) :: PROMPT
-        INTEGER, DIMENSION(*) :: IINPUT
+        integer :: ninp1
+        character(*) :: prompt
+        integer, dimension(*) :: iinput
         !
         ! Local variables
         !
-        LOGICAL :: ERROR
-        INTEGER :: I, NINP, NP
+        logical :: error
+        integer :: i, ninp, np
         !
         !*** End of declarations rewritten by SPAG
         !
         !---- integer input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
         !
-        NINP = MIN(NINP1, 20)
-        DO
+        ninp = min(ninp1, 20)
+        do
             !
-            WRITE (*, 1010) PROMPT(1:NP), (IINPUT(I), I = 1, NINP)
-            1010    FORMAT (1X, A, ':  ', 20I6)
+            write (*, 1010) prompt(1:np), (iinput(i), i = 1, ninp)
+            1010    format (1x, a, ':  ', 20i6)
             !
-            CALL READI(NINP, IINPUT, ERROR)
-            IF (.NOT.(ERROR)) EXIT
-        ENDDO
+            call readi(ninp, iinput, error)
+            if (.not.(error)) exit
+        enddo
         !
-    END SUBROUTINE ASKIN
+    end subroutine askin
     !*==ASKRN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKIN
 
 
-    SUBROUTINE ASKRN(PROMPT, RINPUT, NINP1)
-        IMPLICIT NONE
+    subroutine askrn(prompt, rinput, ninp1)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: NINP1
-        CHARACTER(*) :: PROMPT
-        REAL, DIMENSION(*) :: RINPUT
+        integer :: ninp1
+        character(*) :: prompt
+        real, dimension(*) :: rinput
         !
         ! Local variables
         !
-        LOGICAL :: ERROR
-        INTEGER :: I, NINP, NP
+        logical :: error
+        integer :: i, ninp, np
         !
         !*** End of declarations rewritten by SPAG
         !
         !---- real input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
         !
-        NINP = MIN(NINP1, 20)
-        DO
+        ninp = min(ninp1, 20)
+        do
             !
-            WRITE (*, 1010) PROMPT(1:NP), (RINPUT(I), I = 1, NINP)
-            1010    FORMAT (1X, A, ':  ', 20G12.6)
+            write (*, 1010) prompt(1:np), (rinput(i), i = 1, ninp)
+            1010    format (1x, a, ':  ', 20g12.6)
             !
-            CALL READR(NINP, RINPUT, ERROR)
-            IF (.NOT.(ERROR)) EXIT
-        ENDDO
+            call readr(ninp, rinput, error)
+            if (.not.(error)) exit
+        enddo
         !
-    END SUBROUTINE ASKRN
+    end subroutine askrn
     !*==ASKL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKRN
 
 
 
-    SUBROUTINE ASKL(PROMPT, LINPUT)
-        IMPLICIT NONE
+    subroutine askl(prompt, linput)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: LINPUT
-        CHARACTER(*) :: PROMPT
+        logical :: linput
+        character(*) :: prompt
         !
         ! Local variables
         !
-        CHARACTER(1) :: CHAR
-        INTEGER :: NP
+        character(1) :: char
+        integer :: np
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -280,40 +280,40 @@ contains
         !---- logical input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
-        DO
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
+        do
             !
-            WRITE (*, 1000) PROMPT(1:NP)
-            READ (*, 1010) CHAR
-            IF (CHAR=='y') CHAR = 'Y'
-            IF (CHAR=='n') CHAR = 'N'
-            IF (CHAR=='Y' .OR. CHAR=='N') THEN
+            write (*, 1000) prompt(1:np)
+            read (*, 1010) char
+            if (char=='y') char = 'Y'
+            if (char=='n') char = 'N'
+            if (char=='Y' .or. char=='N') then
                 !
-                LINPUT = CHAR=='Y'
-                RETURN
+                linput = char=='Y'
+                return
                 !
-                1000       FORMAT (/A, ' y/n>  ', $)
-                1010       FORMAT (A)
-            ENDIF
-        ENDDO
-    END SUBROUTINE ASKL
+                1000       format (/a, ' y/n>  ', $)
+                1010       format (a)
+            endif
+        enddo
+    end subroutine askl
     !*==ASKS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKL
 
 
-    SUBROUTINE ASKS(PROMPT, INPUT)
-        IMPLICIT NONE
+    subroutine asks(prompt, input)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: INPUT, PROMPT
+        character(*) :: input, prompt
         !
         ! Local variables
         !
-        INTEGER :: NP
+        integer :: np
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -321,34 +321,34 @@ contains
         !---- string of arbitrary length input
         !
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
         !
-        WRITE (*, 1000) PROMPT(1:NP)
-        READ (*, 1010) INPUT
+        write (*, 1000) prompt(1:np)
+        read (*, 1010) input
         !
-        RETURN
+        return
         !
-        1000 FORMAT (/A, '   s>  ', $)
-        1010 FORMAT (A)
-    END SUBROUTINE ASKS
+        1000 format (/a, '   s>  ', $)
+        1010 format (a)
+    end subroutine asks
     !*==ASKC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKS
 
 
-    SUBROUTINE ASKC(PROMPT, COMAND, CARGS)
-        IMPLICIT NONE
+    subroutine askc(prompt, comand, cargs)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: CARGS, COMAND, PROMPT
+        character(*) :: cargs, comand, prompt
         !
         ! Local variables
         !
-        INTEGER :: I, IZERO, K, KI, NCARGS, NP
-        CHARACTER(128) :: LINE
+        integer :: i, izero, k, ki, ncargs, np
+        character(128) :: line
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -358,109 +358,109 @@ contains
         !
         !
         !
-        IZERO = ICHAR('0')
+        izero = ichar('0')
         !
-        NP = INDEX(PROMPT, '^') - 1
-        IF (NP==0) NP = LEN(PROMPT)
+        np = index(prompt, '^') - 1
+        if (np==0) np = len(prompt)
         !
-        WRITE (*, 1000) PROMPT(1:NP)
-        READ (*, 1020) LINE
+        write (*, 1000) prompt(1:np)
+        read (*, 1020) line
         !
         !---- strip off leading blanks
-        DO K = 1, 128
-            IF (LINE(1:1)/=' ') EXIT
-            LINE = LINE(2:128)
-        ENDDO
+        do k = 1, 128
+            if (line(1:1)/=' ') exit
+            line = line(2:128)
+        enddo
         !
         !---- find position of first blank, "+", "-", ".", ",", or numeral
-        K = INDEX(LINE, ' ')
-        KI = INDEX(LINE, '-')
-        IF (KI/=0) K = MIN(K, KI)
-        KI = INDEX(LINE, '+')
-        IF (KI/=0) K = MIN(K, KI)
-        KI = INDEX(LINE, '.')
-        IF (KI/=0) K = MIN(K, KI)
-        KI = INDEX(LINE, ',')
-        IF (KI/=0) K = MIN(K, KI)
-        DO I = 0, 9
-            KI = INDEX(LINE, CHAR(IZERO + I))
-            IF (KI/=0) K = MIN(K, KI)
-        ENDDO
+        k = index(line, ' ')
+        ki = index(line, '-')
+        if (ki/=0) k = min(k, ki)
+        ki = index(line, '+')
+        if (ki/=0) k = min(k, ki)
+        ki = index(line, '.')
+        if (ki/=0) k = min(k, ki)
+        ki = index(line, ',')
+        if (ki/=0) k = min(k, ki)
+        do i = 0, 9
+            ki = index(line, char(izero + i))
+            if (ki/=0) k = min(k, ki)
+        enddo
         !
         !---- there is no blank between command and argument... use first 4 characters
-        IF (K<=0) K = 5
+        if (k<=0) k = 5
         !
-        IF (K==1) THEN
+        if (k==1) then
             !------ the "command" is a number... set entire COMAND string with it
-            COMAND = LINE
-        ELSE
+            comand = line
+        else
             !------ the "command" is some string... just use the part up to the argument
-            COMAND = LINE(1:K - 1)
-        ENDIF
+            comand = line(1:k - 1)
+        endif
         !
         !---- convert it to uppercase
-        CALL LC2UC(COMAND)
+        call lc2uc(comand)
         !
-        CARGS = LINE(K:128)
-        CALL STRIP(CARGS, NCARGS)
-        RETURN
+        cargs = line(k:128)
+        call strip(cargs, ncargs)
+        return
         !
-        1000 FORMAT (/A, '   c>  ', $)
-        1020 FORMAT (A)
-    END SUBROUTINE ASKC
+        1000 format (/a, '   c>  ', $)
+        1020 format (a)
+    end subroutine askc
     !*==LC2UC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ASKC
 
 
-    SUBROUTINE LC2UC(INPUT)
-        IMPLICIT NONE
+    subroutine lc2uc(input)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: INPUT
+        character(*) :: input
         !
         ! Local variables
         !
-        INTEGER :: I, K, N
-        CHARACTER(26), SAVE :: LCASE, UCASE
+        integer :: i, k, n
+        character(26), save :: lcase, ucase
         !
         !*** End of declarations rewritten by SPAG
         !
         !
-        DATA LCASE/'abcdefghijklmnopqrstuvwxyz'/
-        DATA UCASE/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
+        data lcase/'abcdefghijklmnopqrstuvwxyz'/
+        data ucase/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
         !
-        N = LEN(INPUT)
+        n = len(input)
         !
-        DO I = 1, N
-            K = INDEX(LCASE, INPUT(I:I))
-            IF (K>0) INPUT(I:I) = UCASE(K:K)
-        ENDDO
+        do i = 1, n
+            k = index(lcase, input(i:i))
+            if (k>0) input(i:i) = ucase(k:k)
+        enddo
         !
-    END SUBROUTINE LC2UC
+    end subroutine lc2uc
     !*==READI.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LC2UC
 
 
 
-    SUBROUTINE READI(N, IVAR, ERROR)
-        IMPLICIT NONE
+    subroutine readi(n, ivar, error)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: ERROR
-        INTEGER :: N
-        INTEGER, DIMENSION(N) :: IVAR
+        logical :: error
+        integer :: n
+        integer, dimension(n) :: ivar
         !
         ! Local variables
         !
-        INTEGER :: I, NTMP
-        INTEGER, DIMENSION(40) :: IVTMP
-        CHARACTER(80) :: LINE
+        integer :: i, ntmp
+        integer, dimension(40) :: ivtmp
+        character(80) :: line
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -469,44 +469,44 @@ contains
         !     if only <return> is entered.
         !--------------------------------------------------
         !
-        READ (*, 1000) LINE
-        1000 FORMAT (A80)
+        read (*, 1000) line
+        1000 format (a80)
         !
-        DO I = 1, N
-            IVTMP(I) = IVAR(I)
-        ENDDO
+        do i = 1, n
+            ivtmp(i) = ivar(i)
+        enddo
         !
-        NTMP = 40
-        CALL GETINT(LINE, IVTMP, NTMP, ERROR)
+        ntmp = 40
+        call getint(line, ivtmp, ntmp, error)
         !
-        IF (ERROR) RETURN
+        if (error) return
         !
-        DO I = 1, N
-            IVAR(I) = IVTMP(I)
-        ENDDO
+        do i = 1, n
+            ivar(i) = ivtmp(i)
+        enddo
         !
-    END SUBROUTINE READI
+    end subroutine readi
     !*==READR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! READI
 
 
 
-    SUBROUTINE READR(N, VAR, ERROR)
-        IMPLICIT NONE
+    subroutine readr(n, var, error)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: ERROR
-        INTEGER :: N
-        REAL, DIMENSION(N) :: VAR
+        logical :: error
+        integer :: n
+        real, dimension(n) :: var
         !
         ! Local variables
         !
-        INTEGER :: I, NTMP
-        CHARACTER(80) :: LINE
-        REAL, DIMENSION(40) :: VTMP
+        integer :: i, ntmp
+        character(80) :: line
+        real, dimension(40) :: vtmp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -515,45 +515,45 @@ contains
         !     if only <return> is entered.
         !-------------------------------------------------
         !
-        READ (*, 1000) LINE
-        1000 FORMAT (A80)
+        read (*, 1000) line
+        1000 format (a80)
         !
-        DO I = 1, N
-            VTMP(I) = VAR(I)
-        ENDDO
+        do i = 1, n
+            vtmp(i) = var(i)
+        enddo
         !
-        NTMP = 40
-        CALL GETFLT(LINE, VTMP, NTMP, ERROR)
+        ntmp = 40
+        call getflt(line, vtmp, ntmp, error)
         !
-        IF (ERROR) RETURN
+        if (error) return
         !
-        DO I = 1, N
-            VAR(I) = VTMP(I)
-        ENDDO
+        do i = 1, n
+            var(i) = vtmp(i)
+        enddo
         !
-    END SUBROUTINE READR
+    end subroutine readr
     !*==GETINT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! READR
 
 
 
 
-    SUBROUTINE GETINT(INPUT, A, N, ERROR)
-        IMPLICIT NONE
+    subroutine getint(input, a, n, error)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: ERROR
-        CHARACTER(*) :: INPUT
-        INTEGER :: N
-        INTEGER, DIMENSION(*) :: A
+        logical :: error
+        character(*) :: input
+        integer :: n
+        integer, dimension(*) :: a
         !
         ! Local variables
         !
-        INTEGER :: I, ILEN, ILENP, IPASS, K, KCOMMA, KSPACE, NINP
-        CHARACTER(130) :: REC
+        integer :: i, ilen, ilenp, ipass, k, kcomma, kspace, ninp
+        character(130) :: rec
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -569,77 +569,77 @@ contains
         !----------------------------------------------------------
         !
         !---- only first 128 characters in INPUT will be parsed
-        ILEN = MIN(LEN(INPUT), 128)
-        ILENP = ILEN + 2
+        ilen = min(len(input), 128)
+        ilenp = ilen + 2
         !
         !---- put input into local work string (which will be munched)
-        REC(1:ILENP) = INPUT(1:ILEN) // ' ,'
+        rec(1:ilenp) = input(1:ilen) // ' ,'
         !
         !---- ignore everything after a "!" character
-        K = INDEX(REC, '!')
-        IF (K>0) REC(1:ILEN) = REC(1:K - 1)
+        k = index(rec, '!')
+        if (k>0) rec(1:ilen) = rec(1:k - 1)
         !
-        NINP = N
+        ninp = n
         !
         !---- count up how many numbers are to be extracted
-        N = 0
-        K = 1
-        DO IPASS = 1, ILEN
+        n = 0
+        k = 1
+        do ipass = 1, ilen
             !------ search for next space or comma starting with current index K
-            KSPACE = INDEX(REC(K:ILENP), ' ') + K - 1
-            KCOMMA = INDEX(REC(K:ILENP), ',') + K - 1
+            kspace = index(rec(k:ilenp), ' ') + k - 1
+            kcomma = index(rec(k:ilenp), ',') + k - 1
             !
-            IF (K==KSPACE) THEN
+            if (k==kspace) then
                 !------- just skip this space
-                K = K + 1
-                GOTO 9
-            ENDIF
+                k = k + 1
+                goto 9
+            endif
             !
-            IF (K==KCOMMA) THEN
+            if (k==kcomma) then
                 !------- comma found.. increment number count and keep looking
-                N = N + 1
-                K = K + 1
-                GOTO 9
-            ENDIF
+                n = n + 1
+                k = k + 1
+                goto 9
+            endif
             !
             !------ neither space nor comma found, so we ran into a number...
             !-    ...increment number counter and keep looking after next space or comma
-            N = N + 1
-            K = MIN(KSPACE, KCOMMA) + 1
+            n = n + 1
+            k = min(kspace, kcomma) + 1
             !
-            9       IF (K>=ILEN) EXIT
-        ENDDO
+            9       if (k>=ilen) exit
+        enddo
         !
         !---- decide on how many numbers to read, and go ahead and read them
-        IF (NINP>0) N = MIN(N, NINP)
-        READ (REC(1:ILEN), *, ERR = 20) (A(I), I = 1, N)
-        ERROR = .FALSE.
-        RETURN
+        if (ninp>0) n = min(n, ninp)
+        read (rec(1:ilen), *, err = 20) (a(i), i = 1, n)
+        error = .false.
+        return
         !
         !---- bzzzt !!!
         !cc   WRITE(*,*) 'GETINT: String-to-integer conversion error.'
-        20   N = 0
-        ERROR = .TRUE.
-    END SUBROUTINE GETINT
+        20   n = 0
+        error = .true.
+    end subroutine getint
     !*==GETFLT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE GETFLT(INPUT, A, N, ERROR)
-        IMPLICIT NONE
+    subroutine getflt(input, a, n, error)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: ERROR
-        CHARACTER(*) :: INPUT
-        INTEGER :: N
-        REAL, DIMENSION(*) :: A
+        logical :: error
+        character(*) :: input
+        integer :: n
+        real, dimension(*) :: a
         !
         ! Local variables
         !
-        INTEGER :: I, ILEN, ILENP, IPASS, K, KCOMMA, KSPACE, NINP
-        CHARACTER(130) :: REC
+        integer :: i, ilen, ilenp, ipass, k, kcomma, kspace, ninp
+        character(130) :: rec
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -655,74 +655,74 @@ contains
         !----------------------------------------------------------
         !
         !---- only first 128 characters in INPUT will be parsed
-        ILEN = MIN(LEN(INPUT), 128)
-        ILENP = ILEN + 2
+        ilen = min(len(input), 128)
+        ilenp = ilen + 2
         !
         !---- put input into local work string (which will be munched)
-        REC(1:ILENP) = INPUT(1:ILEN) // ' ,'
+        rec(1:ilenp) = input(1:ilen) // ' ,'
         !
         !---- ignore everything after a "!" character
-        K = INDEX(REC, '!')
-        IF (K>0) REC(1:ILEN) = REC(1:K - 1)
+        k = index(rec, '!')
+        if (k>0) rec(1:ilen) = rec(1:k - 1)
         !
-        NINP = N
+        ninp = n
         !
         !---- count up how many numbers are to be extracted
-        N = 0
-        K = 1
-        DO IPASS = 1, ILEN
+        n = 0
+        k = 1
+        do ipass = 1, ilen
             !------ search for next space or comma starting with current index K
-            KSPACE = INDEX(REC(K:ILENP), ' ') + K - 1
-            KCOMMA = INDEX(REC(K:ILENP), ',') + K - 1
+            kspace = index(rec(k:ilenp), ' ') + k - 1
+            kcomma = index(rec(k:ilenp), ',') + k - 1
             !
-            IF (K==KSPACE) THEN
+            if (k==kspace) then
                 !------- just skip this space
-                K = K + 1
-                GOTO 9
-            ENDIF
+                k = k + 1
+                goto 9
+            endif
             !
-            IF (K==KCOMMA) THEN
+            if (k==kcomma) then
                 !------- comma found.. increment number count and keep looking
-                N = N + 1
-                K = K + 1
-                GOTO 9
-            ENDIF
+                n = n + 1
+                k = k + 1
+                goto 9
+            endif
             !
             !------ neither space nor comma found, so we ran into a number...
             !-    ...increment number counter and keep looking after next space or comma
-            N = N + 1
-            K = MIN(KSPACE, KCOMMA) + 1
+            n = n + 1
+            k = min(kspace, kcomma) + 1
             !
-            9       IF (K>=ILEN) EXIT
-        ENDDO
+            9       if (k>=ilen) exit
+        enddo
         !
         !---- decide on how many numbers to read, and go ahead and read them
-        IF (NINP>0) N = MIN(N, NINP)
-        READ (REC(1:ILEN), *, ERR = 20) (A(I), I = 1, N)
-        ERROR = .FALSE.
-        RETURN
+        if (ninp>0) n = min(n, ninp)
+        read (rec(1:ilen), *, err = 20) (a(i), i = 1, n)
+        error = .false.
+        return
         !
         !---- bzzzt !!!
         !cc   WRITE(*,*) 'GETFLT: String-to-integer conversion error.'
-        20   N = 0
-        ERROR = .TRUE.
-    END SUBROUTINE GETFLT
+        20   n = 0
+        error = .true.
+    end subroutine getflt
     !*==STRIP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE STRIP(STRING, NS)
-        IMPLICIT NONE
+    subroutine strip(string, ns)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: NS
-        CHARACTER(*) :: STRING
+        integer :: ns
+        character(*) :: string
         !
         ! Local variables
         !
-        INTEGER :: K, K1, K2, N
+        integer :: k, k1, k2, n
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -730,47 +730,47 @@ contains
         !     Strips leading blanks off string
         !     and returns length of non-blank part.
         !-------------------------------------------
-        N = LEN(STRING)
+        n = len(string)
         !
         !---- find last non-blank character
-        DO K2 = N, 1, -1
-            IF (STRING(K2:K2)/=' ') GOTO 11
-        ENDDO
-        K2 = 0
+        do k2 = n, 1, -1
+            if (string(k2:k2)/=' ') goto 11
+        enddo
+        k2 = 0
         !
         !---- find first non-blank character
-        11   DO K1 = 1, K2
-            IF (STRING(K1:K1)/=' ') EXIT
-        ENDDO
+        11   do k1 = 1, k2
+            if (string(k1:k1)/=' ') exit
+        enddo
         !
         !---- number of non-blank characters
-        NS = K2 - K1 + 1
-        IF (NS==0) RETURN
+        ns = k2 - k1 + 1
+        if (ns==0) return
         !
         !---- shift STRING so first character is non-blank
-        STRING(1:NS) = STRING(K1:K2)
+        string(1:ns) = string(k1:k2)
         !
         !---- pad tail of STRING with blanks
-        DO K = NS + 1, N
-            STRING(K:K) = ' '
-        ENDDO
+        do k = ns + 1, n
+            string(k:k) = ' '
+        enddo
         !
-    END SUBROUTINE STRIP
+    end subroutine strip
     !*==GETARG0.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
-    SUBROUTINE GETARG0(IARG, ARG)
-        IMPLICIT NONE
+    subroutine getarg0(iarg, arg)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: ARG
-        INTEGER :: IARG
+        character(*) :: arg
+        integer :: iarg
         !
         ! Local variables
         !
-        INTEGER :: NARG
+        integer :: narg
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -782,31 +782,31 @@ contains
         !      (just returns blank string instead)
         !------------------------------------------------
         !
-        NARG = IARGC()
-        IF (NARG>=IARG) THEN
-            CALL GETARG(IARG, ARG)
-        ELSE
-            ARG = ' '
-        ENDIF
+        narg = iargc()
+        if (narg>=iarg) then
+            call getarg(iarg, arg)
+        else
+            arg = ' '
+        endif
         !
-    END SUBROUTINE GETARG0
+    end subroutine getarg0
     !*==RDLINE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GETARG0
 
 
-    SUBROUTINE RDLINE(LUN, LINE, ICNT)
-        IMPLICIT NONE
+    subroutine rdline(lun, line, icnt)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: ICNT, LUN
-        CHARACTER(*) :: LINE
+        integer :: icnt, lun
+        character(*) :: line
         !
         ! Local variables
         !
-        LOGICAL, SAVE :: LECHO
+        logical, save :: lecho
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -818,29 +818,29 @@ contains
         !
         !   Comment lines are assumed to start with ! or #
         !
-        DATA LECHO/.FALSE./
+        data lecho/.false./
         !
-        1000 FORMAT (A)
-        1010 FORMAT (I4, 1X, A)
-        DO
+        1000 format (a)
+        1010 format (i4, 1x, a)
+        do
             !
-            ICNT = ICNT + 1
-            READ (LUN, 1000, END = 80, ERR = 90) LINE
-            IF (LECHO) WRITE (*, 1010) ICNT, LINE(1:60)
+            icnt = icnt + 1
+            read (lun, 1000, end = 80, err = 90) line
+            if (lecho) write (*, 1010) icnt, line(1:60)
             !
             !---- skip comment line
-            IF (INDEX('!#', LINE(1:1))==0) THEN
+            if (index('!#', line(1:1))==0) then
                 !
                 !---- skip blank line
                 !
                 !---- normal return after significant line
-                IF (LINE/=' ') RETURN
-            ENDIF
-        ENDDO
+                if (line/=' ') return
+            endif
+        enddo
         !
-        80   LINE = 'END '
-        RETURN
+        80   line = 'END '
+        return
         !
-        90   LINE = 'ERR '
-    END SUBROUTINE RDLINE
+        90   line = 'ERR '
+    end subroutine rdline
 end module m_userio

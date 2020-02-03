@@ -34,23 +34,23 @@ contains
     !=========================================================================
 
 
-    SUBROUTINE INIGRD
+    subroutine inigrd
         use i_dfdc
         use m_userio, only : askr
         use m_xutils, only : setexp
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        REAL :: AMASS, AMASS1, DMASS1, DS, DS1, DX, DXW, DY, &
-                & FRAC, FRC, SMAX, XCB, XDW, XL, XLAST, XTECB, &
-                & XTEDW, XU, YCB, YDW, YL, YLAST, YU, YY
-        INTEGER :: I, IEL, ILWR, IP, IP1CB, IP1DW, IP2CB, IP2DW, &
-                & IPC, IPCB, IPD, IPDW, IPUP, ITE, IUPR, J, K, &
-                & NR
-        REAL, DIMENSION(IPX) :: S
+        real :: amass, amass1, dmass1, ds, ds1, dx, dxw, dy, &
+                & frac, frc, smax, xcb, xdw, xl, xlast, xtecb, &
+                & xtedw, xu, ycb, ydw, yl, ylast, yu, yy
+        integer :: i, iel, ilwr, ip, ip1cb, ip1dw, ip2cb, ip2dw, &
+                & ipc, ipcb, ipd, ipdw, ipup, ite, iupr, j, k, &
+                & nr
+        real, dimension(ipx) :: s
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -59,238 +59,238 @@ contains
         !     geometry
         !------------------------------------------------------
         !
-        IF (LDBG) THEN
-            WRITE (*, *) ' '
-            WRITE (*, *) 'INIGRD setup grid for slipstream'
+        if (ldbg) then
+            write (*, *) ' '
+            write (*, *) 'INIGRD setup grid for slipstream'
             !
-            WRITE (LUNDBG, *) ' '
-            WRITE (LUNDBG, *) 'INIGRD setup grid for slipstream'
-        ENDIF
+            write (lundbg, *) ' '
+            write (lundbg, *) 'INIGRD setup grid for slipstream'
+        endif
         !
         !---- Find most-upstream rotor point on duct wall and set as start of grid
-        NRUPSTRM = 1
-        IPUP = IPROTDW(NRUPSTRM)
-        DO NR = 2, NROTOR
-            IF (IPROTDW(NR)<IPUP) THEN
-                NRUPSTRM = NR
-                IPUP = IPROTDW(NR)
-            ENDIF
-        ENDDO
+        nrupstrm = 1
+        ipup = iprotdw(nrupstrm)
+        do nr = 2, nrotor
+            if (iprotdw(nr)<ipup) then
+                nrupstrm = nr
+                ipup = iprotdw(nr)
+            endif
+        enddo
         !---- Setup rotor at upstream end of grid
-        DO NR = 1, NROTOR
-            IGROTOR(NR) = 1 + IPROTDW(NR) - IPUP
-        ENDDO
+        do nr = 1, nrotor
+            igrotor(nr) = 1 + iprotdw(nr) - ipup
+        enddo
         !
-        NR = NRUPSTRM
+        nr = nrupstrm
         !---- Indices of rotor line on CB and duct define upstream grid boundary
-        !---- find axial location of rotor and TE's on CB and duct walls
-        IEL = 1
-        IP1CB = IPFRST(IEL)
-        IP2CB = IPLAST(IEL)
-        IPCB = IPROTCB(NR)
-        IF (IPCB==0) THEN
-            WRITE (*, *) 'Error locating rotor on CB wall'
-            STOP
-        ENDIF
-        IF (LDBG) WRITE (LUNDBG, *) 'Rotor on CB @ ', IPCB
-        XCB = XP(IPCB)
-        YCB = YP(IPCB)
-        XTECB = XP(IP1CB)
+        !---- find axial location of rotor and TE's on cb and duct walls
+        iel = 1
+        ip1cb = ipfrst(iel)
+        ip2cb = iplast(iel)
+        ipcb = iprotcb(nr)
+        if (ipcb==0) then
+            write (*, *) 'Error locating rotor on CB wall'
+            stop
+        endif
+        if (ldbg) write (lundbg, *) 'Rotor on CB @ ', ipcb
+        xcb = xp(ipcb)
+        ycb = yp(ipcb)
+        xtecb = xp(ip1cb)
         !c    IF(LDBG) WRITE(*,*) 'XR, XTECB ',XCB,XTECB
         !
-        IEL = 2
-        IP1DW = IPFRST(IEL)
-        IP2DW = IPLAST(IEL)
-        IPDW = IPROTDW(NR)
-        IF (IPDW==0) THEN
-            WRITE (*, *) 'Error locating rotor on Duct wall'
-            STOP
-        ENDIF
-        IF (LDBG) WRITE (LUNDBG, *) 'Rotor on Duct wall @ ', IPDW
-        XDW = XP(IPDW)
-        YDW = YP(IPDW)
-        XTEDW = XP(IP2DW)
+        iel = 2
+        ip1dw = ipfrst(iel)
+        ip2dw = iplast(iel)
+        ipdw = iprotdw(nr)
+        if (ipdw==0) then
+            write (*, *) 'Error locating rotor on Duct wall'
+            stop
+        endif
+        if (ldbg) write (lundbg, *) 'Rotor on Duct wall @ ', ipdw
+        xdw = xp(ipdw)
+        ydw = yp(ipdw)
+        xtedw = xp(ip2dw)
         !c    IF(LDBG) WRITE(*,*) 'XR XTEDW ',XDW,XTEDW
         !
         !
         !---- Define lower streamline (J=1)
-        I = IGROTOR(NR) - 1
-        J = 1
-        DO IP = IPCB, IP1CB, -1
-            I = I + 1
-            XG(I, J) = XP(IP)
-            YG(I, J) = YP(IP)
-            IP2IG(IP) = I
-        ENDDO
-        XLAST = XG(I, J)
-        YLAST = YG(I, J)
-        IGTECB = I
+        i = igrotor(nr) - 1
+        j = 1
+        do ip = ipcb, ip1cb, -1
+            i = i + 1
+            xg(i, j) = xp(ip)
+            yg(i, j) = yp(ip)
+            ip2ig(ip) = i
+        enddo
+        xlast = xg(i, j)
+        ylast = yg(i, j)
+        igtecb = i
         !c      write(*,*) 'IGTECB,II defined as ',IGTECB,II
         !c    IF(LDBG) WRITE(*,*) 'L IGTECB,XYLAST ',IGTECB,XLAST,YLAST
         !
         !---- Add points at X values of duct wall if it extends downstream of CB
-        IPD = IPDW + IGTECB - 1
-        IF (IPD<IP2DW) THEN
-            DO IP = IPD + 1, IP2DW
-                I = I + 1
-                XG(I, J) = XP(IP)
-                YG(I, J) = YLAST
-            ENDDO
-            XLAST = XG(I, J)
-            YLAST = YG(I, J)
-            ITE = I
+        ipd = ipdw + igtecb - 1
+        if (ipd<ip2dw) then
+            do ip = ipd + 1, ip2dw
+                i = i + 1
+                xg(i, j) = xp(ip)
+                yg(i, j) = ylast
+            enddo
+            xlast = xg(i, j)
+            ylast = yg(i, j)
+            ite = i
             !c     IF(LDBG) WRITE(*,*) 'L ITE,XYLAST ',ITE,XLAST,YLAST
-        ENDIF
+        endif
         !
         !---- Check downstream wake end location
-        IF (LDBG) WRITE (LUNDBG, *) 'INIGRD XWAKE ', XWAKE
-        IF (XDWKLEN<0.0 .OR. XDWKLEN>5.0) THEN
-            WRITE (*, *) 'Rotor wake length out of bounds ', XDWKLEN
-            WRITE (*, *) '  CB   TE at X,Y =', XBTE(1), YBTE(1)
-            WRITE (*, *) '  Duct TE at X,Y =', XBTE(2), YBTE(2)
-            WRITE (*, *) '  Rotor Diameter =', 2.0 * RTIP(1)
-            CALL ASKR('Enter length of wake from TE dXlen/D^', XDWKLEN)
-        ENDIF
-        XWAKE = MAX(XBTE(1), XBTE(2)) + XDWKLEN * 2.0 * RTIP(1)
+        if (ldbg) write (lundbg, *) 'INIGRD XWAKE ', xwake
+        if (xdwklen<0.0 .or. xdwklen>5.0) then
+            write (*, *) 'Rotor wake length out of bounds ', xdwklen
+            write (*, *) '  CB   TE at X,Y =', xbte(1), ybte(1)
+            write (*, *) '  Duct TE at X,Y =', xbte(2), ybte(2)
+            write (*, *) '  Rotor Diameter =', 2.0 * rtip(1)
+            call askr('Enter length of wake from TE dXlen/D^', xdwklen)
+        endif
+        xwake = max(xbte(1), xbte(2)) + xdwklen * 2.0 * rtip(1)
         !
         !---- Add points downstream to end of wake
-        DX = XG(I, J) - XG(I - 1, J)
-        DY = YG(I, J) - YG(I - 1, J)
-        DS = SQRT(DX * DX + DY * DY)
+        dx = xg(i, j) - xg(i - 1, j)
+        dy = yg(i, j) - yg(i - 1, j)
+        ds = sqrt(dx * dx + dy * dy)
         !
-        SMAX = XWAKE - XLAST
-        DXW = SMAX / FLOAT(NWAKE - 1)
-        DS1 = 0.2 * DXW
-        CALL SETEXP(S, DS1, SMAX, NWAKE)
-        DO K = 2, NWAKE
-            I = I + 1
-            XG(I, J) = XLAST + S(K)
-            YG(I, J) = YLAST
-        ENDDO
-        ILWR = I
+        smax = xwake - xlast
+        dxw = smax / float(nwake - 1)
+        ds1 = 0.2 * dxw
+        call setexp(s, ds1, smax, nwake)
+        do k = 2, nwake
+            i = i + 1
+            xg(i, j) = xlast + s(k)
+            yg(i, j) = ylast
+        enddo
+        ilwr = i
         !
         !
         !---- Define upper streamline (J=JJ=NRP from rotor line points)
-        JJ = NRP
+        jj = nrp
         !
-        I = IGROTOR(NR) - 1
-        J = JJ
-        DO IP = IPDW, IP2DW
-            I = I + 1
-            XG(I, J) = XP(IP)
-            YG(I, J) = YP(IP)
-            IP2IG(IP) = I
-        ENDDO
-        XLAST = XG(I, J)
-        YLAST = YG(I, J)
-        IGTEDW = I
+        i = igrotor(nr) - 1
+        j = jj
+        do ip = ipdw, ip2dw
+            i = i + 1
+            xg(i, j) = xp(ip)
+            yg(i, j) = yp(ip)
+            ip2ig(ip) = i
+        enddo
+        xlast = xg(i, j)
+        ylast = yg(i, j)
+        igtedw = i
         !c      write(*,*) 'IGTEDW,II defined as ',IGTEDW,II
         !c    IF(LDBG) WRITE(*,*) 'U IGTEDW,XYLAST ',IGTEDW,XLAST,YLAST
         !
         !---- Add points at X values of CB wall if it extends downstream of duct
-        IPC = IPCB - IGTEDW + 1
-        IF (IPC>IP1CB) THEN
-            DO IP = IPC - 1, IP1CB, -1
-                I = I + 1
-                XG(I, J) = XP(IP)
-                YG(I, J) = YLAST
-            ENDDO
-            XLAST = XG(I, J)
-            YLAST = YG(I, J)
-            ITE = I
+        ipc = ipcb - igtedw + 1
+        if (ipc>ip1cb) then
+            do ip = ipc - 1, ip1cb, -1
+                i = i + 1
+                xg(i, j) = xp(ip)
+                yg(i, j) = ylast
+            enddo
+            xlast = xg(i, j)
+            ylast = yg(i, j)
+            ite = i
             !c     IF(LDBG) WRITE(*,*) 'U ITE,XYLAST ',ITE,XLAST,YLAST
-        ENDIF
+        endif
         !
         !---- Add points downstream to end of wake
-        DX = XG(I, J) - XG(I - 1, J)
-        DY = YG(I, J) - YG(I - 1, J)
-        DS = SQRT(DX * DX + DY * DY)
+        dx = xg(i, j) - xg(i - 1, j)
+        dy = yg(i, j) - yg(i - 1, j)
+        ds = sqrt(dx * dx + dy * dy)
         !
-        SMAX = XWAKE - XLAST
-        DXW = SMAX / FLOAT(NWAKE - 1)
-        DS1 = 0.2 * DXW
-        CALL SETEXP(S, DS1, SMAX, NWAKE)
-        DO K = 2, NWAKE
-            I = I + 1
-            XG(I, J) = XLAST + S(K)
-            YG(I, J) = YLAST
-        ENDDO
-        IUPR = I
+        smax = xwake - xlast
+        dxw = smax / float(nwake - 1)
+        ds1 = 0.2 * dxw
+        call setexp(s, ds1, smax, nwake)
+        do k = 2, nwake
+            i = i + 1
+            xg(i, j) = xlast + s(k)
+            yg(i, j) = ylast
+        enddo
+        iupr = i
         !
-        IF (ILWR/=IUPR) THEN
-            WRITE (*, *) 'INIGRD: incompatible # points on J=1 and J=JJ', &
-                    & ILWR, IUPR
-            WRITE (*, *) 'IP1CB,IP2CB,IPCB ', IP1CB, IP2CB, IPCB
-            WRITE (*, *) 'IP1DW,IP2DW,IPDW ', IP1DW, IP2DW, IPDW
-            STOP
-        ENDIF
+        if (ilwr/=iupr) then
+            write (*, *) 'INIGRD: incompatible # points on J=1 and J=JJ', &
+                    & ilwr, iupr
+            write (*, *) 'IP1CB,IP2CB,IPCB ', ip1cb, ip2cb, ipcb
+            write (*, *) 'IP1DW,IP2DW,IPDW ', ip1dw, ip2dw, ipdw
+            stop
+        endif
         !---- Set total # of streamwise points
-        II = IUPR
+        ii = iupr
         !
         !
         !---- Add points at inlet and outlet boundaries
         !---- Inlet points are simply the rotor line points XR,YR
-        I = 1
-        XGMIN = XRP(1, NR)
-        DO J = 1, JJ
-            XG(I, J) = XRP(J, NR)
-            YG(I, J) = YRP(J, NR)
-            XGMIN = MIN(XGMIN, XG(I, J))
-        ENDDO
+        i = 1
+        xgmin = xrp(1, nr)
+        do j = 1, jj
+            xg(i, j) = xrp(j, nr)
+            yg(i, j) = yrp(j, nr)
+            xgmin = min(xgmin, xg(i, j))
+        enddo
         !
         !---- Sweep downstream setting intermediate J lines preserving relative
         !     massflow between upper and lower walls
-        AMASS1 = PI * (YG(1, JJ)**2 - YG(1, 1)**2)
-        DO I = 2, II
-            XL = XG(I, 1)
-            YL = YG(I, 1)
-            XU = XG(I, JJ)
-            YU = YG(I, JJ)
-            AMASS = PI * (YU**2 - YL**2)
+        amass1 = pi * (yg(1, jj)**2 - yg(1, 1)**2)
+        do i = 2, ii
+            xl = xg(i, 1)
+            yl = yg(i, 1)
+            xu = xg(i, jj)
+            yu = yg(i, jj)
+            amass = pi * (yu**2 - yl**2)
             !---- Create radial spacing by preserving relative area
-            DO J = 2, JJ - 1
-                DMASS1 = PI * (YG(1, J)**2 - YG(1, J - 1)**2)
-                FRC = DMASS1 / AMASS1
-                YY = SQRT(FRC * AMASS / PI + YG(I, J - 1)**2)
-                FRAC = (YY - YL) / (YU - YL)
-                XG(I, J) = XL + FRAC * (XU - XL)
-                YG(I, J) = YY
-            ENDDO
-        ENDDO
+            do j = 2, jj - 1
+                dmass1 = pi * (yg(1, j)**2 - yg(1, j - 1)**2)
+                frc = dmass1 / amass1
+                yy = sqrt(frc * amass / pi + yg(i, j - 1)**2)
+                frac = (yy - yl) / (yu - yl)
+                xg(i, j) = xl + frac * (xu - xl)
+                yg(i, j) = yy
+            enddo
+        enddo
         !
         !---- Done, initial grid defined!
-        IF (LDBG) THEN
-            WRITE (*, *) 'INIGRD grid defined with II,JJ ', II, JJ
-            WRITE (LUNDBG, *) 'INIGRD grid defined with II,JJ ', II, JJ
-        ENDIF
+        if (ldbg) then
+            write (*, *) 'INIGRD grid defined with II,JJ ', ii, jj
+            write (lundbg, *) 'INIGRD grid defined with II,JJ ', ii, jj
+        endif
         !
         !     Add initial grid smoothing relaxation?
         !---- Grid smoothing by elliptic solver
-        CALL RLXGRD
+        call rlxgrd
         !
         !---- invalidate existing solution to incorporate new vortex wakes
-        LNCVP = .FALSE.
-        LQAIC = .FALSE.
-        LQGIC = .FALSE.
-        LQCNT = .FALSE.
-        LGSYS = .FALSE.
-        LGAMU = .FALSE.
-        LGAMA = .FALSE.
+        lncvp = .false.
+        lqaic = .false.
+        lqgic = .false.
+        lqcnt = .false.
+        lgsys = .false.
+        lgamu = .false.
+        lgama = .false.
         !
-    END SUBROUTINE INIGRD
+    end subroutine inigrd
     !*==UPDGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! INIGRD
 
 
-    SUBROUTINE UPDGRD
+    subroutine updgrd
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: I, IEL, IP, IP1, IP2, J
+        integer :: i, iel, ip, ip1, ip2, j
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -299,62 +299,62 @@ contains
         !     points from current upper and lower vortex wakes
         !------------------------------------------------------
         !
-        IF (LDBG) THEN
-            WRITE (*, *) ' '
-            WRITE (*, *) 'Updating grid system boundaries'
-        ENDIF
+        if (ldbg) then
+            write (*, *) ' '
+            write (*, *) 'Updating grid system boundaries'
+        endif
         !
         !---- Redefine lower streamline (J=1) with IR=1 wake points
-        J = 1
-        IEL = IR2IEL(1)
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
-        DO IP = IP1, IP2
-            I = IGTECB + (IP - IP1)
-            XG(I, J) = XP(IP)
-            YG(I, J) = YP(IP)
-        ENDDO
-        IF (LDBG) WRITE (LUNDBG, *)                                      &
+        j = 1
+        iel = ir2iel(1)
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
+        do ip = ip1, ip2
+            i = igtecb + (ip - ip1)
+            xg(i, j) = xp(ip)
+            yg(i, j) = yp(ip)
+        enddo
+        if (ldbg) write (lundbg, *)                                      &
                 &'Updated lower boundary from element '&
-                &, IEL
+                &, iel
         !
         !---- Redefine upper streamline (J=JJ) with IR=NRP wake points
-        J = JJ
-        IEL = IR2IEL(NRP)
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
-        DO IP = IP1, IP2
-            I = IGTEDW + (IP - IP1)
-            XG(I, J) = XP(IP)
-            YG(I, J) = YP(IP)
-        ENDDO
-        IF (LDBG) WRITE (LUNDBG, *)                                      &
+        j = jj
+        iel = ir2iel(nrp)
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
+        do ip = ip1, ip2
+            i = igtedw + (ip - ip1)
+            xg(i, j) = xp(ip)
+            yg(i, j) = yp(ip)
+        enddo
+        if (ldbg) write (lundbg, *)                                      &
                 &'Updated upper boundary from element '&
-                &, IEL
+                &, iel
         !
         !---- Grid boundaries redefined!
-        IF (LDBG) WRITE (*, *) 'UPDGRD grid boundaries updated'
+        if (ldbg) write (*, *) 'UPDGRD grid boundaries updated'
         !
         !---- Grid smoothing by elliptic solver
-        CALL RLXGRD
+        call rlxgrd
         !
-    END SUBROUTINE UPDGRD
+    end subroutine updgrd
     !*==RLXGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! UPDGRD
 
 
 
 
-    SUBROUTINE RLXGRD
+    subroutine rlxgrd
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: I, ITMAXS, J, KBCBOT, KBCINL, KBCOUT, KBCTOP
-        REAL :: TOLER
+        integer :: i, itmaxs, j, kbcbot, kbcinl, kbcout, kbctop
+        real :: toler
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -362,34 +362,34 @@ contains
         !     Runs elliptic grid solution to smooth grid
         !------------------------------------------------------
         !
-        IF (II<=0 .OR. JJ<=0) THEN
-            WRITE (*, *) 'RLXGRD:  no grid defined II,JJ ', II, JJ
-            RETURN
-        ENDIF
+        if (ii<=0 .or. jj<=0) then
+            write (*, *) 'RLXGRD:  no grid defined II,JJ ', ii, jj
+            return
+        endif
         !
         !---- Set up streamfunction array
-        YPOS(1) = 0.0
-        DO J = 2, JJ
-            YPOS(J) = YG(1, J)**2 - YG(1, J - 1)**2 + YPOS(J - 1)
-        ENDDO
+        ypos(1) = 0.0
+        do j = 2, jj
+            ypos(j) = yg(1, j)**2 - yg(1, j - 1)**2 + ypos(j - 1)
+        enddo
         !---- Set up streamwise spacing array
-        DO I = 1, II
-            XPOS(I) = XG(I, 1)
-        ENDDO
+        do i = 1, ii
+            xpos(i) = xg(i, 1)
+        enddo
         !
         !---- Run grid solver
-        ITMAXS = -400
-        TOLER = 1.0E-9
-        KBCINL = 0 ! inlet plane Dirichlet, fix nodes
-        KBCOUT = 1 ! outlet plane Neumann, move nodes on boundary
-        KBCBOT = 0 ! bottom streamline Dirichlet, fix nodes
-        KBCTOP = 0 ! top streamline Dirichlet, fix nodes
+        itmaxs = -400
+        toler = 1.0e-9
+        kbcinl = 0 ! inlet plane Dirichlet, fix nodes
+        kbcout = 1 ! outlet plane Neumann, move nodes on boundary
+        kbcbot = 0 ! bottom streamline Dirichlet, fix nodes
+        kbctop = 0 ! top streamline Dirichlet, fix nodes
         !      WRITE(*,*)
         !      WRITE(*,*) 'Grid relaxation iteration'
-        CALL AXELL(IX, II, JJ, XG, YG, XPOS, YPOS, ITMAXS, TOLER, KBCINL, KBCOUT, &
-                & KBCBOT, KBCTOP)
+        call axell(ix, ii, jj, xg, yg, xpos, ypos, itmaxs, toler, kbcinl, kbcout, &
+                & kbcbot, kbctop)
         !
-    END SUBROUTINE RLXGRD
+    end subroutine rlxgrd
     !*==SETGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! RLXGRD
 
@@ -400,17 +400,17 @@ contains
     !     &  XPOS(IX),     YPOS(JX)
 
 
-    SUBROUTINE SETGRDFLW
+    subroutine setgrdflw
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        REAL :: DBGAMG, DDHG, DDSG, SIGC, VMC
-        INTEGER :: I, IC, IC1, IC2, IEL, IG, IP1, IP2, IR, J, &
-                & N, NNC
+        real :: dbgamg, ddhg, ddsg, sigc, vmc
+        integer :: i, ic, ic1, ic2, iel, ig, ip1, ip2, ir, j, &
+                & n, nnc
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -420,64 +420,64 @@ contains
         !---------------------------------------------------------
         !
         !---- Clear grid data for accumulation over sources
-        CALL CLRGRDFLW
+        call clrgrdflw
         !
         !---- Set B*GAM circulation, delta entropy, and delta enthalpy on gridC
         !     from rotor and drag sources
 
-        DO N = 1, NROTOR
+        do n = 1, nrotor
             !
-            IEL = IELROTOR(N)
-            IC1 = ICFRST(IEL)
-            IC2 = ICLAST(IEL)
+            iel = ielrotor(n)
+            ic1 = icfrst(iel)
+            ic2 = iclast(iel)
             !---- Set values at rotor I station due to blade row
-            IG = IGROTOR(N)
+            ig = igrotor(n)
             !
-            NNC = IC2 - IC1 + 1
-            IF (NNC/=JJ - 1) THEN
-                WRITE (*, *) 'Rotor source element-grid mismatch ', NNC, &
-                        & JJ - 1
-                STOP
-            ENDIF
+            nnc = ic2 - ic1 + 1
+            if (nnc/=jj - 1) then
+                write (*, *) 'Rotor source element-grid mismatch ', nnc, &
+                        & jj - 1
+                stop
+            endif
             !
-            DO J = 1, JJ - 1
-                IR = J
+            do j = 1, jj - 1
+                ir = j
                 !---- Circulation and enthalpy
-                DBGAMG = BGAM(IR, N)
-                DDHG = OMEGA(N) * BGAM(IR, N) * PI2I
+                dbgamg = bgam(ir, n)
+                ddhg = omega(n) * bgam(ir, n) * pi2i
                 !---- Entropy from drag sources on rotor
-                IC = IC1 + IR - 1
-                IP1 = IPCO(IC)
-                IP2 = IPCP(IC)
-                VMC = SQRT(QC(1, IC)**2 + QC(2, IC)**2)
-                SIGC = 0.5 * (SIG(IP1) + SIG(IP2))
-                DDSG = VMC * SIGC
+                ic = ic1 + ir - 1
+                ip1 = ipco(ic)
+                ip2 = ipcp(ic)
+                vmc = sqrt(qc(1, ic)**2 + qc(2, ic)**2)
+                sigc = 0.5 * (sig(ip1) + sig(ip2))
+                ddsg = vmc * sigc
                 !
                 !---- Convect values downstream from rotor
-                DO I = IG, II - 1
-                    BGAMG(I, J) = BGAMG(I, J) + DBGAMG
-                    DHG(I, J) = DHG(I, J) + DDHG
-                    DSG(I, J) = DSG(I, J) + DDSG
+                do i = ig, ii - 1
+                    bgamg(i, j) = bgamg(i, j) + dbgamg
+                    dhg(i, j) = dhg(i, j) + ddhg
+                    dsg(i, j) = dsg(i, j) + ddsg
                     !c        RG(I,J)    = RG(1,J)
-                ENDDO
+                enddo
                 !
-            ENDDO
-        ENDDO
+            enddo
+        enddo
         !
-    END SUBROUTINE SETGRDFLW
+    end subroutine setgrdflw
     !*==CLRGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETGRDFLW
 
 
-    SUBROUTINE CLRGRDFLW
+    subroutine clrgrdflw
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: I, J
+        integer :: i, j
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -488,34 +488,34 @@ contains
         !---------------------------------------------------------
         !
         !---- Clear grid data for accumulation of circulation, enthalpy, entropy
-        DO J = 1, JJ
-            DO I = 1, II
-                BGAMG(I, J) = 0.0
-                DHG(I, J) = 0.0
-                DSG(I, J) = 0.0
-                RG(I, J) = RHO
-            ENDDO
-        ENDDO
+        do j = 1, jj
+            do i = 1, ii
+                bgamg(i, j) = 0.0
+                dhg(i, j) = 0.0
+                dsg(i, j) = 0.0
+                rg(i, j) = rho
+            enddo
+        enddo
         !
-    END SUBROUTINE CLRGRDFLW
+    end subroutine clrgrdflw
     !*==ROTBG2GRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CLRGRDFLW
 
 
-    SUBROUTINE ROTBG2GRD(N)
+    subroutine rotbg2grd(n)
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
+        integer :: n
         !
         ! Local variables
         !
-        REAL :: DBGAMG, DDHG
-        INTEGER :: I, IG, IR, J
+        real :: dbgamg, ddhg
+        integer :: i, ig, ir, j
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -526,40 +526,40 @@ contains
         !
         !---- Set B*GAM circulation, delta enthalpy on grid from blade/rotors
         !---- Set values at grid IG station due to blade row
-        IG = IGROTOR(N)
+        ig = igrotor(n)
         !
-        DO J = 1, JJ - 1
-            IR = J
+        do j = 1, jj - 1
+            ir = j
             !---- Circulation and enthalpy
-            DBGAMG = BGAM(IR, N)
-            DDHG = OMEGA(N) * BGAM(IR, N) * PI2I
+            dbgamg = bgam(ir, n)
+            ddhg = omega(n) * bgam(ir, n) * pi2i
             !
             !---- Convect values downstream from rotor
-            DO I = IG, II - 1
-                BGAMG(I, J) = BGAMG(I, J) + DBGAMG
-                DHG(I, J) = DHG(I, J) + DDHG
-            ENDDO
+            do i = ig, ii - 1
+                bgamg(i, j) = bgamg(i, j) + dbgamg
+                dhg(i, j) = dhg(i, j) + ddhg
+            enddo
             !
-        ENDDO
+        enddo
         !
-    END SUBROUTINE ROTBG2GRD
+    end subroutine rotbg2grd
     !*==GETGRDFLW.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ROTBG2GRD
 
 
 
-    SUBROUTINE GETGRDFLW
+    subroutine getgrdflw
         use i_dfdc
         use m_grdutils, only : uvgrdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: I, IO, IP, J, JO, JP
-        REAL :: XCG, XOO, XOP, XPO, XPP, YCG, YOO, YOP, YPO, &
-                & YPP
+        integer :: i, io, ip, j, jo, jp
+        real :: xcg, xoo, xop, xpo, xpp, ycg, yoo, yop, ypo, &
+                & ypp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -567,46 +567,46 @@ contains
         !     Sets grid initial flow data from rotor line conditions
         !---------------------------------------------------------
         !
-        CALL UVGRDC(IX, II, JJ, XG, YG, XPOS, YPOS, QXG, QYG)
+        call uvgrdc(ix, ii, jj, xg, yg, xpos, ypos, qxg, qyg)
         !---- Print grid velocities
-        WRITE (44, *) 'I,J, XC,YC, U, V'
-        DO I = 1, II - 1
-            IO = I
-            IP = I + 1
-            DO J = 1, JJ - 1
-                JO = J
-                JP = J + 1
-                XOO = XG(IO, JO)
-                XPO = XG(IP, JO)
-                XOP = XG(IO, JP)
-                XPP = XG(IP, JP)
-                YOO = YG(IO, JO)
-                YPO = YG(IP, JO)
-                YOP = YG(IO, JP)
-                YPP = YG(IP, JP)
-                XCG = 0.25 * (XOO + XPO + XOP + XPP)
-                YCG = 0.25 * (YOO + YPO + YOP + YPP)
-                WRITE (44, 100) I, J, XCG, YCG, QXG(I, J), QYG(I, J)
-            ENDDO
-        ENDDO
-        100  FORMAT (2I5, 5(1X, F11.6))
+        write (44, *) 'I,J, XC,YC, U, V'
+        do i = 1, ii - 1
+            io = i
+            ip = i + 1
+            do j = 1, jj - 1
+                jo = j
+                jp = j + 1
+                xoo = xg(io, jo)
+                xpo = xg(ip, jo)
+                xop = xg(io, jp)
+                xpp = xg(ip, jp)
+                yoo = yg(io, jo)
+                ypo = yg(ip, jo)
+                yop = yg(io, jp)
+                ypp = yg(ip, jp)
+                xcg = 0.25 * (xoo + xpo + xop + xpp)
+                ycg = 0.25 * (yoo + ypo + yop + ypp)
+                write (44, 100) i, j, xcg, ycg, qxg(i, j), qyg(i, j)
+            enddo
+        enddo
+        100  format (2i5, 5(1x, f11.6))
         !
-    END SUBROUTINE GETGRDFLW
+    end subroutine getgrdflw
     !*==INLSFCN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GETGRDFLW
 
 
 
-    SUBROUTINE INLSFCN
+    subroutine inlsfcn
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: J, NR
-        REAL :: VX, YSCL
+        integer :: j, nr
+        real :: vx, yscl
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -615,35 +615,35 @@ contains
         !     velocities at rotor and current grid points
         !---------------------------------------------------------
         !
-        NR = NRUPSTRM
+        nr = nrupstrm
         !---- Set up streamfunction array using grid and rotor line velocity
-        YPOS(1) = 0.0
-        DO J = 1, JJ
-            VX = VABS(1, J - 1, NR)
-            YPOS(J) = 0.5 * VX * (YG(1, J)**2 - YG(1, J - 1)**2) + YPOS(J - 1)
+        ypos(1) = 0.0
+        do j = 1, jj
+            vx = vabs(1, j - 1, nr)
+            ypos(j) = 0.5 * vx * (yg(1, j)**2 - yg(1, j - 1)**2) + ypos(j - 1)
             !c        YPOS(J) = 0.5*VX*YG(1,J)**2
-        ENDDO
-        YSCL = 1.0 / YPOS(JJ)
+        enddo
+        yscl = 1.0 / ypos(jj)
         !c      DO J = 1, JJ
         !c        write(*,*) 'j ypos ',j,ypos(j)
         !c        YPOS(J) = YSCL*YPOS(J)
         !c      END DO
         !
-    END SUBROUTINE INLSFCN
+    end subroutine inlsfcn
     !*==RLXGRD2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! INLSFCN
 
 
-    SUBROUTINE RLXGRD2
+    subroutine rlxgrd2
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: I, ITMAXS, KBCBOT, KBCINL, KBCOUT, KBCTOP
-        REAL :: TOLER
+        integer :: i, itmaxs, kbcbot, kbcinl, kbcout, kbctop
+        real :: toler
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -651,71 +651,71 @@ contains
         !     Runs elliptic grid solution to smooth grid
         !------------------------------------------------------
         !
-        IF (II<=0 .OR. JJ<=0) THEN
-            WRITE (*, *) 'RLXGRD:  no grid defined II,JJ ', II, JJ
-            RETURN
-        ENDIF
+        if (ii<=0 .or. jj<=0) then
+            write (*, *) 'RLXGRD:  no grid defined II,JJ ', ii, jj
+            return
+        endif
         !
         !---- Set up streamfunction array
-        CALL INLSFCN
+        call inlsfcn
         !
         !---- Set up streamwise spacing array
-        DO I = 1, II
-            XPOS(I) = XG(I, 1)
-        ENDDO
+        do i = 1, ii
+            xpos(i) = xg(i, 1)
+        enddo
         !
         !---- Run grid solver
-        ITMAXS = -400
-        TOLER = 1.0E-9
-        KBCINL = 0 ! inlet plane Dirichlet, fix nodes
-        KBCOUT = 1 ! outlet plane Neumann, move nodes on boundary
-        KBCBOT = 0 ! bottom streamline Dirichlet, fix nodes
-        KBCTOP = 0 ! top streamline Dirichlet, fix nodes
-        CALL AXELL(IX, II, JJ, XG, YG, XPOS, YPOS, ITMAXS, TOLER, KBCINL, KBCOUT, &
-                & KBCBOT, KBCTOP)
+        itmaxs = -400
+        toler = 1.0e-9
+        kbcinl = 0 ! inlet plane Dirichlet, fix nodes
+        kbcout = 1 ! outlet plane Neumann, move nodes on boundary
+        kbcbot = 0 ! bottom streamline Dirichlet, fix nodes
+        kbctop = 0 ! top streamline Dirichlet, fix nodes
+        call axell(ix, ii, jj, xg, yg, xpos, ypos, itmaxs, toler, kbcinl, kbcout, &
+                & kbcbot, kbctop)
         !
-    END SUBROUTINE RLXGRD2
+    end subroutine rlxgrd2
     !*==AXELL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! RLXGRD2
 
 
-    SUBROUTINE AXELL(IX, II, JJ, X, Y, XPOS, YPOS, ITMAXS, TOLER, KBCINL, &
-            & KBCOUT, KBCBOT, KBCTOP)
+    subroutine axell(ix, ii, jj, x, y, xpos, ypos, itmaxs, toler, kbcinl, &
+            & kbcout, kbcbot, kbctop)
         use m_spline, only : deval, spline, seval, scalc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: IDIM = 500
+        integer, parameter :: idim = 500
         !
         ! Dummy arguments
         !
-        INTEGER :: II, ITMAXS, IX, JJ, KBCBOT, KBCINL, KBCOUT, &
-                & KBCTOP
-        REAL :: TOLER
-        REAL, DIMENSION(IX, *) :: X, Y
-        REAL, DIMENSION(*) :: XPOS, YPOS
+        integer :: ii, itmaxs, ix, jj, kbcbot, kbcinl, kbcout, &
+                & kbctop
+        real :: toler
+        real, dimension(ix, *) :: x, y
+        real, dimension(*) :: xpos, ypos
         !
         ! Local variables
         !
-        REAL :: A, AD1, AD2, AINV, AJA, ALF, B, BET, CETM, &
-                & CETP, CXIM, CXIP, DETAV, DETL, DETM, DETP, DETQ, &
-                & DMAX, DS, DSET1, DSET2, DSET3, DX, DXDE1, DXDE2, &
-                & DXDET, DXDX1, DXDX2, DXDXI, DXIAV, DXIL, DXIM, &
-                & DXIP, DXIQ, DXY, DY, DYDE1, DYDE2, DYDET, DYDX1, &
-                & DYDX2, DYDXI, GAM, REZ, RLX, RLX1, RLX2, RLX3, &
-                & SRLX, XDSE, XLO, XMM, XMO, XMP, XOL, XOM, XOO, &
-                & XOP, XOQ, XPM, XPO, XPP, XQO, XS, XSN, YAA, &
-                & YAM, YAP, YDSE, YLO, YMM, YMO, YMP, YOL, YOM, &
-                & YOO, YOP, YOQ, YPM, YPO
-        REAL, DIMENSION(IDIM) :: C, SB, SBI, ST, STI, XB, XBS, &
-                & XT, XTS, YB, YBS, YT, YTS
-        REAL, DIMENSION(2, IDIM) :: D
-        INTEGER :: IBACK, IFIN, IL, IM, IO, IP, IPASS, IQ, &
-                & ITMAX, JL, JM, JO, JP, JQ
-        REAL :: YPP, YQO, YS, YSN, Z_S, Z_XOO, Z_YOO
+        real :: a, ad1, ad2, ainv, aja, alf, b, bet, cetm, &
+                & cetp, cxim, cxip, detav, detl, detm, detp, detq, &
+                & dmax, ds, dset1, dset2, dset3, dx, dxde1, dxde2, &
+                & dxdet, dxdx1, dxdx2, dxdxi, dxiav, dxil, dxim, &
+                & dxip, dxiq, dxy, dy, dyde1, dyde2, dydet, dydx1, &
+                & dydx2, dydxi, gam, rez, rlx, rlx1, rlx2, rlx3, &
+                & srlx, xdse, xlo, xmm, xmo, xmp, xol, xom, xoo, &
+                & xop, xoq, xpm, xpo, xpp, xqo, xs, xsn, yaa, &
+                & yam, yap, ydse, ylo, ymm, ymo, ymp, yol, yom, &
+                & yoo, yop, yoq, ypm, ypo
+        real, dimension(idim) :: c, sb, sbi, st, sti, xb, xbs, &
+                & xt, xts, yb, ybs, yt, yts
+        real, dimension(2, idim) :: d
+        integer :: iback, ifin, il, im, io, ip, ipass, iq, &
+                & itmax, jl, jm, jo, jp, jq
+        real :: ypp, yqo, ys, ysn, z_s, z_xoo, z_yoo
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -776,290 +776,290 @@ contains
         !-------------------------------------------------------------
         !
         !
-        IF (II>IDIM) STOP 'ELLIP: Array overflow.  Increase IDIM.'
+        if (ii>idim) stop 'ELLIP: Array overflow.  Increase IDIM.'
         !
-        ITMAX = IABS(ITMAXS)
+        itmax = iabs(itmaxs)
         !
         !---- convergence tolerance for each phase
-        DSET1 = 1.0E-1
-        DSET2 = 5.0E-3
-        DSET3 = 5.0E-7
+        dset1 = 1.0e-1
+        dset2 = 5.0e-3
+        dset3 = 5.0e-7
         !
-        IF (ITMAXS>0) THEN
+        if (itmaxs>0) then
             !----- over-relaxation parameter for each phase
-            RLX1 = 1.00      !          DMAX > DSET1
-            RLX2 = 1.10      !  DSET1 > DMAX > DSET2
-            RLX3 = 1.40      !  DSET2 > DMAX > DSET3
+            rlx1 = 1.00      !          DMAX > DSET1
+            rlx2 = 1.10      !  DSET1 > DMAX > DSET2
+            rlx3 = 1.40      !  DSET2 > DMAX > DSET3
             !CC    STOP              !  DSET3 > DMAX
-        ELSE
-            RLX1 = 1.0
-            RLX2 = 1.0
-            RLX3 = 1.0
-        ENDIF
+        else
+            rlx1 = 1.0
+            rlx2 = 1.0
+            rlx3 = 1.0
+        endif
         !
         !---- spline bottom & top wall shapes
-        JO = 1
-        DO IO = 1, II
-            XB(IO) = X(IO, JO)
-            YB(IO) = Y(IO, JO)
-        ENDDO
+        jo = 1
+        do io = 1, ii
+            xb(io) = x(io, jo)
+            yb(io) = y(io, jo)
+        enddo
         !
-        DX = ABS(XB(II) - XB(1))
-        DY = ABS(YB(II) - YB(1))
-        DXY = MAX(XB(1), YB(1), DX, DY)
+        dx = abs(xb(ii) - xb(1))
+        dy = abs(yb(ii) - yb(1))
+        dxy = max(xb(1), yb(1), dx, dy)
         !
-        CALL SCALC(XB, YB, SB, II)
-        CALL SPLINE(XB, XBS, SB, II)
-        CALL SPLINE(YB, YBS, SB, II)
-        DO IO = 1, II
-            SBI(IO) = SB(IO)
-        ENDDO
+        call scalc(xb, yb, sb, ii)
+        call spline(xb, xbs, sb, ii)
+        call spline(yb, ybs, sb, ii)
+        do io = 1, ii
+            sbi(io) = sb(io)
+        enddo
         !
-        JO = JJ
-        DO IO = 1, II
-            XT(IO) = X(IO, JO)
-            YT(IO) = Y(IO, JO)
-        ENDDO
-        CALL SCALC(XT, YT, ST, II)
-        CALL SPLINE(XT, XTS, ST, II)
-        CALL SPLINE(YT, YTS, ST, II)
-        DO IO = 1, II
-            STI(IO) = ST(IO)
-        ENDDO
+        jo = jj
+        do io = 1, ii
+            xt(io) = x(io, jo)
+            yt(io) = y(io, jo)
+        enddo
+        call scalc(xt, yt, st, ii)
+        call spline(xt, xts, st, ii)
+        call spline(yt, yts, st, ii)
+        do io = 1, ii
+            sti(io) = st(io)
+        enddo
         !
-        RLX = RLX1
+        rlx = rlx1
         !
-        DO IPASS = 1, ITMAX
+        do ipass = 1, itmax
             !
-            DMAX = 0.
+            dmax = 0.
             !
-            JO = 1
-            IF (KBCBOT==1 .AND. JJ>2) THEN
+            jo = 1
+            if (kbcbot==1 .and. jj>2) then
                 !-------- relax to get dX/dj = 0 on lower streamline
-                DO IO = 2, II - 1
-                    IP = IO + 1
-                    IM = IO - 1
+                do io = 2, ii - 1
+                    ip = io + 1
+                    im = io - 1
                     !
-                    JP = JO + 1
-                    JQ = JO + 2
+                    jp = jo + 1
+                    jq = jo + 2
                     !
-                    XOO = X(IO, JO)
-                    XOP = X(IO, JP)
-                    XOQ = X(IO, JQ)
+                    xoo = x(io, jo)
+                    xop = x(io, jp)
+                    xoq = x(io, jq)
                     !
-                    YOO = Y(IO, JO)
-                    YOP = Y(IO, JP)
-                    YOQ = Y(IO, JQ)
+                    yoo = y(io, jo)
+                    yop = y(io, jp)
+                    yoq = y(io, jq)
                     !
-                    XS = DEVAL(SBI(IO), XB, XBS, SB, II)
-                    YS = DEVAL(SBI(IO), YB, YBS, SB, II)
+                    xs = deval(sbi(io), xb, xbs, sb, ii)
+                    ys = deval(sbi(io), yb, ybs, sb, ii)
                     !
-                    DETP = YPOS(JP) - YPOS(JO)
-                    DETQ = YPOS(JQ) - YPOS(JP)
+                    detp = ypos(jp) - ypos(jo)
+                    detq = ypos(jq) - ypos(jp)
                     !
-                    DXDE1 = (XOP - XOO) / DETP
-                    DXDE2 = (XOQ - XOP) / DETQ
+                    dxde1 = (xop - xoo) / detp
+                    dxde2 = (xoq - xop) / detq
                     !
-                    DYDE1 = (YOP - YOO) / DETP
-                    DYDE2 = (YOQ - YOP) / DETQ
+                    dyde1 = (yop - yoo) / detp
+                    dyde2 = (yoq - yop) / detq
                     !
-                    REZ = XS * (DXDE1 - DETP * (DXDE2 - DXDE1) / (DETP + DETQ))          &
-                            & + YS * (DYDE1 - DETP * (DYDE2 - DYDE1) / (DETP + DETQ))
+                    rez = xs * (dxde1 - detp * (dxde2 - dxde1) / (detp + detq))          &
+                            & + ys * (dyde1 - detp * (dyde2 - dyde1) / (detp + detq))
                     !
-                    Z_XOO = XS * (-1.0 / DETP - 1.0 / (DETP + DETQ))
-                    Z_YOO = YS * (-1.0 / DETP - 1.0 / (DETP + DETQ))
+                    z_xoo = xs * (-1.0 / detp - 1.0 / (detp + detq))
+                    z_yoo = ys * (-1.0 / detp - 1.0 / (detp + detq))
                     !
-                    Z_S = Z_XOO * XS + Z_YOO * YS
+                    z_s = z_xoo * xs + z_yoo * ys
                     !
-                    DS = -REZ / Z_S
+                    ds = -rez / z_s
                     !
-                    SBI(IO) = SBI(IO) + DS
+                    sbi(io) = sbi(io) + ds
                     !
-                    X(IO, JO) = SEVAL(SBI(IO), XB, XBS, SB, II)
-                    Y(IO, JO) = SEVAL(SBI(IO), YB, YBS, SB, II)
-                ENDDO
-            ENDIF
+                    x(io, jo) = seval(sbi(io), xb, xbs, sb, ii)
+                    y(io, jo) = seval(sbi(io), yb, ybs, sb, ii)
+                enddo
+            endif
             !
-            JO = JJ
-            IF (KBCTOP==1 .AND. JJ>2) THEN
+            jo = jj
+            if (kbctop==1 .and. jj>2) then
                 !-------- relax to get dX/dj = 0 on upper streamline
-                DO IO = 2, II - 1
-                    IP = IO + 1
-                    IM = IO - 1
+                do io = 2, ii - 1
+                    ip = io + 1
+                    im = io - 1
                     !
-                    JM = JO - 1
-                    JL = JO - 2
+                    jm = jo - 1
+                    jl = jo - 2
                     !
-                    XOO = X(IO, JO)
-                    XOM = X(IO, JM)
-                    XOL = X(IO, JL)
+                    xoo = x(io, jo)
+                    xom = x(io, jm)
+                    xol = x(io, jl)
                     !
-                    YOO = Y(IO, JO)
-                    YOM = Y(IO, JM)
-                    YOL = Y(IO, JL)
+                    yoo = y(io, jo)
+                    yom = y(io, jm)
+                    yol = y(io, jl)
                     !
-                    XS = DEVAL(STI(IO), XT, XTS, ST, II)
-                    YS = DEVAL(STI(IO), YT, YTS, ST, II)
+                    xs = deval(sti(io), xt, xts, st, ii)
+                    ys = deval(sti(io), yt, yts, st, ii)
                     !
-                    DETM = YPOS(JO) - YPOS(JM)
-                    DETL = YPOS(JM) - YPOS(JL)
+                    detm = ypos(jo) - ypos(jm)
+                    detl = ypos(jm) - ypos(jl)
                     !
-                    DXDE1 = (XOO - XOM) / DETM
-                    DXDE2 = (XOM - XOL) / DETL
+                    dxde1 = (xoo - xom) / detm
+                    dxde2 = (xom - xol) / detl
                     !
-                    DYDE1 = (YOO - YOM) / DETM
-                    DYDE2 = (YOM - YOL) / DETL
+                    dyde1 = (yoo - yom) / detm
+                    dyde2 = (yom - yol) / detl
                     !
-                    REZ = XS * (DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL))          &
-                            & + YS * (DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL))
+                    rez = xs * (dxde1 + detm * (dxde1 - dxde2) / (detm + detl))          &
+                            & + ys * (dyde1 + detm * (dyde1 - dyde2) / (detm + detl))
                     !
-                    Z_XOO = XS * (1.0 / DETM + 1.0 / (DETM + DETL))
-                    Z_YOO = YS * (1.0 / DETM + 1.0 / (DETM + DETL))
+                    z_xoo = xs * (1.0 / detm + 1.0 / (detm + detl))
+                    z_yoo = ys * (1.0 / detm + 1.0 / (detm + detl))
                     !
-                    Z_S = Z_XOO * XS + Z_YOO * YS
+                    z_s = z_xoo * xs + z_yoo * ys
                     !
-                    DS = -REZ / Z_S
+                    ds = -rez / z_s
                     !
-                    STI(IO) = STI(IO) + DS
+                    sti(io) = sti(io) + ds
                     !
-                    X(IO, JO) = SEVAL(STI(IO), XT, XTS, ST, II)
-                    Y(IO, JO) = SEVAL(STI(IO), YT, YTS, ST, II)
-                ENDDO
-            ENDIF
+                    x(io, jo) = seval(sti(io), xt, xts, st, ii)
+                    y(io, jo) = seval(sti(io), yt, yts, st, ii)
+                enddo
+            endif
             !
             !
             !------ go over all interior streamlines
-            DO JO = 2, JJ - 1
-                JM = JO - 1
-                JP = JO + 1
+            do jo = 2, jj - 1
+                jm = jo - 1
+                jp = jo + 1
                 !
-                IF (KBCINL==1) THEN
+                if (kbcinl==1) then
                     !---------- Neumann BC is specified on i=1 plane:  relax node positions
                     !
-                    IO = 1
-                    IP = IO + 1
-                    IQ = IO + 2
+                    io = 1
+                    ip = io + 1
+                    iq = io + 2
                     !
-                    XOO = X(IO, JO)
-                    XPO = X(IP, JO)
-                    XQO = X(IQ, JO)
+                    xoo = x(io, jo)
+                    xpo = x(ip, jo)
+                    xqo = x(iq, jo)
                     !
-                    YOO = Y(IO, JO)
-                    YPO = Y(IP, JO)
-                    YQO = Y(IQ, JO)
+                    yoo = y(io, jo)
+                    ypo = y(ip, jo)
+                    yqo = y(iq, jo)
                     !
-                    XS = X(IO, JP) - X(IO, JM)
-                    YS = Y(IO, JP) - Y(IO, JM)
+                    xs = x(io, jp) - x(io, jm)
+                    ys = y(io, jp) - y(io, jm)
                     !
-                    XSN = XS / SQRT(XS**2 + YS**2)
-                    YSN = YS / SQRT(XS**2 + YS**2)
+                    xsn = xs / sqrt(xs**2 + ys**2)
+                    ysn = ys / sqrt(xs**2 + ys**2)
                     !
-                    DXIP = XPOS(IP) - XPOS(IO)
-                    DXIQ = XPOS(IQ) - XPOS(IP)
+                    dxip = xpos(ip) - xpos(io)
+                    dxiq = xpos(iq) - xpos(ip)
                     !
-                    DXDX1 = (XPO - XOO) / DXIP
-                    DXDX2 = (XQO - XPO) / DXIQ
+                    dxdx1 = (xpo - xoo) / dxip
+                    dxdx2 = (xqo - xpo) / dxiq
                     !
-                    DYDX1 = (YPO - YOO) / DXIP
-                    DYDX2 = (YQO - YPO) / DXIQ
+                    dydx1 = (ypo - yoo) / dxip
+                    dydx2 = (yqo - ypo) / dxiq
                     !
                     !---------- 2nd-order 3-point difference for tangential velocity
-                    REZ = XSN * (DXDX1 - DXIP * (DXDX2 - DXDX1) / (DXIP + DXIQ))         &
-                            & + YSN * (DYDX1 - DXIP * (DYDX2 - DYDX1) / (DXIP + DXIQ))
+                    rez = xsn * (dxdx1 - dxip * (dxdx2 - dxdx1) / (dxip + dxiq))         &
+                            & + ysn * (dydx1 - dxip * (dydx2 - dydx1) / (dxip + dxiq))
                     !
-                    Z_XOO = XSN * (-1.0 / DXIP - 1.0 / (DXIP + DXIQ))
-                    Z_YOO = YSN * (-1.0 / DXIP - 1.0 / (DXIP + DXIQ))
+                    z_xoo = xsn * (-1.0 / dxip - 1.0 / (dxip + dxiq))
+                    z_yoo = ysn * (-1.0 / dxip - 1.0 / (dxip + dxiq))
                     !
-                    Z_S = Z_XOO * XSN + Z_YOO * YSN
+                    z_s = z_xoo * xsn + z_yoo * ysn
                     !
-                    SRLX = 1.00 * RLX
-                    DS = -SRLX * REZ / Z_S
+                    srlx = 1.00 * rlx
+                    ds = -srlx * rez / z_s
                     !
-                    X(IO, JO) = X(IO, JO) + DS * XSN
-                    Y(IO, JO) = Y(IO, JO) + DS * YSN
-                ENDIF
+                    x(io, jo) = x(io, jo) + ds * xsn
+                    y(io, jo) = y(io, jo) + ds * ysn
+                endif
                 !
-                IF (KBCOUT==1) THEN
+                if (kbcout==1) then
                     !---------- Neumann BC is specified on i=II plane:  relax node positions
                     !
-                    IO = II
-                    IM = IO - 1
-                    IL = IO - 2
+                    io = ii
+                    im = io - 1
+                    il = io - 2
                     !
-                    XOO = X(IO, JO)
-                    XMO = X(IM, JO)
-                    XLO = X(IL, JO)
+                    xoo = x(io, jo)
+                    xmo = x(im, jo)
+                    xlo = x(il, jo)
                     !
-                    YOO = Y(IO, JO)
-                    YMO = Y(IM, JO)
-                    YLO = Y(IL, JO)
+                    yoo = y(io, jo)
+                    ymo = y(im, jo)
+                    ylo = y(il, jo)
                     !
-                    XS = X(IO, JP) - X(IO, JM)
-                    YS = Y(IO, JP) - Y(IO, JM)
+                    xs = x(io, jp) - x(io, jm)
+                    ys = y(io, jp) - y(io, jm)
                     !
-                    XSN = XS / SQRT(XS**2 + YS**2)
-                    YSN = YS / SQRT(XS**2 + YS**2)
+                    xsn = xs / sqrt(xs**2 + ys**2)
+                    ysn = ys / sqrt(xs**2 + ys**2)
                     !
-                    DXIM = XPOS(IO) - XPOS(IM)
-                    DXIL = XPOS(IM) - XPOS(IL)
+                    dxim = xpos(io) - xpos(im)
+                    dxil = xpos(im) - xpos(il)
                     !
-                    DXDX1 = (XOO - XMO) / DXIM
-                    DXDX2 = (XMO - XLO) / DXIL
+                    dxdx1 = (xoo - xmo) / dxim
+                    dxdx2 = (xmo - xlo) / dxil
                     !
-                    DYDX1 = (YOO - YMO) / DXIM
-                    DYDX2 = (YMO - YLO) / DXIL
+                    dydx1 = (yoo - ymo) / dxim
+                    dydx2 = (ymo - ylo) / dxil
                     !
                     !---------- 2nd-order 3-point difference for tangential velocity
-                    REZ = XSN * (DXDX1 + DXIM * (DXDX1 - DXDX2) / (DXIM + DXIL))         &
-                            & + YSN * (DYDX1 + DXIM * (DYDX1 - DYDX2) / (DXIM + DXIL))
+                    rez = xsn * (dxdx1 + dxim * (dxdx1 - dxdx2) / (dxim + dxil))         &
+                            & + ysn * (dydx1 + dxim * (dydx1 - dydx2) / (dxim + dxil))
                     !
-                    Z_XOO = XSN * (1.0 / DXIM + 1.0 / (DXIM + DXIL))
-                    Z_YOO = YSN * (1.0 / DXIM + 1.0 / (DXIM + DXIL))
+                    z_xoo = xsn * (1.0 / dxim + 1.0 / (dxim + dxil))
+                    z_yoo = ysn * (1.0 / dxim + 1.0 / (dxim + dxil))
                     !
-                    Z_S = Z_XOO * XSN + Z_YOO * YSN
+                    z_s = z_xoo * xsn + z_yoo * ysn
                     !
-                    SRLX = 1.00 * RLX
-                    DS = -SRLX * REZ / Z_S
+                    srlx = 1.00 * rlx
+                    ds = -srlx * rez / z_s
                     !
-                    X(IO, JO) = X(IO, JO) + DS * XSN
-                    Y(IO, JO) = Y(IO, JO) + DS * YSN
-                ENDIF
+                    x(io, jo) = x(io, jo) + ds * xsn
+                    y(io, jo) = y(io, jo) + ds * ysn
+                endif
 
                 !-------- relax all points on this streamline by SLOR
-                DO IO = 2, II - 1
-                    IM = IO - 1
-                    IP = IO + 1
+                do io = 2, ii - 1
+                    im = io - 1
+                    ip = io + 1
                     !
-                    XMM = X(IM, JM)
-                    XOM = X(IO, JM)
-                    XPM = X(IP, JM)
-                    XMO = X(IM, JO)
-                    XOO = X(IO, JO)
-                    XPO = X(IP, JO)
-                    XMP = X(IM, JP)
-                    XOP = X(IO, JP)
-                    XPP = X(IP, JP)
-                    YMM = Y(IM, JM)
-                    YOM = Y(IO, JM)
-                    YPM = Y(IP, JM)
-                    YMO = Y(IM, JO)
-                    YOO = Y(IO, JO)
-                    YPO = Y(IP, JO)
-                    YMP = Y(IM, JP)
-                    YOP = Y(IO, JP)
-                    YPP = Y(IP, JP)
+                    xmm = x(im, jm)
+                    xom = x(io, jm)
+                    xpm = x(ip, jm)
+                    xmo = x(im, jo)
+                    xoo = x(io, jo)
+                    xpo = x(ip, jo)
+                    xmp = x(im, jp)
+                    xop = x(io, jp)
+                    xpp = x(ip, jp)
+                    ymm = y(im, jm)
+                    yom = y(io, jm)
+                    ypm = y(ip, jm)
+                    ymo = y(im, jo)
+                    yoo = y(io, jo)
+                    ypo = y(ip, jo)
+                    ymp = y(im, jp)
+                    yop = y(io, jp)
+                    ypp = y(ip, jp)
                     !
-                    YAP = 0.5 * (YOO + YOP)
-                    YAM = 0.5 * (YOO + YOM)
-                    YAA = 0.5 * (YAP + YAM)
+                    yap = 0.5 * (yoo + yop)
+                    yam = 0.5 * (yoo + yom)
+                    yaa = 0.5 * (yap + yam)
                     !
-                    DXIM = XPOS(IO) - XPOS(IM)
-                    DXIP = XPOS(IP) - XPOS(IO)
-                    DXIAV = 0.5 * (DXIM + DXIP)
+                    dxim = xpos(io) - xpos(im)
+                    dxip = xpos(ip) - xpos(io)
+                    dxiav = 0.5 * (dxim + dxip)
                     !
-                    DETM = YPOS(JO) - YPOS(JM)
-                    DETP = YPOS(JP) - YPOS(JO)
-                    DETAV = 0.5 * (DETM + DETP)
+                    detm = ypos(jo) - ypos(jm)
+                    detp = ypos(jp) - ypos(jo)
+                    detav = 0.5 * (detm + detp)
                     !
                     !----------------
                     !            DXDETP = (XOP - XOO)/DETP * YAP/YAA
@@ -1101,10 +1101,10 @@ contains
                     !     &                  + (YOO - YMO)/DXIM )
 
                     !
-                    DXDET = 0.5 * (XOP - XOM) / DETAV
-                    DYDET = 0.5 * (YOP - YOM) / DETAV
-                    DXDXI = 0.5 * (XPO - XMO) / DXIAV
-                    DYDXI = 0.5 * (YPO - YMO) / DXIAV
+                    dxdet = 0.5 * (xop - xom) / detav
+                    dydet = 0.5 * (yop - yom) / detav
+                    dxdxi = 0.5 * (xpo - xmo) / dxiav
+                    dydxi = 0.5 * (ypo - ymo) / dxiav
                     !
                     !            DXDET2 = 0.5*( (XOP - XOO) * YAP/YAA
                     !     &                   + (XOO - XOM) * YAM/YAA ) / DETAV
@@ -1115,10 +1115,10 @@ contains
                     !            BET = DXDET2*DXDXI + DYDET2*DYDXI
                     !            AJA = DYDET2*DXDXI - DXDET2*DYDXI
                     !
-                    ALF = DXDET**2 + DYDET**2
-                    GAM = DXDXI**2 + DYDXI**2
-                    BET = DXDET * DXDXI + DYDET * DYDXI
-                    AJA = DYDET * DXDXI - DXDET * DYDXI
+                    alf = dxdet**2 + dydet**2
+                    gam = dxdxi**2 + dydxi**2
+                    bet = dxdet * dxdxi + dydet * dydxi
+                    aja = dydet * dxdxi - dxdet * dydxi
 
 
                     !----------------
@@ -1128,69 +1128,69 @@ contains
                     !            CETM = 1.0/(DETM*DETAV) * YAM/YAA
                     !            CETP = 1.0/(DETP*DETAV) * YAP/YAA
                     !
-                    CXIM = DETM * DETP / (DXIM * DXIAV)
-                    CXIP = DETM * DETP / (DXIP * DXIAV)
-                    CETM = DETP / DETAV * YAM / YAA
-                    CETP = DETM / DETAV * YAP / YAA
+                    cxim = detm * detp / (dxim * dxiav)
+                    cxip = detm * detp / (dxip * dxiav)
+                    cetm = detp / detav * yam / yaa
+                    cetp = detm / detav * yap / yaa
                     !
-                    B = -ALF * CXIM
-                    A = ALF * (CXIM + CXIP) + GAM * (CETM + CETP)
-                    C(IO) = -ALF * CXIP
-                    IF (IO==2) B = 0.0
+                    b = -alf * cxim
+                    a = alf * (cxim + cxip) + gam * (cetm + cetp)
+                    c(io) = -alf * cxip
+                    if (io==2) b = 0.0
                     !
-                    XDSE = DETM * DETP * (XPP - XMP - XPM + XMM) / (4.0 * DXIAV * DETAV)
-                    YDSE = DETM * DETP * (YPP - YMP - YPM + YMM) / (4.0 * DXIAV * DETAV)
+                    xdse = detm * detp * (xpp - xmp - xpm + xmm) / (4.0 * dxiav * detav)
+                    ydse = detm * detp * (ypp - ymp - ypm + ymm) / (4.0 * dxiav * detav)
                     !
-                    D(1, IO) = ALF * ((XPO - XOO) * CXIP - (XOO - XMO) * CXIM)            &
-                            & - 2.0 * BET * XDSE + &
-                            & GAM * ((XOP - XOO) * CETP - (XOO - XOM) * CETM)            &
-                            & - BET * DYDXI * DXDET * DETM * DETP / YAA
+                    d(1, io) = alf * ((xpo - xoo) * cxip - (xoo - xmo) * cxim)            &
+                            & - 2.0 * bet * xdse + &
+                            & gam * ((xop - xoo) * cetp - (xoo - xom) * cetm)            &
+                            & - bet * dydxi * dxdet * detm * detp / yaa
                     ! !!! (XPP-XMP-XPM+XMM) / (4.0*DXIAV*DETAV)&
                     !
-                    D(2, IO) = ALF * ((YPO - YOO) * CXIP - (YOO - YMO) * CXIM)            &
-                            & - 2.0 * BET * YDSE + &
-                            & GAM * ((YOP - YOO) * CETP - (YOO - YOM) * CETM)            &
-                            & - BET * DYDXI * DYDET * DETM * DETP / YAA
+                    d(2, io) = alf * ((ypo - yoo) * cxip - (yoo - ymo) * cxim)            &
+                            & - 2.0 * bet * ydse + &
+                            & gam * ((yop - yoo) * cetp - (yoo - yom) * cetm)            &
+                            & - bet * dydxi * dydet * detm * detp / yaa
                     ! !!! (YPP-YMP-YPM+YMM) / (4.0*DXIAV*DETAV)&
                     !
-                    AINV = 1.0 / (A - B * C(IM))
-                    C(IO) = C(IO) * AINV
-                    D(1, IO) = (D(1, IO) - B * D(1, IM)) * AINV
-                    D(2, IO) = (D(2, IO) - B * D(2, IM)) * AINV
+                    ainv = 1.0 / (a - b * c(im))
+                    c(io) = c(io) * ainv
+                    d(1, io) = (d(1, io) - b * d(1, im)) * ainv
+                    d(2, io) = (d(2, io) - b * d(2, im)) * ainv
                     !
-                ENDDO
+                enddo
                 !
-                D(1, II) = 0.
-                D(2, II) = 0.
+                d(1, ii) = 0.
+                d(2, ii) = 0.
                 !
-                IFIN = II - 1
-                DO IBACK = 2, IFIN
-                    IO = II - IBACK + 1
-                    IP = IO + 1
-                    D(1, IO) = D(1, IO) - C(IO) * D(1, IP)
-                    D(2, IO) = D(2, IO) - C(IO) * D(2, IP)
+                ifin = ii - 1
+                do iback = 2, ifin
+                    io = ii - iback + 1
+                    ip = io + 1
+                    d(1, io) = d(1, io) - c(io) * d(1, ip)
+                    d(2, io) = d(2, io) - c(io) * d(2, ip)
                     !
-                    X(IO, JO) = X(IO, JO) + RLX * D(1, IO)
-                    Y(IO, JO) = Y(IO, JO) + RLX * D(2, IO)
-                    AD1 = ABS(D(1, IO))
-                    AD2 = ABS(D(2, IO))
-                    DMAX = MAX(DMAX, AD1, AD2)
-                ENDDO
+                    x(io, jo) = x(io, jo) + rlx * d(1, io)
+                    y(io, jo) = y(io, jo) + rlx * d(2, io)
+                    ad1 = abs(d(1, io))
+                    ad2 = abs(d(2, io))
+                    dmax = max(dmax, ad1, ad2)
+                enddo
                 !
-            ENDDO
+            enddo
             !
             !        IF(MOD(IPASS,10).EQ.0) THEN
             !          WRITE(*,*) IPASS, '  Dmax = ', DMAX, RLX
             !        ENDIF
             !
-            IF (DMAX<TOLER * DXY) RETURN
+            if (dmax<toler * dxy) return
             !
-            RLX = RLX1
-            IF (DMAX<DSET1 * DXY) RLX = RLX2
-            IF (DMAX<DSET2 * DXY) RLX = RLX3
-            IF (DMAX<DSET3 * DXY) RETURN
+            rlx = rlx1
+            if (dmax<dset1 * dxy) rlx = rlx2
+            if (dmax<dset2 * dxy) rlx = rlx3
+            if (dmax<dset3 * dxy) return
             !
-        ENDDO
+        enddo
         !
-    END SUBROUTINE AXELL
+    end subroutine axell
 end module m_inigrd

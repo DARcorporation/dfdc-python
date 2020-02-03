@@ -2,403 +2,403 @@
 
 
 
-MODULE I_DFDC
-    IMPLICIT NONE
+module i_dfdc
+    implicit none
     !
     ! PARAMETER definitions
     !
-    REAL, PARAMETER :: PI = 3.1415926535897932384, PI2I = 0.5 / PI, &
-            & DTR = PI / 180.
-    INTEGER, PARAMETER :: IBX = 1000, NEX = 30, NRPNX = 4, &
-            & IPX = 2000, ICX = 2000, NQSPX = 5, &
-            & NSEGX = 10, NMODX = 10, NPNTX = 200, &
-            & NPOLX = 10, NCX = ICX - NEX, &
-            & NSX = 2 * NEX, NSYSX = ICX + NEX, &
-            & NUX = IPX + NEX + 2, NGLVX = 4 * NSEGX, &
-            & NGLPX = NMODX, NRHSX = NGLVX + NGLPX + &
-            & 1, IPAL = 1, IPCL = 2, IPCD = 3, &
-            & IPCM = 4, IPCV = 5, IPMA = 7, &
-            & IPQI = 10, IPTOT = 10, JPCX = 1, &
-            & JPCY = 2, JPCM = 3, JPGAM = 4, &
-            & JPSIG = 5, JPSOUR = 6, JPCIRC = 7, &
-            & JPDBLX = 8, JPDBLY = 9, JPTOT = 9, &
-            & KPTP = 1, KPTN = 2, KPTOT = 2, &
-            & JCPLT = 1, JQPLT = 2, JAPLT = 3, &
-            & NBLVX = 12, NDRGX = 10, IDX = 30, &
-            & NRX = 3, IRX = 30, NAX = 20, &
-            & NDX = 15, IX = 200, JX = 60, &
-            & NAFX = 12, NPX = 200, NLSX = 36
-    REAL, PARAMETER :: MTI = 39.370079, DTRX = PI / 180.
-    INTEGER, PARAMETER :: NTCX = 10, IQXX = 360, IWX = 200
+    real, parameter :: pi = 3.1415926535897932384, pi2i = 0.5 / pi, &
+            & dtr = pi / 180.
+    integer, parameter :: ibx = 1000, nex = 30, nrpnx = 4, &
+            & ipx = 2000, icx = 2000, nqspx = 5, &
+            & nsegx = 10, nmodx = 10, npntx = 200, &
+            & npolx = 10, ncx = icx - nex, &
+            & nsx = 2 * nex, nsysx = icx + nex, &
+            & nux = ipx + nex + 2, nglvx = 4 * nsegx, &
+            & nglpx = nmodx, nrhsx = nglvx + nglpx + &
+            & 1, ipal = 1, ipcl = 2, ipcd = 3, &
+            & ipcm = 4, ipcv = 5, ipma = 7, &
+            & ipqi = 10, iptot = 10, jpcx = 1, &
+            & jpcy = 2, jpcm = 3, jpgam = 4, &
+            & jpsig = 5, jpsour = 6, jpcirc = 7, &
+            & jpdblx = 8, jpdbly = 9, jptot = 9, &
+            & kptp = 1, kptn = 2, kptot = 2, &
+            & jcplt = 1, jqplt = 2, japlt = 3, &
+            & nblvx = 12, ndrgx = 10, idx = 30, &
+            & nrx = 3, irx = 30, nax = 20, &
+            & ndx = 15, ix = 200, jx = 60, &
+            & nafx = 12, npx = 200, nlsx = 36
+    real, parameter :: mti = 39.370079, dtrx = pi / 180.
+    integer, parameter :: ntcx = 10, iqxx = 360, iwx = 200
     !
     ! COMMON /CC_GEN/
     !
-    CHARACTER(80) :: ANAME, ARGP1, ARGP2, CPFILE, FRFILE, &
-            & ISPARS, NAME, PFILE
-    CHARACTER(2), DIMENSION(99) :: PNUM
-    CHARACTER(64) :: PREFIX
+    character(80) :: aname, argp1, argp2, cpfile, frfile, &
+            & ispars, name, pfile
+    character(2), dimension(99) :: pnum
+    character(64) :: prefix
     !
     ! COMMON /CI_AERO/
     !
-    INTEGER, DIMENSION(NRX) :: NAERO
+    integer, dimension(nrx) :: naero
     !
     ! COMMON /CI_BL/
     !
-    INTEGER, DIMENSION(2, NEX) :: ICBLBEG, ICBLEND
+    integer, dimension(2, nex) :: icblbeg, icblend
     !
     ! COMMON /CI_CVP/
     !
-    INTEGER, DIMENSION(NEX) :: ICFRST, ICLAST, ICSTG, IPFRST, &
-            & IPLAST, IPTE1, IPTE2
-    INTEGER, DIMENSION(ICX) :: ICTYPE, IPCO, IPCP
-    INTEGER :: NCTOT, NPTOT
+    integer, dimension(nex) :: icfrst, iclast, icstg, ipfrst, &
+            & iplast, ipte1, ipte2
+    integer, dimension(icx) :: ictype, ipco, ipcp
+    integer :: nctot, nptot
     !
     ! COMMON /CI_DRG/
     !
-    INTEGER, DIMENSION(NDRGX) :: IELDRGOBJ, NDDEF
-    INTEGER :: NDOBJ
+    integer, dimension(ndrgx) :: ieldrgobj, nddef
+    integer :: ndobj
     !
     ! COMMON /CI_FLO/
     !
-    INTEGER, DIMENSION(IPX) :: IUGAM, IUSIG
-    INTEGER :: IUQINF, NPSEQ, NU
-    INTEGER, DIMENSION(NEX) :: IUVWK
+    integer, dimension(ipx) :: iugam, iusig
+    integer :: iuqinf, npseq, nu
+    integer, dimension(nex) :: iuvwk
     !
     ! COMMON /CI_GEN/
     !
-    INTEGER, DIMENSION(NEX) :: IEWAKE
-    INTEGER :: IMATYP, ITMAX, LUNDBG, NNAME, NPREFIX
-    INTEGER, DIMENSION(IPX) :: IZERO
+    integer, dimension(nex) :: iewake
+    integer :: imatyp, itmax, lundbg, nname, nprefix
+    integer, dimension(ipx) :: izero
     !
     ! COMMON /CI_GEO/
     !
-    INTEGER, DIMENSION(NEX) :: IBFRST, IBLAST, NBTYPE, NETYPE
-    INTEGER :: IELGDES, NBEL, NBTOT, NEL, NMOD
+    integer, dimension(nex) :: ibfrst, iblast, nbtype, netype
+    integer :: ielgdes, nbel, nbtot, nel, nmod
     !
     ! COMMON /CI_GRD/
     !
-    INTEGER, DIMENSION(ICX) :: IC2IG
-    INTEGER, DIMENSION(NRX) :: IGROTOR
-    INTEGER :: IGTECB, IGTEDW, II, JJ
-    INTEGER, DIMENSION(IPX) :: IP2IG
+    integer, dimension(icx) :: ic2ig
+    integer, dimension(nrx) :: igrotor
+    integer :: igtecb, igtedw, ii, jj
+    integer, dimension(ipx) :: ip2ig
     !
     ! COMMON /CI_PAN/
     !
-    INTEGER, DIMENSION(NEX) :: NPAN
-    INTEGER :: NPANDEF
+    integer, dimension(nex) :: npan
+    integer :: npandef
     !
     ! COMMON /CI_PLT/
     !
-    INTEGER, DIMENSION(NEX) :: ICOLEL, ISPLOT
-    INTEGER :: IPTYPE
+    integer, dimension(nex) :: icolel, isplot
+    integer :: iptype
     !
     ! COMMON /CI_QSP/
     !
-    INTEGER :: IELQDES, KQTARG, NQSP, NSEG
-    INTEGER, DIMENSION(NSEGX) :: IELSEG, IPSEG1, IPSEG2
-    INTEGER, DIMENSION(IPX) :: KSEGP
+    integer :: ielqdes, kqtarg, nqsp, nseg
+    integer, dimension(nsegx) :: ielseg, ipseg1, ipseg2
+    integer, dimension(ipx) :: ksegp
     !
     ! COMMON /CI_ROT/
     !
-    INTEGER, DIMENSION(IRX, NRX) :: IAERO
-    INTEGER, DIMENSION(NEX) :: IEL2IR
-    INTEGER, DIMENSION(NRX) :: IELROTOR, IPROTCB, IPROTDW, &
-            & IRTYPDEF, IRTYPE, NRBLD, NRDEF
-    INTEGER, DIMENSION(IPX) :: IP2IR
-    INTEGER, DIMENSION(IRX) :: IR2IEL
-    INTEGER :: NRC, NROTOR, NRP, NRSTA, NRUPSTRM
+    integer, dimension(irx, nrx) :: iaero
+    integer, dimension(nex) :: iel2ir
+    integer, dimension(nrx) :: ielrotor, iprotcb, iprotdw, &
+            & irtypdef, irtype, nrbld, nrdef
+    integer, dimension(ipx) :: ip2ir
+    integer, dimension(irx) :: ir2iel
+    integer :: nrc, nrotor, nrp, nrsta, nrupstrm
     !
     ! COMMON /CI_SOLV/
     !
-    INTEGER :: ITRMAXSOLV
+    integer :: itrmaxsolv
     !
     ! COMMON /CI_SYS/
     !
-    INTEGER, DIMENSION(ICX) :: IELDOFC, KSYSGMG, KSYSVNC
-    INTEGER, DIMENSION(IPX) :: JAICGAM, JAICGTH, JAICSIG, &
-            & JAICXYP, JSYSDXY, JSYSGAM, &
-            & KSYSGAM
-    INTEGER, DIMENSION(NEX) :: JAICVWK, JSYSQNC, KSYSGSS, &
-            & KSYSKUT, KSYSQNC, KSYSQTT
-    INTEGER, DIMENSION(NSYSX) :: JPSYS
-    INTEGER, DIMENSION(4, 0:NSEGX) :: JSYSQSP, KSYSDNS
-    INTEGER :: NAICGAM, NAICGTH, NAICSIG, NAICVWK, NAICXYP, &
-            & NSYS
+    integer, dimension(icx) :: ieldofc, ksysgmg, ksysvnc
+    integer, dimension(ipx) :: jaicgam, jaicgth, jaicsig, &
+            & jaicxyp, jsysdxy, jsysgam, &
+            & ksysgam
+    integer, dimension(nex) :: jaicvwk, jsysqnc, ksysgss, &
+            & ksyskut, ksysqnc, ksysqtt
+    integer, dimension(nsysx) :: jpsys
+    integer, dimension(4, 0:nsegx) :: jsysqsp, ksysdns
+    integer :: naicgam, naicgth, naicsig, naicvwk, naicxyp, &
+            & nsys
     !
     ! COMMON /CI_VELS/
     !
-    INTEGER :: NINFL
+    integer :: ninfl
     !
     ! COMMON /CI_WAK/
     !
-    INTEGER :: NWAKE
+    integer :: nwake
     !
     ! COMMON /CL_BL/
     !
-    LOGICAL :: LVISC
+    logical :: lvisc
     !
     ! COMMON /CL_DRG/
     !
-    LOGICAL :: LDRGOBJ
+    logical :: ldrgobj
     !
     ! COMMON /CL_GEN/
     !
-    LOGICAL :: LAGRID, LCOORD, LDBG, LDINT, LEPLT, LFREF, &
-            & LGAMA, LGAMU, LGGRID, LGPARM, LGSYS, LGTICK, &
-            & LLOAD, LNCVP, LNORM, LPACC, LPGRID, LPPLT, &
-            & LPREF, LPSHO, LPSTAG, LQAIC, LQCNT, LQGIC, &
-            & LQSYS, LRSPC, LRSPCDEF, LRSPCUSR, LSIGM, LSIGP, &
-            & LSPLT, LSYSP, LVAIC, LVGIC, LVMAV, LVPLT, &
-            & LWSHO, LXYMOV
-    LOGICAL, DIMENSION(NEX) :: LBODY, LNDOF, LQNZR, LREVEL, &
-            & LTPAN, LV1ZR, LV2ZR, LXBOD
-    LOGICAL, DIMENSION(0:NUX) :: LUSET
+    logical :: lagrid, lcoord, ldbg, ldint, leplt, lfref, &
+            & lgama, lgamu, lggrid, lgparm, lgsys, lgtick, &
+            & lload, lncvp, lnorm, lpacc, lpgrid, lpplt, &
+            & lpref, lpsho, lpstag, lqaic, lqcnt, lqgic, &
+            & lqsys, lrspc, lrspcdef, lrspcusr, lsigm, lsigp, &
+            & lsplt, lsysp, lvaic, lvgic, lvmav, lvplt, &
+            & lwsho, lxymov
+    logical, dimension(nex) :: lbody, lndof, lqnzr, lrevel, &
+            & ltpan, lv1zr, lv2zr, lxbod
+    logical, dimension(0:nux) :: luset
     !
     ! COMMON /CL_QSP/
     !
-    LOGICAL, DIMENSION(NSEGX) :: LDFIX1, LDFIX2, LNFIX1, LNFIX2
-    LOGICAL :: LGNFIX, LGPLOT, LGSAME, LGSLOP, LGSPPL, LGSYMM, &
-            & LHOMPL, LQCURV, LQQREV, LQREFL, LQSLOP, LQSPEC, &
-            & LQSPPL, LQSREV, LQSVIS
+    logical, dimension(nsegx) :: ldfix1, ldfix2, lnfix1, lnfix2
+    logical :: lgnfix, lgplot, lgsame, lgslop, lgsppl, lgsymm, &
+            & lhompl, lqcurv, lqqrev, lqrefl, lqslop, lqspec, &
+            & lqsppl, lqsrev, lqsvis
     !
     ! COMMON /CL_ROT/
     !
-    LOGICAL :: LBLDEF, LCHANGE
-    LOGICAL, DIMENSION(IRX, NRX) :: LSTALLR
+    logical :: lbldef, lchange
+    logical, dimension(irx, nrx) :: lstallr
     !
     ! COMMON /CL_SOLV/
     !
-    LOGICAL :: LCONV
+    logical :: lconv
     !
     ! COMMON /CL_WAK/
     !
-    LOGICAL :: LWRLX
+    logical :: lwrlx
     !
     ! COMMON /CR_AERO/
     !
-    REAL, DIMENSION(NDX, NAX, NRX) :: AERODATA
-    REAL, DIMENSION(IRX, NRX) :: AZERO
-    REAL, DIMENSION(NAX, NRX) :: XIAERO
+    real, dimension(ndx, nax, nrx) :: aerodata
+    real, dimension(irx, nrx) :: azero
+    real, dimension(nax, nrx) :: xiaero
     !
     ! COMMON /CR_BL/
     !
-    REAL :: AMPMAX, UREN
-    REAL, DIMENSION(NBLVX, ICX) :: BLDATA
-    REAL, DIMENSION(0:NEX) :: CXVIS
-    REAL, DIMENSION(2, NEX) :: SFIX, SSEP, STRN
+    real :: ampmax, uren
+    real, dimension(nblvx, icx) :: bldata
+    real, dimension(0:nex) :: cxvis
+    real, dimension(2, nex) :: sfix, ssep, strn
     !
     ! COMMON /CR_CVP/
     !
-    REAL, DIMENSION(2, ICX) :: ANC, CPL_QCL, CPR_QCR, DSC_DXY, &
-            & QC, QCL, QCR, QC_XC, QC_YC
-    REAL, DIMENSION(2, 2, ICX) :: ANC_DXY
-    REAL, DIMENSION(2, IPX) :: ANP
-    REAL, DIMENSION(2, 2, IPX) :: ANP_XYM, ANP_XYO, ANP_XYP
-    REAL, DIMENSION(ICX) :: CPL, CPL_QINF, CPR, CPR_QINF, DSC, &
-            & XC, YC
-    REAL, DIMENSION(ICX, NUX) :: CPLU, CPRU
-    REAL, DIMENSION(2, ICX, NUX) :: QCLU, QCRU
-    REAL, DIMENSION(2, ICX, 0:NUX) :: QCU
-    REAL, DIMENSION(2, IPX, ICX) :: QC_GAM, QC_GTH, QC_SIG, &
-            & QC_XP, QC_YP
-    REAL, DIMENSION(IPX) :: SP, VMAVG, XP, XPS, YP, YPS
-    REAL, DIMENSION(NEX) :: SPLE, XPCENT, XPLE, XPMAXE, &
-            & XPMINE, XPREFE, XPTE, XSTG, &
-            & YPCENT, YPLE, YPMAXE, YPMINE, &
-            & YPREFE, YPTE, YSTG
-    REAL :: XPMAX, XPMIN, YPMAX, YPMIN
+    real, dimension(2, icx) :: anc, cpl_qcl, cpr_qcr, dsc_dxy, &
+            & qc, qcl, qcr, qc_xc, qc_yc
+    real, dimension(2, 2, icx) :: anc_dxy
+    real, dimension(2, ipx) :: anp
+    real, dimension(2, 2, ipx) :: anp_xym, anp_xyo, anp_xyp
+    real, dimension(icx) :: cpl, cpl_qinf, cpr, cpr_qinf, dsc, &
+            & xc, yc
+    real, dimension(icx, nux) :: cplu, cpru
+    real, dimension(2, icx, nux) :: qclu, qcru
+    real, dimension(2, icx, 0:nux) :: qcu
+    real, dimension(2, ipx, icx) :: qc_gam, qc_gth, qc_sig, &
+            & qc_xp, qc_yp
+    real, dimension(ipx) :: sp, vmavg, xp, xps, yp, yps
+    real, dimension(nex) :: sple, xpcent, xple, xpmaxe, &
+            & xpmine, xprefe, xpte, xstg, &
+            & ypcent, yple, ypmaxe, ypmine, &
+            & yprefe, ypte, ystg
+    real :: xpmax, xpmin, ypmax, ypmin
     !
     ! COMMON /CR_DRG/
     !
-    REAL, DIMENSION(IDX, NDRGX) :: CDADEF, XDDEF, YDDEF
+    real, dimension(idx, ndrgx) :: cdadef, xddef, yddef
     !
     ! COMMON /CR_FLO/
     !
-    REAL :: ALTH, DELTAT, GEE, MACH, MACH1, QINF, QINFP1, &
-            & QINFP2, QINFPD, QREF, RHO, RMU, VSO
-    REAL, DIMENSION(0:NEX) :: CD, CM, CX, CY
-    REAL, DIMENSION(0:NEX, NUX) :: CDU, CMU, CXU, CYU
-    REAL, DIMENSION(IPX) :: GAM, GAMVSP, GTH, SIG, SIGVSP
-    REAL, DIMENSION(NEX) :: GAMP1, GAMP2, GAMPD, GAMSET, &
-            & QNDOF, SIGP1, SIGP2, SIGPD, &
-            & SIGSET, XTR1, XTR2
-    REAL, DIMENSION(IPX, 0:NUX) :: GAMU, GTHU, SIGU
-    REAL, DIMENSION(NEX, 0:NUX) :: QNDOFU
+    real :: alth, deltat, gee, mach, mach1, qinf, qinfp1, &
+            & qinfp2, qinfpd, qref, rho, rmu, vso
+    real, dimension(0:nex) :: cd, cm, cx, cy
+    real, dimension(0:nex, nux) :: cdu, cmu, cxu, cyu
+    real, dimension(ipx) :: gam, gamvsp, gth, sig, sigvsp
+    real, dimension(nex) :: gamp1, gamp2, gampd, gamset, &
+            & qndof, sigp1, sigp2, sigpd, &
+            & sigset, xtr1, xtr2
+    real, dimension(ipx, 0:nux) :: gamu, gthu, sigu
+    real, dimension(nex, 0:nux) :: qndofu
     !
     ! COMMON /CR_GEN/
     !
-    REAL, DIMENSION(IBX) :: ONE, ZER
-    CHARACTER(64) :: SVERSION
-    REAL :: VERSION
+    real, dimension(ibx) :: one, zer
+    character(64) :: sversion
+    real :: version
     !
     ! COMMON /CR_GEO/
     !
-    REAL, DIMENSION(NEX) :: AGBSUM, AREA2DA, AREA2DT, ASURFV, &
-            & ASURFVT, DXBSUM, DYBSUM, EIXX2DA, &
-            & EIXX2DT, EIXY2DA, EIXY2DT, EIYY2DA, &
-            & EIYY2DT, RGYRXV, RGYRXVT, RGYRYV, &
-            & RGYRYVT, SBLE, VOLUMV, VOLUMVT, &
-            & XBCEN2DA, XBCEN2DT, XBCENV, &
-            & XBCENVT, XBLE, XBMAXE, XBMINE, &
-            & XBREFE, XBTE, XFBSUM, YBCEN2DA, &
-            & YBCEN2DT, YBCENV, YBCENVT, YBLE, &
-            & YBMAXE, YBMINE, YBREFE, YBTE, &
-            & YFBSUM
-    REAL :: DTEBOD, DTEPAN, XBMAX, XBMIN, YBMAX, YBMIN
-    REAL, DIMENSION(IBX) :: SB, XB, XBS, YB, YBS
-    REAL, DIMENSION(2) :: XGBOX, XWBOX, YGBOX, YWBOX
+    real, dimension(nex) :: agbsum, area2da, area2dt, asurfv, &
+            & asurfvt, dxbsum, dybsum, eixx2da, &
+            & eixx2dt, eixy2da, eixy2dt, eiyy2da, &
+            & eiyy2dt, rgyrxv, rgyrxvt, rgyryv, &
+            & rgyryvt, sble, volumv, volumvt, &
+            & xbcen2da, xbcen2dt, xbcenv, &
+            & xbcenvt, xble, xbmaxe, xbmine, &
+            & xbrefe, xbte, xfbsum, ybcen2da, &
+            & ybcen2dt, ybcenv, ybcenvt, yble, &
+            & ybmaxe, ybmine, ybrefe, ybte, &
+            & yfbsum
+    real :: dtebod, dtepan, xbmax, xbmin, ybmax, ybmin
+    real, dimension(ibx) :: sb, xb, xbs, yb, ybs
+    real, dimension(2) :: xgbox, xwbox, ygbox, ywbox
     !
     ! COMMON /CR_GRD/
     !
-    REAL, DIMENSION(IX, JX) :: BGAMG, DHG, DSG, PG, POG, QG, &
-            & QTG, QXG, QYG, RG, XG, YG
-    REAL :: XGMIN
-    REAL, DIMENSION(IX) :: XPOS
-    REAL, DIMENSION(JX) :: YPOS
+    real, dimension(ix, jx) :: bgamg, dhg, dsg, pg, pog, qg, &
+            & qtg, qxg, qyg, rg, xg, yg
+    real :: xgmin
+    real, dimension(ix) :: xpos
+    real, dimension(jx) :: ypos
     !
     ! COMMON /CR_PAN/
     !
-    REAL, DIMENSION(NRPNX, NEX) :: CRRAT, SRPN1, SRPN2
-    REAL, DIMENSION(NEX) :: CVEX, FSLE, FSTE, SMOF
-    REAL :: FPANDEF
+    real, dimension(nrpnx, nex) :: crrat, srpn1, srpn2
+    real, dimension(nex) :: cvex, fsle, fste, smof
+    real :: fpandef
     !
     ! COMMON /CR_PLT/
     !
-    REAL :: CPLDEL, CPLFAC, CPLMAX, CPLMIN, CPXAR, CPYAR, &
-            & FACA, GSF, PVFAC, QPLDEL, QPLFAC, QPLMAX, QPLMIN, &
-            & QVFAC, XBOFF, XBSF, XOFA, XOFG, XPLDEL, XPLFAC, &
-            & XPLMAX, XPLMIN, XPOFF, XPSF, XQOFF, XQSF, YBOFF, &
-            & YBSF, YOFA, YOFG, YPLDEL, YPLFAC, YPLMAX, YPLMIN, &
-            & YPOFF, YPSF, YQOFF, YQSF
-    REAL, DIMENSION(0:7) :: SHF, SSIZEL
-    REAL, DIMENSION(NEX) :: XELNUM, YELNUM
+    real :: cpldel, cplfac, cplmax, cplmin, cpxar, cpyar, &
+            & faca, gsf, pvfac, qpldel, qplfac, qplmax, qplmin, &
+            & qvfac, xboff, xbsf, xofa, xofg, xpldel, xplfac, &
+            & xplmax, xplmin, xpoff, xpsf, xqoff, xqsf, yboff, &
+            & ybsf, yofa, yofg, ypldel, yplfac, yplmax, yplmin, &
+            & ypoff, ypsf, yqoff, yqsf
+    real, dimension(0:7) :: shf, ssizel
+    real, dimension(nex) :: xelnum, yelnum
     !
     ! COMMON /CR_QSP/
     !
-    REAL :: ALGAM, CLGAM, CMGAM, CXGAM, CYGAM, QIGAM, RLXMAX
-    REAL, DIMENSION(NQSPX) :: ALQSP, CLQSP, CMQSP, CXQSP, &
-            & CYQSP, QIQSP
-    REAL, DIMENSION(4, IPX) :: FSPEC
-    REAL, DIMENSION(IPX) :: GAMSP, QSGAM, SIGSP, SSPEC, XSPOC, &
-            & XSPOCS, YSPOC, YSPOCS
-    REAL, DIMENSION(NEX) :: QSPDEL, QSPMAX, QSPMIN, SSPDEL, &
-            & SSPLE, SSPMAX, SSPMIN
-    REAL, DIMENSION(4, NSEGX) :: QSPDOF
-    REAL, DIMENSION(IPX, NQSPX) :: QSPEC, QSPECS
+    real :: algam, clgam, cmgam, cxgam, cygam, qigam, rlxmax
+    real, dimension(nqspx) :: alqsp, clqsp, cmqsp, cxqsp, &
+            & cyqsp, qiqsp
+    real, dimension(4, ipx) :: fspec
+    real, dimension(ipx) :: gamsp, qsgam, sigsp, sspec, xspoc, &
+            & xspocs, yspoc, yspocs
+    real, dimension(nex) :: qspdel, qspmax, qspmin, sspdel, &
+            & ssple, sspmax, sspmin
+    real, dimension(4, nsegx) :: qspdof
+    real, dimension(ipx, nqspx) :: qspec, qspecs
     !
     ! COMMON /CR_ROT/
     !
-    REAL, DIMENSION(NRX) :: ADISK, ATIP, OMEGA, PINVR, PTOTR, &
-            & PVISR, QINVR, QI_OMG, QI_QNF, &
-            & QTOTR, QVISR, QV_DBE, QV_OMG, &
-            & QV_QNF, RHUB, RTIP, TINVR, TI_OMG, &
-            & TI_QNF, TTOTR, TVISR, TV_DBE, &
-            & TV_OMG, TV_QNF, VAAVG, XDISK
-    REAL, DIMENSION(IRX, NRX) :: ALFAR, BETADEF, BETAR, BETARP, &
-            & BGAM, BGAMDEF, CDR, CHR, &
-            & CHRDEF, CHRP, CLALF, CLR, CMR, &
-            & DPII, DPSI, DPVI, DQII, DQVI, &
-            & DTII, DTVI, MACHR, QI_GAM, &
-            & QI_VA, QI_VT, QV_GAM, QV_VA, &
-            & QV_VT, RER, TI_GAM, TI_VA, &
-            & TI_VT, TV_GAM, TV_VA, TV_VT, &
-            & XRC, XRP, YRC, YRDEF, YRP
-    REAL, DIMENSION(IRX) :: BETADES, CHDES, CLDES
-    REAL :: FOM, PTOT, PVIS, QTOT, QVIS, TDUCT, TGAP, &
-            & TGAPZL, TTOT, TVIS, XPAXIS
-    REAL, DIMENSION(3, IRX, NRX) :: VABS, VIND, VREL
+    real, dimension(nrx) :: adisk, atip, omega, pinvr, ptotr, &
+            & pvisr, qinvr, qi_omg, qi_qnf, &
+            & qtotr, qvisr, qv_dbe, qv_omg, &
+            & qv_qnf, rhub, rtip, tinvr, ti_omg, &
+            & ti_qnf, ttotr, tvisr, tv_dbe, &
+            & tv_omg, tv_qnf, vaavg, xdisk
+    real, dimension(irx, nrx) :: alfar, betadef, betar, betarp, &
+            & bgam, bgamdef, cdr, chr, &
+            & chrdef, chrp, clalf, clr, cmr, &
+            & dpii, dpsi, dpvi, dqii, dqvi, &
+            & dtii, dtvi, machr, qi_gam, &
+            & qi_va, qi_vt, qv_gam, qv_va, &
+            & qv_vt, rer, ti_gam, ti_va, &
+            & ti_vt, tv_gam, tv_va, tv_vt, &
+            & xrc, xrp, yrc, yrdef, yrp
+    real, dimension(irx) :: betades, chdes, cldes
+    real :: fom, ptot, pvis, qtot, qvis, tduct, tgap, &
+            & tgapzl, ttot, tvis, xpaxis
+    real, dimension(3, irx, nrx) :: vabs, vind, vrel
     !
     ! COMMON /CR_SOLV/
     !
-    REAL :: EPSSOLV, RLXSOLV, VAVGINIT
+    real :: epssolv, rlxsolv, vavginit
     !
     ! COMMON /CR_SYS/
     !
-    REAL, DIMENSION(NSYSX, 0:IPX) :: AICGAM, AICGTH, AICSIG
-    REAL, DIMENSION(NSYSX, 0:1) :: AICQFF
-    REAL, DIMENSION(NSYSX, 0:NEX) :: AICVWK
-    REAL, DIMENSION(NSYSX, 2, 0:IPX) :: AICXYP
-    REAL, DIMENSION(0:NSYSX) :: RES
-    REAL, DIMENSION(NSYSX, 0:NSYSX) :: SYS
+    real, dimension(nsysx, 0:ipx) :: aicgam, aicgth, aicsig
+    real, dimension(nsysx, 0:1) :: aicqff
+    real, dimension(nsysx, 0:nex) :: aicvwk
+    real, dimension(nsysx, 2, 0:ipx) :: aicxyp
+    real, dimension(0:nsysx) :: res
+    real, dimension(nsysx, 0:nsysx) :: sys
     !
     ! COMMON /CR_TEP/
     !
-    REAL, DIMENSION(2, NEX) :: GAMT, GAMT_DX, GAMT_DY, SIGT, &
-            & SIGT_DX, SIGT_DY, XPT, YPT
-    REAL, DIMENSION(2, 2, NEX) :: GAMT_GAM, GAMT_SIG, GAMT_XP, &
-            & GAMT_YP, SIGT_GAM, SIGT_SIG, &
-            & SIGT_XP, SIGT_YP, XPT_XP, YPT_YP
+    real, dimension(2, nex) :: gamt, gamt_dx, gamt_dy, sigt, &
+            & sigt_dx, sigt_dy, xpt, ypt
+    real, dimension(2, 2, nex) :: gamt_gam, gamt_sig, gamt_xp, &
+            & gamt_yp, sigt_gam, sigt_sig, &
+            & sigt_xp, sigt_yp, xpt_xp, ypt_yp
     !
     ! COMMON /CR_VELS/
     !
-    REAL, DIMENSION(IRX) :: RINFL, VAINFL, VAINFLR, VTINFL, &
-            & VTINFLR
+    real, dimension(irx) :: rinfl, vainfl, vainflr, vtinfl, &
+            & vtinflr
     !
     ! COMMON /CR_WAK/
     !
-    REAL :: XDWKLEN, XWAKE
+    real :: xdwklen, xwake
     !
     ! COMMON /DF_BBLOC/
     !
-    REAL :: BBPFAC, BPLAST
-    REAL, DIMENSION(IRX, NRX) :: BBVFAC
-    REAL, DIMENSION(IRX) :: CLNEG, CLPOS
-    LOGICAL, DIMENSION(NRX) :: LBBLOFT
-    LOGICAL :: LBLBL
+    real :: bbpfac, bplast
+    real, dimension(irx, nrx) :: bbvfac
+    real, dimension(irx) :: clneg, clpos
+    logical, dimension(nrx) :: lbbloft
+    logical :: lblbl
     !
     ! COMMON /DF_ESLOFT/
     !
-    REAL, DIMENSION(NAFX, NRX) :: ALFZ, CAMLO, CAMLOC, PANGTE, &
-            & PAREA, PLERAD, TETH, TLOC, &
-            & TOCE
-    REAL :: APARA, AXHUB, AXTIP, AZTIP, OSHUB, OSTIP, OUTFAC, &
-            & PAF, PAXIS, PLOFT, TKHUB, TKTIP
-    REAL, DIMENSION(NRX) :: AXHUBQ, AXTIPQ, AZTIPQ, OSHUBQ, &
-            & OSTIPQ, PAFQ, PAXISQ, PLOFTQ, &
-            & TKHUBQ, TKTIPQ
-    REAL, DIMENSION(NLSX) :: AZDFDC, AZLOFT, BECORR, BELOFT, &
-            & CDLOFT, TCLOFT, THLOFT, TT1, &
-            & TT1S, TT2, TT2S, TT3, YLOFT
-    REAL, DIMENSION(NPX, NLSX) :: BLXX, BLYY, TRXX, TRYY
-    CHARACTER(80), DIMENSION(NAFX, NRX) :: ENAME
-    INTEGER :: ICBS, IHUB, ITIP, ITTYPE, NAF, NLOFT, NLOFT2, &
-            & NLOLD, NPP, NPP2
-    INTEGER, DIMENSION(NRX) :: ITTYPEQ, NAFQ, NLOFT2Q, NLOFTQ, &
-            & NPP2Q
-    LOGICAL :: LBLEN, LCALC, LL2D, LLOFT, LROTATE, LSMOD, &
-            & LTDEF, LTRAN
-    CHARACTER(80) :: LONAME, SNAME
-    LOGICAL, DIMENSION(NRX) :: LTDEFQ
-    INTEGER, DIMENSION(NAFX) :: NTC
-    CHARACTER(80), DIMENSION(NRX) :: SNAMEQ
-    REAL, DIMENSION(NAFX, NTCX) :: TCLOC
-    REAL, DIMENSION(NLSX, NRX) :: TCLOFTQ, THLOFTQ
-    REAL, DIMENSION(NPX, NAFX) :: XXE, YYE
-    REAL, DIMENSION(NPX, NAFX, NRX) :: XXEQ, YYEQ
+    real, dimension(nafx, nrx) :: alfz, camlo, camloc, pangte, &
+            & parea, plerad, teth, tloc, &
+            & toce
+    real :: apara, axhub, axtip, aztip, oshub, ostip, outfac, &
+            & paf, paxis, ploft, tkhub, tktip
+    real, dimension(nrx) :: axhubq, axtipq, aztipq, oshubq, &
+            & ostipq, pafq, paxisq, ploftq, &
+            & tkhubq, tktipq
+    real, dimension(nlsx) :: azdfdc, azloft, becorr, beloft, &
+            & cdloft, tcloft, thloft, tt1, &
+            & tt1s, tt2, tt2s, tt3, yloft
+    real, dimension(npx, nlsx) :: blxx, blyy, trxx, tryy
+    character(80), dimension(nafx, nrx) :: ename
+    integer :: icbs, ihub, itip, ittype, naf, nloft, nloft2, &
+            & nlold, npp, npp2
+    integer, dimension(nrx) :: ittypeq, nafq, nloft2q, nloftq, &
+            & npp2q
+    logical :: lblen, lcalc, ll2d, lloft, lrotate, lsmod, &
+            & ltdef, ltran
+    character(80) :: loname, sname
+    logical, dimension(nrx) :: ltdefq
+    integer, dimension(nafx) :: ntc
+    character(80), dimension(nrx) :: snameq
+    real, dimension(nafx, ntcx) :: tcloc
+    real, dimension(nlsx, nrx) :: tcloftq, thloftq
+    real, dimension(npx, nafx) :: xxe, yye
+    real, dimension(npx, nafx, nrx) :: xxeq, yyeq
     !
     ! COMMON /DF_MODI/
     !
-    REAL :: BLFAC
-    REAL, DIMENSION(IRX, NRX) :: BUFBET, BUFCHD, CURBET, CURCHD
-    LOGICAL :: LBA, LBC
-    REAL, DIMENSION(IRX) :: WB1, WB2, WB3, WC2
+    real :: blfac
+    real, dimension(irx, nrx) :: bufbet, bufchd, curbet, curchd
+    logical :: lba, lbc
+    real, dimension(irx) :: wb1, wb2, wb3, wc2
     !
     ! COMMON /TEMP_X/
     !
-    REAL, DIMENSION(IWX) :: WE1, WE2, WE3
+    real, dimension(iwx) :: we1, we2, we3
     !
     ! COMMON /XF_PLOTS/
     !
-    REAL :: ANGBTEX, APX1BA, APX1BT, APX2BA, APX2BT, AREABX, &
-            & CAMBRBX, CHGX, CHORDBX, DXYGX, EI11BA, EI11BT, &
-            & EI22BA, EI22BT, GTICKX, RADBLEX, SBLEX, TETHX, &
-            & THICKBX, XBMAXX, XBMINX, XCAMBRBX, XGMAXX, XGMINX, &
-            & XOFFX, XSFX, XTHICKBX, YBMAXX, YBMINX, YGMAXX, &
-            & YGMINX, YOFFX, YSFX
-    REAL, DIMENSION(8, NLSX) :: BLENDATA
-    INTEGER, DIMENSION(NLSX) :: IXPLOT
-    INTEGER :: IXTYPE, NBB, NOVER, NXPLOT
-    LOGICAL :: LGEOPLX, LGGRIDX, LGPARMX, LGTICKX
-    CHARACTER(80) :: NAMEX
-    REAL, DIMENSION(NPX) :: SBB, XBB, XBBP, YBB, YBBP
-END MODULE I_DFDC
+    real :: angbtex, apx1ba, apx1bt, apx2ba, apx2bt, areabx, &
+            & cambrbx, chgx, chordbx, dxygx, ei11ba, ei11bt, &
+            & ei22ba, ei22bt, gtickx, radblex, sblex, tethx, &
+            & thickbx, xbmaxx, xbminx, xcambrbx, xgmaxx, xgminx, &
+            & xoffx, xsfx, xthickbx, ybmaxx, ybminx, ygmaxx, &
+            & ygminx, yoffx, ysfx
+    real, dimension(8, nlsx) :: blendata
+    integer, dimension(nlsx) :: ixplot
+    integer :: ixtype, nbb, nover, nxplot
+    logical :: lgeoplx, lggridx, lgparmx, lgtickx
+    character(80) :: namex
+    real, dimension(npx) :: sbb, xbb, xbbp, ybb, ybbp
+end module i_dfdc

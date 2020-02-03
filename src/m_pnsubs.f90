@@ -38,21 +38,21 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE PANDEF(IELDEF)
+    subroutine pandef(ieldef)
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IELDEF
+        integer :: ieldef
         !
         ! Local variables
         !
-        REAL :: ANPAN, SBMAG, SBMAX, SBMIN
-        INTEGER :: IEL, IEL1, IEL2, IRPN, NPANMAX, NPANMIN
-        REAL, DIMENSION(NEX) :: SBTOT
+        real :: anpan, sbmag, sbmax, sbmin
+        integer :: iel, iel1, iel2, irpn, npanmax, npanmin
+        real, dimension(nex) :: sbtot
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -60,94 +60,94 @@ contains
         !     Sets default paneling parameters
         !-----------------------------------------------
         !
-        IF (IELDEF==0) THEN
-            IEL1 = 1
-            IEL2 = NBEL
-        ELSE
-            IEL1 = IELDEF
-            IEL2 = IELDEF
-        ENDIF
+        if (ieldef==0) then
+            iel1 = 1
+            iel2 = nbel
+        else
+            iel1 = ieldef
+            iel2 = ieldef
+        endif
         !
-        SBMIN = 0.0
-        SBMAX = 0.0
-        DO IEL = IEL1, IEL2
-            SBTOT(IEL) = SB(IBLAST(IEL)) - SB(IBFRST(IEL))
-            IF (NETYPE(IEL)==0) THEN
-                SBMIN = MIN(SBMIN, SBTOT(IEL))
-                SBMAX = MAX(SBMAX, SBTOT(IEL))
-            ENDIF
-        ENDDO
+        sbmin = 0.0
+        sbmax = 0.0
+        do iel = iel1, iel2
+            sbtot(iel) = sb(iblast(iel)) - sb(ibfrst(iel))
+            if (netype(iel)==0) then
+                sbmin = min(sbmin, sbtot(iel))
+                sbmax = max(sbmax, sbtot(iel))
+            endif
+        enddo
         !---- use mean element arclength for scaling
-        SBMAG = 0.5 * (SBMIN + SBMAX)
+        sbmag = 0.5 * (sbmin + sbmax)
         !
-        ANPAN = FLOAT(NPANDEF)
+        anpan = float(npandef)
         !---- set min, max # panels per element
-        NPANMIN = NPANDEF / 2
-        NPANMAX = 2 * NPANDEF
+        npanmin = npandef / 2
+        npanmax = 2 * npandef
         !
-        DO IEL = IEL1, IEL2
-            CVEX(IEL) = 1.0
-            SMOF(IEL) = 1.0
-            FSLE(IEL) = 0.6
-            FSTE(IEL) = 0.6
+        do iel = iel1, iel2
+            cvex(iel) = 1.0
+            smof(iel) = 1.0
+            fsle(iel) = 0.6
+            fste(iel) = 0.6
             !
-            IF (SBTOT(IEL)==0.0) THEN
-                NPAN(IEL) = 1
-            ELSEIF (NETYPE(IEL)==0) THEN
+            if (sbtot(iel)==0.0) then
+                npan(iel) = 1
+            elseif (netype(iel)==0) then
                 !-------- solid airfoil element
-                NPAN(IEL) = INT(ANPAN * (SBTOT(IEL) / SBMAG)**FPANDEF)
-                NPAN(IEL) = MAX(NPANMIN, NPAN(IEL))
-                NPAN(IEL) = MIN(NPANMAX, NPAN(IEL))
-                CVEX(IEL) = 1.0
-                FSLE(IEL) = 0.6
-                FSTE(IEL) = 0.6
+                npan(iel) = int(anpan * (sbtot(iel) / sbmag)**fpandef)
+                npan(iel) = max(npanmin, npan(iel))
+                npan(iel) = min(npanmax, npan(iel))
+                cvex(iel) = 1.0
+                fsle(iel) = 0.6
+                fste(iel) = 0.6
                 !
-            ELSEIF (NETYPE(IEL)==1 .OR. NETYPE(IEL)==2 .OR. NETYPE(IEL)   &
-                    & ==5) THEN
+            elseif (netype(iel)==1 .or. netype(iel)==2 .or. netype(iel)   &
+                    & ==5) then
                 !-------- wake sheet, wake line or source line element
-                NPAN(IEL) = INT(ANPAN / 4.0 * (SBTOT(IEL) / SBMAG)**FPANDEF)
+                npan(iel) = int(anpan / 4.0 * (sbtot(iel) / sbmag)**fpandef)
                 !---- not less than 2 panels for these...
-                NPAN(IEL) = MAX(2, NPAN(IEL))
-                CVEX(IEL) = 1.0
-                FSLE(IEL) = 0.6
-                FSTE(IEL) = 5.0
-            ELSE
+                npan(iel) = max(2, npan(iel))
+                cvex(iel) = 1.0
+                fsle(iel) = 0.6
+                fste(iel) = 5.0
+            else
                 !-------- point or ring element (these won't really be used)
-                NPAN(IEL) = 1
-                CVEX(IEL) = 1.0
-                FSLE(IEL) = 1.0
-                FSTE(IEL) = 1.0
-            ENDIF
+                npan(iel) = 1
+                cvex(iel) = 1.0
+                fsle(iel) = 1.0
+                fste(iel) = 1.0
+            endif
             !
             !------ refinement-station parameters
-            DO IRPN = 1, NRPNX
-                CRRAT(IRPN, IEL) = 1.0
-                SRPN1(IRPN, IEL) = 0.0
-                SRPN2(IRPN, IEL) = 0.0
-            ENDDO
-        ENDDO
+            do irpn = 1, nrpnx
+                crrat(irpn, iel) = 1.0
+                srpn1(irpn, iel) = 0.0
+                srpn2(irpn, iel) = 0.0
+            enddo
+        enddo
         !
         !---- Set flag for spacing defined, unset user-defined flag
-        LRSPCDEF = .TRUE.
-        LRSPCUSR = .FALSE.
+        lrspcdef = .true.
+        lrspcusr = .false.
         !
-    END SUBROUTINE PANDEF
+    end subroutine pandef
     !*==PANCOP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANDEF
 
 
-    SUBROUTINE PANCOP
+    subroutine pancop
         use i_dfdc
         use m_geom, only : itpset, xypspl
         use m_geutil, only : minmax
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        REAL :: DUMMY
-        INTEGER :: I, IB, IEL, IP, N
+        real :: dummy
+        integer :: i, ib, iel, ip, n
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -155,100 +155,100 @@ contains
         !     Copies XB,YB arrays directly into panel arrays.
         !------------------------------------------------------------
         !
-        IF (NBTOT>IPX) STOP 'PANCOP: Array overflow on IPX.'
+        if (nbtot>ipx) stop 'PANCOP: Array overflow on IPX.'
         !
         !---- total number of panel nodes
-        NPTOT = NBTOT
-        NEL = NBEL
+        nptot = nbtot
+        nel = nbel
         !c      write(60,*) 'PANCOP '
         !c      write(60,*) 'NBEL,NBTOT ',NBEL,NBTOT
         !
         !---- panel node locations
-        DO IB = 1, NBTOT
-            IP = IB
+        do ib = 1, nbtot
+            ip = ib
             !c        write(60,99) ib,xb(ip),yb(ip),xp(ip),yp(ip)
-            XP(IP) = XB(IB)
-            YP(IP) = YB(IB)
-        ENDDO
-        99   FORMAT (i5, 6F12.6)
+            xp(ip) = xb(ib)
+            yp(ip) = yb(ib)
+        enddo
+        99   format (i5, 6f12.6)
         !
         !---- reference point location for each element
-        DO IEL = 1, NEL
-            XPREFE(IEL) = XBREFE(IEL)
-            YPREFE(IEL) = YBREFE(IEL)
+        do iel = 1, nel
+            xprefe(iel) = xbrefe(iel)
+            yprefe(iel) = ybrefe(iel)
             !
-            XPCENT(IEL) = XBCEN2DT(IEL)
-            XPCENT(IEL) = XBCEN2DT(IEL)
-        ENDDO
+            xpcent(iel) = xbcen2dt(iel)
+            xpcent(iel) = xbcen2dt(iel)
+        enddo
         !
         !---- set new stuff for each element
-        DO IEL = 1, NEL
+        do iel = 1, nel
             !c       write(60,*) IEL,IPFRST(IEL),IPLAST(IEL),IBFRST(IEL),IBLAST(IEL)
-            IPFRST(IEL) = IBFRST(IEL)
-            IPLAST(IEL) = IBLAST(IEL)
-            IF (IPLAST(IEL)>IPX) STOP 'PANCOP: Array overflow on IPX'
+            ipfrst(iel) = ibfrst(iel)
+            iplast(iel) = iblast(iel)
+            if (iplast(iel)>ipx) stop 'PANCOP: Array overflow on IPX'
             !
             !------ set prescribed panel number to actual new panel number
-            NPAN(IEL) = IPLAST(IEL) - IPFRST(IEL) + 1
+            npan(iel) = iplast(iel) - ipfrst(iel) + 1
             !
             !------ spline and set other stuff for element IEL
-            CALL XYPSPL(IEL)
+            call xypspl(iel)
             !
             !------ set indices of TE panel, if any
-            CALL ITPSET(IEL)
+            call itpset(iel)
             !
-            I = IPFRST(IEL)
-            N = IPLAST(IEL) - IPFRST(IEL) + 1
-            CALL MINMAX(N, XP(I), XPMINE(IEL), XPMAXE(IEL))
-            CALL MINMAX(N, YP(I), YPMINE(IEL), YPMAXE(IEL))
-        ENDDO
+            i = ipfrst(iel)
+            n = iplast(iel) - ipfrst(iel) + 1
+            call minmax(n, xp(i), xpmine(iel), xpmaxe(iel))
+            call minmax(n, yp(i), ypmine(iel), ypmaxe(iel))
+        enddo
         !
         !---- set overall min,max over all elements
-        CALL MINMAX(NEL, XPMINE, XPMIN, DUMMY)
-        CALL MINMAX(NEL, YPMINE, YPMIN, DUMMY)
-        CALL MINMAX(NEL, XPMAXE, DUMMY, XPMAX)
-        CALL MINMAX(NEL, YPMAXE, DUMMY, YPMAX)
+        call minmax(nel, xpmine, xpmin, dummy)
+        call minmax(nel, ypmine, ypmin, dummy)
+        call minmax(nel, xpmaxe, dummy, xpmax)
+        call minmax(nel, ypmaxe, dummy, ypmax)
         !
         !---- we now have a new geometry... invalidate any existing solution
-        LNCVP = .FALSE.
-        LQAIC = .FALSE.
-        LQGIC = .FALSE.
-        LQCNT = .FALSE.
-        LSYSP = .FALSE.
-        LGSYS = .FALSE.
-        LGAMU = .FALSE.
-        LGAMA = .FALSE.
-        LSIGP = .FALSE.
-        LSIGM = .FALSE.
+        lncvp = .false.
+        lqaic = .false.
+        lqgic = .false.
+        lqcnt = .false.
+        lsysp = .false.
+        lgsys = .false.
+        lgamu = .false.
+        lgama = .false.
+        lsigp = .false.
+        lsigm = .false.
         !
-        LGSAME = .TRUE.
+        lgsame = .true.
         !
-    END SUBROUTINE PANCOP
+    end subroutine pancop
     !*==PANGEN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANCOP
 
-    SUBROUTINE PANGEN(LQUERY)
+    subroutine pangen(lquery)
         use i_dfdc
         use m_geom, only : itpset, xypspl
         use m_spline, only : seval
         use m_sgutil, only : sgcurv
         use m_geutil, only : minmax
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: LQUERY
+        logical :: lquery
         !
         ! Local variables
         !
-        REAL :: DUMMY, SBI
-        INTEGER :: I, IB, IB1, IB2, IEL, IG, IP, IP1, IP2, &
-                & IPDEL, KEL, KP, KP1, KP2, KPD, N, NBPTS, NG, &
-                & NPPTS
-        LOGICAL, SAVE :: LCPLOT
-        REAL, DIMENSION(IPX) :: SG
+        real :: dummy, sbi
+        integer :: i, ib, ib1, ib2, iel, ig, ip, ip1, ip2, &
+                & ipdel, kel, kp, kp1, kp2, kpd, n, nbpts, ng, &
+                & nppts
+        logical, save :: lcplot
+        real, dimension(ipx) :: sg
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -258,59 +258,59 @@ contains
         !------------------------------------------------------------------
         !
         !
-        DATA LCPLOT/.FALSE./
+        data lcplot/.false./
         !
-        IF (NBEL==0) RETURN
-        NEL = NBEL
+        if (nbel==0) return
+        nel = nbel
         !
         !---- process each element
-        DO IEL = 1, NBEL
+        do iel = 1, nbel
             !
-            IB1 = IBFRST(IEL)
-            IB2 = IBLAST(IEL)
-            NBPTS = IB2 - IB1 + 1
-            IP1 = IPFRST(IEL)
-            IP2 = IPLAST(IEL)
-            NPPTS = IP2 - IP1 + 1
-            IF (LDBG) THEN
-                WRITE (*, *) 'PANGEN IEL ', IEL
-                WRITE (*, *) 'IB1,IB2 ', IB1, IB2
-                WRITE (*, *) 'IP1,IP2 ', IP1, IP2
-            ENDIF
+            ib1 = ibfrst(iel)
+            ib2 = iblast(iel)
+            nbpts = ib2 - ib1 + 1
+            ip1 = ipfrst(iel)
+            ip2 = iplast(iel)
+            nppts = ip2 - ip1 + 1
+            if (ldbg) then
+                write (*, *) 'PANGEN IEL ', iel
+                write (*, *) 'IB1,IB2 ', ib1, ib2
+                write (*, *) 'IP1,IP2 ', ip1, ip2
+            endif
             !
-            IF (NPPTS<=1 .AND. NBPTS<=1) THEN
+            if (nppts<=1 .and. nbpts<=1) then
                 !------- don't try to panel point or ring element
-                NG = 1
-                SG(1) = 0.
+                ng = 1
+                sg(1) = 0.
                 !
-            ELSE
+            else
                 !
-                IF (.NOT.(LQUERY)) THEN
+                if (.not.(lquery)) then
                     !--------- no initial paneling for SGCURV
-                    SG(1) = 0.
+                    sg(1) = 0.
                     !-------- set current spacing so SGCURV has something to plot
-                ELSEIF (NPPTS>1) THEN
+                elseif (nppts>1) then
                     !--------- set SG from existing paneled geometry, if defined
-                    NG = NPPTS
-                    DO IP = IP1, IP2
-                        IG = IP - IP1 + 1
-                        SG(IG) = (SP(IP) - SP(IP1)) / (SP(IP2) - SP(IP1))
-                    ENDDO
-                ELSEIF (NBPTS>1) THEN
+                    ng = nppts
+                    do ip = ip1, ip2
+                        ig = ip - ip1 + 1
+                        sg(ig) = (sp(ip) - sp(ip1)) / (sp(ip2) - sp(ip1))
+                    enddo
+                elseif (nbpts>1) then
                     !--------- or, set SG from buffer geometry
-                    NG = NBPTS
-                    DO IB = IB1, IB2
-                        IG = IB - IB1 + 1
-                        SG(IG) = (SB(IB) - SB(IB1)) / (SB(IB2) - SB(IB1))
-                    ENDDO
-                    IF (NPAN(IEL)<=0) NPAN(IEL) = NBPTS
-                ELSE
-                    WRITE (*, *)
-                    WRITE (*, *) '  No current paneling to modify'
-                    WRITE (*, *) '  Input case and/or Execute PANE command'
-                    RETURN
+                    ng = nbpts
+                    do ib = ib1, ib2
+                        ig = ib - ib1 + 1
+                        sg(ig) = (sb(ib) - sb(ib1)) / (sb(ib2) - sb(ib1))
+                    enddo
+                    if (npan(iel)<=0) npan(iel) = nbpts
+                else
+                    write (*, *)
+                    write (*, *) '  No current paneling to modify'
+                    write (*, *) '  Input case and/or Execute PANE command'
+                    return
                     !
-                ENDIF
+                endif
                 !
                 !         WRITE(*,1150) IEL
                 ! 1150    FORMAT(
@@ -319,128 +319,128 @@ contains
                 !
                 !------- surface element... generate spacing array SG
                 !
-                CALL SGCURV(LQUERY, LCPLOT, NBPTS, XB(IB1), XBS(IB1), YB(IB1), &
-                        & YBS(IB1), SB(IB1), IPX, NG, SG, NPAN(IEL), CVEX(IEL), &
-                        & SMOF(IEL), FSLE(IEL), FSTE(IEL), NRPNX, SRPN1(1, IEL)&
-                        &, SRPN2(1, IEL), CRRAT(1, IEL))
-            ENDIF
+                call sgcurv(lquery, lcplot, nbpts, xb(ib1), xbs(ib1), yb(ib1), &
+                        & ybs(ib1), sb(ib1), ipx, ng, sg, npan(iel), cvex(iel), &
+                        & smof(iel), fsle(iel), fste(iel), nrpnx, srpn1(1, iel)&
+                        &, srpn2(1, iel), crrat(1, iel))
+            endif
             !
-            IF (LQUERY) THEN
+            if (lquery) then
                 !---- Set flag for spacing defined, unset user-defined flag
-                LRSPCDEF = .TRUE.
-                LRSPCUSR = .TRUE.
-            ENDIF
+                lrspcdef = .true.
+                lrspcusr = .true.
+            endif
             !
             !------ starting and ending indices for this element IEL
-            IF (IEL==1) THEN
-                IP1 = 1
-                IP2 = NG
-            ELSE
-                IP1 = IPLAST(IEL - 1) + 1
-                IP2 = IPLAST(IEL - 1) + NG
-            ENDIF
-            IF (IP2>IPX) STOP 'PANGEN: Array overflow on IPX'
+            if (iel==1) then
+                ip1 = 1
+                ip2 = ng
+            else
+                ip1 = iplast(iel - 1) + 1
+                ip2 = iplast(iel - 1) + ng
+            endif
+            if (ip2>ipx) stop 'PANGEN: Array overflow on IPX'
             !
-            IF (LQUERY) THEN
-                IPDEL = IP2 - IPLAST(IEL)
-                IF (NPTOT + IPDEL>IPX) STOP 'PANGEN: Array overflow on IPX'
+            if (lquery) then
+                ipdel = ip2 - iplast(iel)
+                if (nptot + ipdel>ipx) stop 'PANGEN: Array overflow on IPX'
                 !
                 !-------- move current points in subsequent elements to make/take-up room
-                IF (IPDEL>0) THEN
-                    KP1 = NPTOT
-                    KP2 = IPLAST(IEL) + 1
-                    KPD = -1
-                ELSE
-                    KP1 = IPLAST(IEL) + 1
-                    KP2 = NPTOT
-                    KPD = +1
-                ENDIF
-                DO KP = KP1, KP2, KPD
-                    SP(KP + IPDEL) = SP(KP)
-                    XP(KP + IPDEL) = XP(KP)
-                    YP(KP + IPDEL) = YP(KP)
-                    XPS(KP + IPDEL) = XPS(KP)
-                    YPS(KP + IPDEL) = YPS(KP)
-                ENDDO
-                DO KEL = IEL + 1, NEL
-                    IPFRST(KEL) = IPFRST(KEL) + IPDEL
-                    IPLAST(KEL) = IPLAST(KEL) + IPDEL
-                ENDDO
-            ENDIF
+                if (ipdel>0) then
+                    kp1 = nptot
+                    kp2 = iplast(iel) + 1
+                    kpd = -1
+                else
+                    kp1 = iplast(iel) + 1
+                    kp2 = nptot
+                    kpd = +1
+                endif
+                do kp = kp1, kp2, kpd
+                    sp(kp + ipdel) = sp(kp)
+                    xp(kp + ipdel) = xp(kp)
+                    yp(kp + ipdel) = yp(kp)
+                    xps(kp + ipdel) = xps(kp)
+                    yps(kp + ipdel) = yps(kp)
+                enddo
+                do kel = iel + 1, nel
+                    ipfrst(kel) = ipfrst(kel) + ipdel
+                    iplast(kel) = iplast(kel) + ipdel
+                enddo
+            endif
             !
             !------ set panel nodes at fractional arc length locations SG
-            DO IP = IP1, IP2
-                IG = IP - IP1 + 1
-                SBI = SB(IB1) + (SB(IB2) - SB(IB1)) * SG(IG)
+            do ip = ip1, ip2
+                ig = ip - ip1 + 1
+                sbi = sb(ib1) + (sb(ib2) - sb(ib1)) * sg(ig)
                 !
-                XP(IP) = SEVAL(SBI, XB(IB1), XBS(IB1), SB(IB1), NBPTS)
-                YP(IP) = SEVAL(SBI, YB(IB1), YBS(IB1), SB(IB1), NBPTS)
-            ENDDO
-            IPFRST(IEL) = IP1
-            IPLAST(IEL) = IP2
+                xp(ip) = seval(sbi, xb(ib1), xbs(ib1), sb(ib1), nbpts)
+                yp(ip) = seval(sbi, yb(ib1), ybs(ib1), sb(ib1), nbpts)
+            enddo
+            ipfrst(iel) = ip1
+            iplast(iel) = ip2
             !
             !------ centroid location
-            XPCENT(IEL) = XBCEN2DT(IEL)
-            YPCENT(IEL) = YBCEN2DT(IEL)
+            xpcent(iel) = xbcen2dt(iel)
+            ypcent(iel) = ybcen2dt(iel)
 
             !------ spline and set other stuff for element IEL
-            CALL XYPSPL(IEL)
+            call xypspl(iel)
             !
             !------ set indices of TE panel, if any
-            CALL ITPSET(IEL)
+            call itpset(iel)
             !
-            I = IPFRST(IEL)
-            N = IPLAST(IEL) - IPFRST(IEL) + 1
-            CALL MINMAX(N, XP(I), XPMINE(IEL), XPMAXE(IEL))
-            CALL MINMAX(N, YP(I), YPMINE(IEL), YPMAXE(IEL))
-        ENDDO
+            i = ipfrst(iel)
+            n = iplast(iel) - ipfrst(iel) + 1
+            call minmax(n, xp(i), xpmine(iel), xpmaxe(iel))
+            call minmax(n, yp(i), ypmine(iel), ypmaxe(iel))
+        enddo
         !
         !---- set total number of panel vertices
-        NPTOT = IPLAST(NEL)
+        nptot = iplast(nel)
         !
         !---- set overall min,max over all elements
-        CALL MINMAX(NEL, XPMINE, XPMIN, DUMMY)
-        CALL MINMAX(NEL, YPMINE, YPMIN, DUMMY)
-        CALL MINMAX(NEL, XPMAXE, DUMMY, XPMAX)
-        CALL MINMAX(NEL, YPMAXE, DUMMY, YPMAX)
+        call minmax(nel, xpmine, xpmin, dummy)
+        call minmax(nel, ypmine, ypmin, dummy)
+        call minmax(nel, xpmaxe, dummy, xpmax)
+        call minmax(nel, ypmaxe, dummy, ypmax)
         !
         !---- default reference point location for each element
-        DO IEL = 1, NEL
-            XPREFE(IEL) = 0.0
-            YPREFE(IEL) = 0.0
-        ENDDO
+        do iel = 1, nel
+            xprefe(iel) = 0.0
+            yprefe(iel) = 0.0
+        enddo
         !
         !---- we now have a new geometry... invalidate any existing solution
-        LNCVP = .FALSE.
-        LQAIC = .FALSE.
-        LQGIC = .FALSE.
-        LQCNT = .FALSE.
-        LSYSP = .FALSE.
-        LGSYS = .FALSE.
-        LGAMU = .FALSE.
-        LGAMA = .FALSE.
-        LSIGP = .FALSE.
-        LSIGM = .FALSE.
+        lncvp = .false.
+        lqaic = .false.
+        lqgic = .false.
+        lqcnt = .false.
+        lsysp = .false.
+        lgsys = .false.
+        lgamu = .false.
+        lgama = .false.
+        lsigp = .false.
+        lsigm = .false.
         !
-        LQSPEC = .FALSE.
-        LGSAME = .FALSE.
+        lqspec = .false.
+        lgsame = .false.
         !
-    END SUBROUTINE PANGEN
+    end subroutine pangen
     !*==PANWRT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANGEN
 
 
 
-    SUBROUTINE PANWRT
+    subroutine panwrt
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: IEL, IRPN, LU
-        CHARACTER(80) :: PFNDEF
+        integer :: iel, irpn, lu
+        character(80) :: pfndef
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -448,59 +448,59 @@ contains
         !     Writes paneling-parameter file
         !-----------------------------------------
         !
-        1000 FORMAT (A)
+        1000 format (a)
         !
-        LU = 8
-        20   DO
+        lu = 8
+        20   do
             !
             !---- use existing paneling-parameter filename (if any) as the default
-            WRITE (*, 1200) PFILE(1:60)
-            1200    FORMAT (/' Enter output filename:  ', A)
+            write (*, 1200) pfile(1:60)
+            1200    format (/' Enter output filename:  ', a)
             !
-            READ (*, 1000) PFNDEF
-            IF (PFNDEF(1:1)/=' ') THEN
-                PFILE = PFNDEF
-            ELSEIF (PFILE(1:1)==' ') THEN
-                CYCLE
-            ENDIF
-            EXIT
-        ENDDO
+            read (*, 1000) pfndef
+            if (pfndef(1:1)/=' ') then
+                pfile = pfndef
+            elseif (pfile(1:1)==' ') then
+                cycle
+            endif
+            exit
+        enddo
         !
-        OPEN (LU, FILE = PFILE, STATUS = 'UNKNOWN', ERR = 20)
-        REWIND (LU)
+        open (lu, file = pfile, status = 'UNKNOWN', err = 20)
+        rewind (lu)
         !
-        WRITE (LU, *) NEL, NRPNX
-        DO IEL = 1, NEL
-            WRITE (LU, *) NPAN(IEL)
-            WRITE (LU, *) CVEX(IEL), SMOF(IEL), FSLE(IEL), FSTE(IEL)
-            DO IRPN = 1, NRPNX
-                WRITE (LU, *) SRPN1(IRPN, IEL), SRPN2(IRPN, IEL), &
-                        & CRRAT(IRPN, IEL)
-            ENDDO
-        ENDDO
-        CLOSE (LU)
+        write (lu, *) nel, nrpnx
+        do iel = 1, nel
+            write (lu, *) npan(iel)
+            write (lu, *) cvex(iel), smof(iel), fsle(iel), fste(iel)
+            do irpn = 1, nrpnx
+                write (lu, *) srpn1(irpn, iel), srpn2(irpn, iel), &
+                        & crrat(irpn, iel)
+            enddo
+        enddo
+        close (lu)
         !
-    END SUBROUTINE PANWRT
+    end subroutine panwrt
     !*==PANGET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! PANWRT
 
 
 
-    SUBROUTINE PANGET(FNAME, ERROR)
+    subroutine panget(fname, error)
         use i_dfdc
         use m_userio, only : asks, strip
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        LOGICAL :: ERROR
-        CHARACTER(*) :: FNAME
+        logical :: error
+        character(*) :: fname
         !
         ! Local variables
         !
-        INTEGER :: IEL, IRPN, LU, NEL0, NFNAME, NRPN0
+        integer :: iel, irpn, lu, nel0, nfname, nrpn0
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -508,48 +508,48 @@ contains
         !     Reads paneling-parameter file FNAME
         !-----------------------------------------
         !
-        LU = 8
+        lu = 8
         !
-        IF (FNAME(1:1)==' ') CALL ASKS(&
+        if (fname(1:1)==' ') call asks(&
                 &'Enter paneling-parameter filename^'&
-                &, FNAME)
+                &, fname)
         !
         !---- strip off leading blanks and get number of characters
-        CALL STRIP(FNAME, NFNAME)
+        call strip(fname, nfname)
         !
-        WRITE (*, *)
+        write (*, *)
         !
-        OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 90)
-        REWIND (LU)
+        open (lu, file = fname, status = 'OLD', err = 90)
+        rewind (lu)
         !
-        READ (LU, *, ERR = 80) NEL0, NRPN0
-        NEL0 = MIN(NEL0, NEX)
-        NRPN0 = MIN(NRPN0, NRPNX)
+        read (lu, *, err = 80) nel0, nrpn0
+        nel0 = min(nel0, nex)
+        nrpn0 = min(nrpn0, nrpnx)
         !
-        DO IEL = 1, NEL0
-            READ (LU, *, ERR = 80) NPAN(IEL)
-            READ (LU, *, ERR = 80) CVEX(IEL), SMOF(IEL), FSLE(IEL), &
-                    & FSTE(IEL)
-            DO IRPN = 1, NRPN0
-                READ (LU, *, ERR = 80) SRPN1(IRPN, IEL), SRPN2(IRPN, IEL), &
-                        & CRRAT(IRPN, IEL)
-            ENDDO
-        ENDDO
-        CLOSE (LU)
-        WRITE (*, *) 'Paneling parameters read from file ', &
-                & FNAME(1:NFNAME)
-        LRSPCDEF = .TRUE.
-        LRSPCUSR = .TRUE.
-        ERROR = .FALSE.
-        RETURN
+        do iel = 1, nel0
+            read (lu, *, err = 80) npan(iel)
+            read (lu, *, err = 80) cvex(iel), smof(iel), fsle(iel), &
+                    & fste(iel)
+            do irpn = 1, nrpn0
+                read (lu, *, err = 80) srpn1(irpn, iel), srpn2(irpn, iel), &
+                        & crrat(irpn, iel)
+            enddo
+        enddo
+        close (lu)
+        write (*, *) 'Paneling parameters read from file ', &
+                & fname(1:nfname)
+        lrspcdef = .true.
+        lrspcusr = .true.
+        error = .false.
+        return
         !
-        80   CLOSE (LU)
-        WRITE (*, *) 'READ error on panel-parameter file ', &
-                & FNAME(1:NFNAME)
-        ERROR = .TRUE.
-        RETURN
+        80   close (lu)
+        write (*, *) 'READ error on panel-parameter file ', &
+                & fname(1:nfname)
+        error = .true.
+        return
         !
         !      WRITE(*,*) 'OPEN error on panel-parameter file ', FNAME(1:NFNAME)
-        90   ERROR = .TRUE.
-    END SUBROUTINE PANGET
+        90   error = .true.
+    end subroutine panget
 end module m_pnsubs

@@ -33,20 +33,20 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE LUDCMP(NSIZ, N, A)
-        IMPLICIT NONE
+    subroutine ludcmp(nsiz, n, a)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N, NSIZ
-        REAL, DIMENSION(NSIZ, NSIZ) :: A
+        integer :: n, nsiz
+        real, dimension(nsiz, nsiz) :: a
         !
         ! Local variables
         !
-        REAL :: DUM, SUM
-        INTEGER :: I, J, K
+        real :: dum, sum
+        integer :: i, j, k
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -66,76 +66,76 @@ contains
         !     *******************************************************
         !
         !
-        DO J = 1, N
-            DO I = 1, J - 1
-                SUM = A(I, J)
-                DO K = 1, I - 1
-                    SUM = SUM - A(I, K) * A(K, J)
-                ENDDO
-                A(I, J) = SUM
-            ENDDO
+        do j = 1, n
+            do i = 1, j - 1
+                sum = a(i, j)
+                do k = 1, i - 1
+                    sum = sum - a(i, k) * a(k, j)
+                enddo
+                a(i, j) = sum
+            enddo
             !
-            DO I = J, N
-                SUM = A(I, J)
-                DO K = 1, J - 1
-                    SUM = SUM - A(I, K) * A(K, J)
-                ENDDO
-                A(I, J) = SUM
-            ENDDO
+            do i = j, n
+                sum = a(i, j)
+                do k = 1, j - 1
+                    sum = sum - a(i, k) * a(k, j)
+                enddo
+                a(i, j) = sum
+            enddo
             !
-            DUM = 1.0 / A(J, J)
-            DO I = J + 1, N
-                A(I, J) = A(I, J) * DUM
-            ENDDO
+            dum = 1.0 / a(j, j)
+            do i = j + 1, n
+                a(i, j) = a(i, j) * dum
+            enddo
             !
-        ENDDO
+        enddo
         !
-    END SUBROUTINE LUDCMP
+    end subroutine ludcmp
     !*==BAKSUB.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LUDCMP
 
 
 
-    SUBROUTINE BAKSUB(NSIZ, N, A, B)
-        IMPLICIT NONE
+    subroutine baksub(nsiz, n, a, b)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N, NSIZ
-        REAL, DIMENSION(NSIZ, NSIZ) :: A
-        REAL, DIMENSION(NSIZ) :: B
+        integer :: n, nsiz
+        real, dimension(nsiz, nsiz) :: a
+        real, dimension(nsiz) :: b
         !
         ! Local variables
         !
-        INTEGER :: I, II, J
-        REAL :: SUM
+        integer :: i, ii, j
+        real :: sum
         !
         !*** End of declarations rewritten by SPAG
         !
         !
-        DO II = 1, N
-            IF (B(II)/=0.0) EXIT
-        ENDDO
+        do ii = 1, n
+            if (b(ii)/=0.0) exit
+        enddo
         !
-        DO I = II + 1, N
-            SUM = B(I)
-            DO J = II, I - 1
-                SUM = SUM - A(I, J) * B(J)
-            ENDDO
-            B(I) = SUM
-        ENDDO
+        do i = ii + 1, n
+            sum = b(i)
+            do j = ii, i - 1
+                sum = sum - a(i, j) * b(j)
+            enddo
+            b(i) = sum
+        enddo
         !
-        B(N) = B(N) / A(N, N)
+        b(n) = b(n) / a(n, n)
         !
-        DO I = N - 1, 1, -1
-            SUM = B(I)
-            DO J = I + 1, N
-                SUM = SUM - A(I, J) * B(J)
-            ENDDO
-            B(I) = SUM / A(I, I)
-        ENDDO
+        do i = n - 1, 1, -1
+            sum = b(i)
+            do j = i + 1, n
+                sum = sum - a(i, j) * b(j)
+            enddo
+            b(i) = sum / a(i, i)
+        enddo
         !
-    END SUBROUTINE BAKSUB
+    end subroutine baksub
 end module m_gauss

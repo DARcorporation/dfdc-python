@@ -33,18 +33,18 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE WAKERESET
+    subroutine wakereset
         use i_dfdc
         use m_dfdcsubs, only : updrotwak
         use m_inigrd, only : updgrd
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        REAL :: DX, DX0, DY, DY0
-        INTEGER :: IEL, IELO, IP, IP1, IP1O, IP2O, IPM, IPTE
+        real :: dx, dx0, dy, dy0
+        integer :: iel, ielo, ip, ip1, ip1o, ip2o, ipm, ipte
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -58,70 +58,70 @@ contains
         !-------------------------------------------------------------
         !
         !---- CB wake
-        IEL = IR2IEL(1)
-        CALL WAKMOV(IEL, ISPLOT(IEL))
+        iel = ir2iel(1)
+        call wakmov(iel, isplot(iel))
         !
         !---- duct wake (check for tip gap...)
-        IF (TGAP<=0.0) THEN
-            IEL = IR2IEL(NRP)
-            CALL WAKMOV(IEL, ISPLOT(IEL))
-        ELSE
+        if (tgap<=0.0) then
+            iel = ir2iel(nrp)
+            call wakmov(iel, isplot(iel))
+        else
             !---- if tip gap move next inner wake (the one with circulation)
-            IEL = IR2IEL(NRP - 1)
-            CALL WAKMOV(IEL, ISPLOT(IEL))
+            iel = ir2iel(nrp - 1)
+            call wakmov(iel, isplot(iel))
             !---- move outer wake streamline to match moved streamline
-            IP1 = IPFRST(IEL)
-            IELO = IR2IEL(NRP)
-            IP1O = IPFRST(IELO)
-            IP2O = IPLAST(IELO)
-            IPTE = IP1 + IGTEDW - 1
-            DX0 = XP(IP1O) - XP(IPTE)
-            DY0 = YP(IP1O) - YP(IPTE)
+            ip1 = ipfrst(iel)
+            ielo = ir2iel(nrp)
+            ip1o = ipfrst(ielo)
+            ip2o = iplast(ielo)
+            ipte = ip1 + igtedw - 1
+            dx0 = xp(ip1o) - xp(ipte)
+            dy0 = yp(ip1o) - yp(ipte)
             !c        write(*,*) 'WAKERESET first dx0,dy0 ',dx0,dy0
-            DO IP = IP1O, IP2O
-                IPM = IPTE + (IP - IP1O)
-                DX = XP(IP) - XP(IPM)
-                DY = YP(IP) - YP(IPM)
+            do ip = ip1o, ip2o
+                ipm = ipte + (ip - ip1o)
+                dx = xp(ip) - xp(ipm)
+                dy = yp(ip) - yp(ipm)
                 !c          write(*,*) 'WAKERESET ip,dx,dy ',ip,dx,dy
-                YP(IP) = YP(IP) - (DY - DY0)
-            ENDDO
-        ENDIF
+                yp(ip) = yp(ip) - (dy - dy0)
+            enddo
+        endif
         !
         !---- change grid boundaries, relax grid and update vortex wakes
-        CALL UPDGRD
-        CALL UPDROTWAK
+        call updgrd
+        call updrotwak
         !
         !---- invalidate existing solution
-        LNCVP = .FALSE.
-        LQAIC = .FALSE.
-        LQGIC = .FALSE.
-        LQCNT = .FALSE.
-        LGSYS = .FALSE.
-        LGAMU = .FALSE.
-        LGAMA = .FALSE.
+        lncvp = .false.
+        lqaic = .false.
+        lqgic = .false.
+        lqcnt = .false.
+        lgsys = .false.
+        lgamu = .false.
+        lgama = .false.
         !
-    END SUBROUTINE WAKERESET
+    end subroutine wakereset
     !*==WAKMOV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WAKERESET
 
 
 
 
-    SUBROUTINE WAKMOV(IELA, ISQ)
+    subroutine wakmov(iela, isq)
         use i_dfdc
         use m_geom, only : xycset, xypspl, anpset
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IELA, ISQ
+        integer :: iela, isq
         !
         ! Local variables
         !
-        INTEGER :: IEL, IP, IP1, IP2, IR
-        REAL :: XP2
+        integer :: iel, ip, ip1, ip2, ir
+        real :: xp2
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -138,30 +138,30 @@ contains
         !     vectors on the panel.
         !-------------------------------------------------------------
         !
-        IF (NETYPE(IELA)==0) THEN
+        if (netype(iela)==0) then
             !----- this element is a body panel
-            WRITE (*, *) 'WAKMOV: Element', IELA, &
+            write (*, *) 'WAKMOV: Element', iela, &
                     &' is body, cannot be moved!'
-            RETURN
-        ENDIF
+            return
+        endif
         !
-        IEL = IELA
+        iel = iela
         !
         !---- Save X location for end of wake
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
-        XP2 = XP(IP2)
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
+        xp2 = xp(ip2)
         !
-        CALL WAKMOVR(IEL, XP, YP, ISQ)
+        call wakmovr(iel, xp, yp, isq)
         !
         !---- Reset last point to initial (unchanged) XWAKE location
-        XP(IP2) = XP2
+        xp(ip2) = xp2
         !
         !---- respline node powgrints
-        CALL XYPSPL(IEL)
+        call xypspl(iel)
         !---- reset control points and normal vectors
-        CALL XYCSET(IEL)
-        CALL ANPSET(IEL)
+        call xycset(iel)
+        call anpset(iel)
         !
         !      WRITE(*,*) 'Generating dq/d(gam,sig) influence of moved wake...'
         !      CALL QAIC1(.FALSE., 1,NCTOT, IEL,IEL)
@@ -175,39 +175,39 @@ contains
         !      CALL GSYS(.FALSE., .FALSE., .TRUE., IP1,IP2, 1,0)
         !
         !---- free existing unit wake strength vectors (if any), mark vectors invalid
-        DO IP = IP1, IP2
-            LUSET(IUGAM(IP)) = .FALSE.
-            LUSET(IUSIG(IP)) = .FALSE.
-            IUGAM(IP) = 0
-            IUSIG(IP) = 0
-        ENDDO
-        DO IR = 1, NRP
-            LUSET(IUVWK(IR)) = .FALSE.
-            IUVWK(IR) = 0
-        ENDDO
+        do ip = ip1, ip2
+            luset(iugam(ip)) = .false.
+            luset(iusig(ip)) = .false.
+            iugam(ip) = 0
+            iusig(ip) = 0
+        enddo
+        do ir = 1, nrp
+            luset(iuvwk(ir)) = .false.
+            iuvwk(ir) = 0
+        enddo
         !
-    END SUBROUTINE WAKMOV
+    end subroutine wakmov
     !*==WAKMOVR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! WAKMOV
 
 
 
-    SUBROUTINE WAKMOVR(IEL, XPNEW, YPNEW, ISQ)
+    subroutine wakmovr(iel, xpnew, ypnew, isq)
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IEL, ISQ
-        REAL, DIMENSION(*) :: XPNEW, YPNEW
+        integer :: iel, isq
+        real, dimension(*) :: xpnew, ypnew
         !
         ! Local variables
         !
-        REAL, DIMENSION(IPX) :: DSP
-        REAL :: DXP, DYP, QMAG, QSTAG, QX, QY, UN, VN
-        INTEGER :: IC, IC1, IC2, IP, IP1, IP2, IPO, IPP
+        real, dimension(ipx) :: dsp
+        real :: dxp, dyp, qmag, qstag, qx, qy, un, vn
+        integer :: ic, ic1, ic2, ip, ip1, ip2, ipo, ipp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -218,58 +218,58 @@ contains
         !
         !
         !---- speed below this is treated as stagnation
-        QSTAG = 0.0001 * QREF
+        qstag = 0.0001 * qref
         !
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
         !
-        IC1 = ICFRST(IEL)
-        IC2 = ICLAST(IEL)
+        ic1 = icfrst(iel)
+        ic2 = iclast(iel)
         !
         !---- calculate velocity and its Jacobians at all wake points
         !cc      CALL QAIC1(.FALSE., IC1,IC2, 1,NEL)
         !---- set velocities on both sides of panels at all control points
         !cc      CALL QQCALC(NCTOT,ANC, IPCO,IPCP, GAM,SIG, QC, QCL,QCR )
         !
-        DO IP = IP1, IP2 - 1
-            DXP = XP(IP + 1) - XP(IP)
-            DYP = YP(IP + 1) - YP(IP)
-            DSP(IP) = SQRT(DXP**2 + DYP**2)
-        ENDDO
+        do ip = ip1, ip2 - 1
+            dxp = xp(ip + 1) - xp(ip)
+            dyp = yp(ip + 1) - yp(ip)
+            dsp(ip) = sqrt(dxp**2 + dyp**2)
+        enddo
         !
         !---- march down wake setting wake points
-        IP = IPCO(IC1)
-        XPNEW(IP) = XP(IP)
-        YPNEW(IP) = YP(IP)
+        ip = ipco(ic1)
+        xpnew(ip) = xp(ip)
+        ypnew(ip) = yp(ip)
         !
-        DO IC = IC1, IC2
-            IPO = IPCO(IC)
-            IPP = IPCP(IC)
+        do ic = ic1, ic2
+            ipo = ipco(ic)
+            ipp = ipcp(ic)
             !
-            IF (ISQ==0) THEN
-                QX = QC(1, IC)
-                QY = QC(2, IC)
-            ELSEIF (ISQ==1) THEN
-                QX = QCR(1, IC)
-                QY = QCR(2, IC)
-            ELSEIF (ISQ==2) THEN
-                QX = QCL(1, IC)
-                QY = QCL(2, IC)
-            ELSE
-                QX = QC(1, IC)
-                QY = QC(2, IC)
-            ENDIF
+            if (isq==0) then
+                qx = qc(1, ic)
+                qy = qc(2, ic)
+            elseif (isq==1) then
+                qx = qcr(1, ic)
+                qy = qcr(2, ic)
+            elseif (isq==2) then
+                qx = qcl(1, ic)
+                qy = qcl(2, ic)
+            else
+                qx = qc(1, ic)
+                qy = qc(2, ic)
+            endif
             !
-            QMAG = SQRT(QX**2 + QY**2)
+            qmag = sqrt(qx**2 + qy**2)
             !------- stagnation... don't try to move points
-            IF (QMAG<QSTAG) RETURN
+            if (qmag<qstag) return
             !
-            UN = QX / QMAG
-            VN = QY / QMAG
-            XPNEW(IPP) = XPNEW(IPO) + UN * DSP(IPO)
-            YPNEW(IPP) = YPNEW(IPO) + VN * DSP(IPO)
+            un = qx / qmag
+            vn = qy / qmag
+            xpnew(ipp) = xpnew(ipo) + un * dsp(ipo)
+            ypnew(ipp) = ypnew(ipo) + vn * dsp(ipo)
             !
-        ENDDO
+        enddo
         !
-    END SUBROUTINE WAKMOVR
+    end subroutine wakmovr
 end module m_wakesubs

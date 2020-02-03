@@ -37,23 +37,23 @@ contains
     !=========================================================================
 
 
-    SUBROUTINE QCPFOR
+    subroutine qcpfor
         use i_dfdc
         use m_forces, only : cpcalc, fcoeff
         use m_system, only : qcsum
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        REAL, DIMENSION(2) :: ANT
-        REAL :: CIRC, CMTE, COSA, CXTE, CYTE, &
-                & DELTACP, DXT, DYT, QRSQ, QUE, SINA, VTSQ, &
-                & VTT
-        INTEGER :: I, IC, ICT1, ICT2, IEL, IG, IP1, IP2, IPT1, &
-                & IPT2, IR, IR1, IR2, IU, JG, N
-        REAL, DIMENSION(1) :: CPTL, CPTR, DSCT, XCT, YCT
+        real, dimension(2) :: ant
+        real :: circ, cmte, cosa, cxte, cyte, &
+                & deltacp, dxt, dyt, qrsq, que, sina, vtsq, &
+                & vtt
+        integer :: i, ic, ict1, ict2, iel, ig, ip1, ip2, ipt1, &
+                & ipt2, ir, ir1, ir2, iu, jg, n
+        real, dimension(1) :: cptl, cptr, dsct, xct, yct
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -63,121 +63,121 @@ contains
         !---------------------------------------------
         !
         !---- compute velocities at control points (average between two panel sides)
-        IF (.NOT.LQCNT) CALL QCSUM
+        if (.not.lqcnt) call qcsum
         !
         !---- set velocities on both sides of panels at all control points
-        CALL QQCALC(NCTOT, ANC, IPCO, IPCP, GAM, SIG, GTH, QC, QCL, QCR)
+        call qqcalc(nctot, anc, ipco, ipcp, gam, sig, gth, qc, qcl, qcr)
         !
         !---- also set QCL,QCR sensitivities to imposed freestream, singularities, etc.
-        DO IU = 1, NU
-            CALL QQCALC(NCTOT, ANC, IPCO, IPCP, GAMU(1, IU), SIGU(1, IU), &
-                    & GTHU(1, IU), QCU(1, 1, IU), QCLU(1, 1, IU), QCRU(1, 1, IU))
-        ENDDO
+        do iu = 1, nu
+            call qqcalc(nctot, anc, ipco, ipcp, gamu(1, iu), sigu(1, iu), &
+                    & gthu(1, iu), qcu(1, 1, iu), qclu(1, 1, iu), qcru(1, 1, iu))
+        enddo
         !
         !---- set velocities and Cp on both sides of panels at all control points
-        CALL CPCALC(NCTOT, QCL, QINF, QREF, CPL, CPL_QCL, CPL_QINF)
-        CALL CPCALC(NCTOT, QCR, QINF, QREF, CPR, CPR_QCR, CPR_QINF)
+        call cpcalc(nctot, qcl, qinf, qref, cpl, cpl_qcl, cpl_qinf)
+        call cpcalc(nctot, qcr, qinf, qref, cpr, cpr_qcr, cpr_qinf)
         !
         !---- add in contribution from rotor enthalpy and entropy losses to Cp's
         !     CB and duct walls and on upper and lower wakes
-        QRSQ = QREF**2
-        DO IC = 1, NCTOT
-            IP1 = IPCO(IC)
-            IP2 = IPCP(IC)
-            IR1 = IP2IR(IP1)
-            IR2 = IP2IR(IP2)
-            IG = IC2IG(IC)
+        qrsq = qref**2
+        do ic = 1, nctot
+            ip1 = ipco(ic)
+            ip2 = ipcp(ic)
+            ir1 = ip2ir(ip1)
+            ir2 = ip2ir(ip2)
+            ig = ic2ig(ic)
             !---- check for control point in rotor slipstream (in grid)
-            IF (IG>0) THEN
-                IR = IR1
-                IF (IR==1) THEN
-                    JG = IR
-                    IF (IP2<=IPLAST(1)) THEN
+            if (ig>0) then
+                ir = ir1
+                if (ir==1) then
+                    jg = ir
+                    if (ip2<=iplast(1)) then
                         !---- on CB downstream of rotor
-                        CIRC = BGAMG(IG, JG)
-                        VTT = CIRC * PI2I / YC(IC)
-                        VTSQ = VTT**2
-                        DELTACP = 2.0 * (DHG(IG, JG) - DSG(IG, JG)) / QRSQ - VTSQ / QRSQ
-                        CPR(IC) = CPR(IC) + DELTACP
-                    ELSE
+                        circ = bgamg(ig, jg)
+                        vtt = circ * pi2i / yc(ic)
+                        vtsq = vtt**2
+                        deltacp = 2.0 * (dhg(ig, jg) - dsg(ig, jg)) / qrsq - vtsq / qrsq
+                        cpr(ic) = cpr(ic) + deltacp
+                    else
                         !---- on CB wake element
-                        CIRC = BGAMG(IG, JG)
-                        VTT = CIRC * PI2I / YC(IC)
-                        VTSQ = VTT**2
-                        DELTACP = 2.0 * (DHG(IG, JG) - DSG(IG, JG)) / QRSQ - VTSQ / QRSQ
-                        CPL(IC) = CPL(IC) + DELTACP
-                    ENDIF
+                        circ = bgamg(ig, jg)
+                        vtt = circ * pi2i / yc(ic)
+                        vtsq = vtt**2
+                        deltacp = 2.0 * (dhg(ig, jg) - dsg(ig, jg)) / qrsq - vtsq / qrsq
+                        cpl(ic) = cpl(ic) + deltacp
+                    endif
                     !
-                ELSEIF (IR==NRP) THEN
-                    JG = IR - 1
-                    IF (IP1<IPLAST(2)) THEN
+                elseif (ir==nrp) then
+                    jg = ir - 1
+                    if (ip1<iplast(2)) then
                         !---- on DUCT downstream of rotor
-                        CIRC = BGAMG(IG, JG)
-                        VTT = CIRC * PI2I / YC(IC)
-                        VTSQ = VTT**2
-                        DELTACP = 2.0 * (DHG(IG, JG) - DSG(IG, JG)) / QRSQ - VTSQ / QRSQ
-                        CPR(IC) = CPR(IC) + DELTACP
-                    ELSE
+                        circ = bgamg(ig, jg)
+                        vtt = circ * pi2i / yc(ic)
+                        vtsq = vtt**2
+                        deltacp = 2.0 * (dhg(ig, jg) - dsg(ig, jg)) / qrsq - vtsq / qrsq
+                        cpr(ic) = cpr(ic) + deltacp
+                    else
                         !---- on DUCT wake element
-                        CIRC = BGAMG(IG, JG)
-                        VTT = CIRC * PI2I / YC(IC)
-                        VTSQ = VTT**2
-                        DELTACP = 2.0 * (DHG(IG, JG) - DSG(IG, JG)) / QRSQ - VTSQ / QRSQ
-                        CPR(IC) = CPR(IC) + DELTACP
-                    ENDIF
-                ELSE
-                    JG = IR - 1
-                    CIRC = BGAMG(IG, JG)
-                    VTT = CIRC * PI2I / YC(IC)
-                    VTSQ = VTT**2
-                    DELTACP = 2.0 * (DHG(IG, JG) - DSG(IG, JG)) / QRSQ - VTSQ / QRSQ
-                    CPR(IC) = CPR(IC) + DELTACP
+                        circ = bgamg(ig, jg)
+                        vtt = circ * pi2i / yc(ic)
+                        vtsq = vtt**2
+                        deltacp = 2.0 * (dhg(ig, jg) - dsg(ig, jg)) / qrsq - vtsq / qrsq
+                        cpr(ic) = cpr(ic) + deltacp
+                    endif
+                else
+                    jg = ir - 1
+                    circ = bgamg(ig, jg)
+                    vtt = circ * pi2i / yc(ic)
+                    vtsq = vtt**2
+                    deltacp = 2.0 * (dhg(ig, jg) - dsg(ig, jg)) / qrsq - vtsq / qrsq
+                    cpr(ic) = cpr(ic) + deltacp
                     !
-                    JG = IR
-                    CIRC = BGAMG(IG, JG)
-                    VTT = CIRC * PI2I / YC(IC)
-                    VTSQ = VTT**2
-                    DELTACP = 2.0 * (DHG(IG, JG) - DSG(IG, JG)) / QRSQ - VTSQ / QRSQ
-                    CPL(IC) = CPL(IC) + DELTACP
-                ENDIF
-            ENDIF
-        ENDDO
+                    jg = ir
+                    circ = bgamg(ig, jg)
+                    vtt = circ * pi2i / yc(ic)
+                    vtsq = vtt**2
+                    deltacp = 2.0 * (dhg(ig, jg) - dsg(ig, jg)) / qrsq - vtsq / qrsq
+                    cpl(ic) = cpl(ic) + deltacp
+                endif
+            endif
+        enddo
         !
         !---- also set CPL,CPR sensitivities
-        DO IU = 1, NU
-            DO IC = 1, NCTOT
-                CPLU(IC, IU) = CPL_QCL(1, IC) * QCLU(1, IC, IU) + CPL_QCL(2, IC)   &
-                        & * QCLU(2, IC, IU)
-                CPRU(IC, IU) = CPR_QCR(1, IC) * QCRU(1, IC, IU) + CPR_QCR(2, IC)   &
-                        & * QCRU(2, IC, IU)
-            ENDDO
-        ENDDO
+        do iu = 1, nu
+            do ic = 1, nctot
+                cplu(ic, iu) = cpl_qcl(1, ic) * qclu(1, ic, iu) + cpl_qcl(2, ic)   &
+                        & * qclu(2, ic, iu)
+                cpru(ic, iu) = cpr_qcr(1, ic) * qcru(1, ic, iu) + cpr_qcr(2, ic)   &
+                        & * qcru(2, ic, iu)
+            enddo
+        enddo
         !
         !---- integrate Cp to get forces and moment, and all sensitivities
-        COSA = 1.0
-        SINA = 0.0
-        CX(0) = 0.
-        CY(0) = 0.
-        CM(0) = 0.
-        CD(0) = 0.
-        CXVIS(0) = 0.
-        DO IU = 1, NU
-            CXU(0, IU) = 0.
-            CYU(0, IU) = 0.
-            CMU(0, IU) = 0.
-            CDU(0, IU) = 0.
-        ENDDO
-        DO IEL = 1, NEL
-            I = ICFRST(IEL)
-            N = ICLAST(IEL) - ICFRST(IEL) + 1
-            IF (N>=1) THEN
-                CALL FCOEFF(N, CPL(I), CPR(I), XC(I), YC(I), ANC(1, I), DSC(I), &
-                        & CX(IEL), CY(IEL), CM(IEL))
+        cosa = 1.0
+        sina = 0.0
+        cx(0) = 0.
+        cy(0) = 0.
+        cm(0) = 0.
+        cd(0) = 0.
+        cxvis(0) = 0.
+        do iu = 1, nu
+            cxu(0, iu) = 0.
+            cyu(0, iu) = 0.
+            cmu(0, iu) = 0.
+            cdu(0, iu) = 0.
+        enddo
+        do iel = 1, nel
+            i = icfrst(iel)
+            n = iclast(iel) - icfrst(iel) + 1
+            if (n>=1) then
+                call fcoeff(n, cpl(i), cpr(i), xc(i), yc(i), anc(1, i), dsc(i), &
+                        & cx(iel), cy(iel), cm(iel))
                 !
-                CD(IEL) = CX(IEL)
+                cd(iel) = cx(iel)
                 !
                 !---- Totals go in index 0
-                CX(0) = CX(0) + CX(IEL)
+                cx(0) = cx(0) + cx(iel)
                 !         CY(0) = CY(0) + CY(IEL)
                 !         CM(0) = CM(0) + CM(IEL)
                 !         CD(0) = CD(0) + CD(IEL)
@@ -190,137 +190,137 @@ contains
                 !        sina_v =  u**2 / q**3 = cosa**2/q
                 !
                 !------- also set sensitivities due to freestream
-                IU = IUQINF
-                IF (LUSET(IU)) THEN
-                    CALL FCOEFF(N, CPLU(I, IU), CPRU(I, IU), XC(I), YC(I), ANC(1, I), &
-                            & DSC(I), CXU(IEL, IU), CYU(IEL, IU), CMU(IEL, IU))
-                    CDU(IEL, IU) = CXU(IEL, IU)
+                iu = iuqinf
+                if (luset(iu)) then
+                    call fcoeff(n, cplu(i, iu), cpru(i, iu), xc(i), yc(i), anc(1, i), &
+                            & dsc(i), cxu(iel, iu), cyu(iel, iu), cmu(iel, iu))
+                    cdu(iel, iu) = cxu(iel, iu)
                     !---- Totals go in index 0
-                    CXU(0, IU) = CXU(0, IU) + CXU(IEL, IU)
+                    cxu(0, iu) = cxu(0, iu) + cxu(iel, iu)
                     !           CYU(0,IU) = CYU(0,IU) + CYU(IEL,IU)
                     !           CMU(0,IU) = CMU(0,IU) + CMU(IEL,IU)
                     !           CDU(0,IU) = CDU(0,IU) + CDU(IEL,IU)
-                ENDIF
+                endif
                 !
                 !---- Add in viscous forces if BL has been calculated
-                IF (LVISC) THEN
-                    CX(IEL) = CX(IEL) + CXVIS(IEL)
-                    CD(IEL) = CX(IEL)
+                if (lvisc) then
+                    cx(iel) = cx(iel) + cxvis(iel)
+                    cd(iel) = cx(iel)
                     !---- Add viscous forces to total forces in index 0
-                    CX(0) = CX(0) + CXVIS(IEL)
-                    CXVIS(0) = CXVIS(0) + CXVIS(IEL)
-                ENDIF
+                    cx(0) = cx(0) + cxvis(iel)
+                    cxvis(0) = cxvis(0) + cxvis(iel)
+                endif
                 !
                 !
                 !---- Elements with TE panels
                 !     Add forces due to pressures on TE panel
-                IF (LTPAN(IEL) .AND. NETYPE(IEL)==0) THEN
-                    IPT1 = IPTE1(IEL)
-                    IPT2 = IPTE2(IEL)
-                    ICT1 = 0
-                    ICT2 = 0
-                    IF (IPT1==IPFRST(IEL)) ICT1 = ICFRST(IEL)
-                    IF (IPT1==IPLAST(IEL)) ICT1 = ICLAST(IEL)
-                    IF (IPT2==IPFRST(IEL)) ICT2 = ICFRST(IEL)
-                    IF (IPT2==IPLAST(IEL)) ICT2 = ICLAST(IEL)
+                if (ltpan(iel) .and. netype(iel)==0) then
+                    ipt1 = ipte1(iel)
+                    ipt2 = ipte2(iel)
+                    ict1 = 0
+                    ict2 = 0
+                    if (ipt1==ipfrst(iel)) ict1 = icfrst(iel)
+                    if (ipt1==iplast(iel)) ict1 = iclast(iel)
+                    if (ipt2==ipfrst(iel)) ict2 = icfrst(iel)
+                    if (ipt2==iplast(iel)) ict2 = iclast(iel)
                     !          write(12,*) 'iel ',iel
                     !          write(12,*) 'ipt1,ipt2 ',ipt1,ipt2
                     !          write(12,*) 'ipfrst,iplast ',ipfrst(iel),iplast(iel)
                     !          write(12,*) 'ict1,ict2 ',ict1,ict2
                     !          write(12,*) 'icfrst,iclast ',icfrst(iel),iclast(iel)
                     !
-                    IF (ICT1/=0 .AND. ICT2/=0) THEN
-                        CPTL = 0.5 * (CPL(ICT1) + CPL(ICT2))
-                        CPTR = 0.5 * (CPR(ICT1) + CPR(ICT2))
-                    ELSEIF (ICT1==0) THEN
-                        CPTL = CPL(ICT2)
-                        CPTR = CPR(ICT2)
-                    ELSEIF (ICT2==0) THEN
-                        CPTL = CPL(ICT1)
-                        CPTR = CPR(ICT1)
-                    ENDIF
-                    XCT = 0.5 * (XPT(1, IEL) + XPT(2, IEL))
-                    YCT = 0.5 * (YPT(1, IEL) + YPT(2, IEL))
-                    DXT = XPT(1, IEL) - XPT(2, IEL)
-                    DYT = YPT(1, IEL) - YPT(2, IEL)
-                    DSCT = SQRT(DXT * DXT + DYT * DYT)
-                    ANT(1) = DYT / DSCT(1)
-                    ANT(2) = -DXT / DSCT(1)
+                    if (ict1/=0 .and. ict2/=0) then
+                        cptl = 0.5 * (cpl(ict1) + cpl(ict2))
+                        cptr = 0.5 * (cpr(ict1) + cpr(ict2))
+                    elseif (ict1==0) then
+                        cptl = cpl(ict2)
+                        cptr = cpr(ict2)
+                    elseif (ict2==0) then
+                        cptl = cpl(ict1)
+                        cptr = cpr(ict1)
+                    endif
+                    xct = 0.5 * (xpt(1, iel) + xpt(2, iel))
+                    yct = 0.5 * (ypt(1, iel) + ypt(2, iel))
+                    dxt = xpt(1, iel) - xpt(2, iel)
+                    dyt = ypt(1, iel) - ypt(2, iel)
+                    dsct = sqrt(dxt * dxt + dyt * dyt)
+                    ant(1) = dyt / dsct(1)
+                    ant(2) = -dxt / dsct(1)
                     !          write(12,*) 'cptl,cptr ',cptl,cptr
                     !          write(12,*) 'xct,yct ',xct,yct
                     !          write(12,*) 'dsct ',dsct
                     !          write(12,*) 'ant ',ant(1),ant(2)
                     !
-                    CALL FCOEFF(1, CPTL, CPTR, XCT, YCT, ANT, DSCT, CXTE, CYTE, CMTE)
+                    call fcoeff(1, cptl, cptr, xct, yct, ant, dsct, cxte, cyte, cmte)
                     !          write(12,*) 'CXTE ',cxte
                     !          write(12,*) 'CYTE ',cyte
                     !          write(12,*) 'CMTE ',cmte
                     !
                     !---- Add in TE forces
-                    CX(IEL) = CX(IEL) + CXTE
+                    cx(iel) = cx(iel) + cxte
                     !          CY(IEL) = CY(IEL) + CYTE
                     !          CD(IEL) = CX(IEL)
                     !---- Add TE forces to total forces in index 0
-                    CX(0) = CX(0) + CXTE
+                    cx(0) = cx(0) + cxte
                     !          CY(0) = CY(0) + CYTE
                     !          CM(0) = CM(0) + CMTE
                     !          CD(0) = CD(0) + CXTE
 
                     !------- also set sensitivities due to freestream
-                    IU = IUQINF
-                    IF (LUSET(IU)) THEN
-                        IF (ICT1/=0 .AND. ICT2/=0) THEN
-                            CPTL = 0.5 * (CPLU(ICT1, IU) + CPLU(ICT2, IU))
-                            CPTR = 0.5 * (CPRU(ICT1, IU) + CPRU(ICT2, IU))
-                        ELSEIF (ICT1==0) THEN
-                            CPTL = CPLU(ICT2, IU)
-                            CPTR = CPRU(ICT2, IU)
-                        ELSEIF (ICT2==0) THEN
-                            CPTL = CPLU(ICT1, IU)
-                            CPTR = CPRU(ICT1, IU)
-                        ENDIF
-                        CALL FCOEFF(1, CPTL, CPTR, XCT, YCT, ANT, DSCT, CXTE, CYTE, &
-                                & CMTE)
-                        CXU(IEL, IU) = CXU(IEL, IU) + CXTE
+                    iu = iuqinf
+                    if (luset(iu)) then
+                        if (ict1/=0 .and. ict2/=0) then
+                            cptl = 0.5 * (cplu(ict1, iu) + cplu(ict2, iu))
+                            cptr = 0.5 * (cpru(ict1, iu) + cpru(ict2, iu))
+                        elseif (ict1==0) then
+                            cptl = cplu(ict2, iu)
+                            cptr = cpru(ict2, iu)
+                        elseif (ict2==0) then
+                            cptl = cplu(ict1, iu)
+                            cptr = cpru(ict1, iu)
+                        endif
+                        call fcoeff(1, cptl, cptr, xct, yct, ant, dsct, cxte, cyte, &
+                                & cmte)
+                        cxu(iel, iu) = cxu(iel, iu) + cxte
                         !            CYU(IEL,IU) = CYU(IEL,IU) + CYTE
                         !            CDU(IEL,IU) = CXU(IEL,IU)
                         !---- Totals go in index 0
-                        CXU(0, IU) = CXU(0, IU) + CXTE
+                        cxu(0, iu) = cxu(0, iu) + cxte
                         !            CYU(0,IU) = CYU(0,IU) + CYTE
                         !            CMU(0,IU) = CMU(0,IU) + CMTE
                         !            CDU(0,IU) = CDU(0,IU) + CXTE
-                    ENDIF
-                ENDIF
+                    endif
+                endif
                 !
-            ENDIF
-        ENDDO
+            endif
+        enddo
         !
         !---- Save duct + centerbody (IEL=1,2) X force (thrust)
-        QUE = 0.5 * RHO * QREF**2
-        TDUCT = -(CX(1) + CX(2)) * QUE
+        que = 0.5 * rho * qref**2
+        tduct = -(cx(1) + cx(2)) * que
         !
-    END SUBROUTINE QCPFOR
+    end subroutine qcpfor
     !*==QQCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCPFOR
 
 
 
-    SUBROUTINE QQCALC(N, AN, IPO, IPP, GAM, SIG, GTH, Q, QL, QR)
-        IMPLICIT NONE
+    subroutine qqcalc(n, an, ipo, ipp, gam, sig, gth, q, ql, qr)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL, DIMENSION(2, *) :: AN, Q, QL, QR
-        REAL, DIMENSION(*) :: GAM, GTH, SIG
-        INTEGER, DIMENSION(*) :: IPO, IPP
+        integer :: n
+        real, dimension(2, *) :: an, q, ql, qr
+        real, dimension(*) :: gam, gth, sig
+        integer, dimension(*) :: ipo, ipp
         !
         ! Local variables
         !
-        REAL :: DQN, DQT, GAMC, SIGC
-        INTEGER :: I, IO, IP
+        real :: dqn, dqt, gamc, sigc
+        integer :: i, io, ip
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -328,49 +328,49 @@ contains
         !     Sets velocity on both sides of vortex,source sheet.
         !-------------------------------------------------------------
         !
-        DO I = 1, N
-            IO = IPO(I)
-            IP = IPP(I)
+        do i = 1, n
+            io = ipo(i)
+            ip = ipp(i)
             !
-            GAMC = 0.5 * (GAM(IO) + GAM(IP))
-            SIGC = 0.5 * (SIG(IO) + SIG(IP))
+            gamc = 0.5 * (gam(io) + gam(ip))
+            sigc = 0.5 * (sig(io) + sig(ip))
             !---- Add vorticity contribution from additional vortex wake gamma
-            GAMC = GAMC + 0.5 * (GTH(IO) + GTH(IP))
+            gamc = gamc + 0.5 * (gth(io) + gth(ip))
             !
             !------ 1/2 of sheet strength adds,subtracts to left,right speed
-            DQT = 0.5 * GAMC
-            DQN = 0.5 * SIGC
+            dqt = 0.5 * gamc
+            dqn = 0.5 * sigc
             !
-            QR(1, I) = Q(1, I) + AN(1, I) * DQN + AN(2, I) * DQT
-            QR(2, I) = Q(2, I) + AN(2, I) * DQN - AN(1, I) * DQT
+            qr(1, i) = q(1, i) + an(1, i) * dqn + an(2, i) * dqt
+            qr(2, i) = q(2, i) + an(2, i) * dqn - an(1, i) * dqt
             !
-            QL(1, I) = Q(1, I) - AN(1, I) * DQN - AN(2, I) * DQT
-            QL(2, I) = Q(2, I) - AN(2, I) * DQN + AN(1, I) * DQT
-        ENDDO
+            ql(1, i) = q(1, i) - an(1, i) * dqn - an(2, i) * dqt
+            ql(2, i) = q(2, i) - an(2, i) * dqn + an(1, i) * dqt
+        enddo
         !
-    END SUBROUTINE QQCALC
+    end subroutine qqcalc
     !*==QTCALC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QQCALC
 
 
 
-    SUBROUTINE QTCALC(N, AN, IPO, IPP, GAM, GTH, Q, QT)
-        IMPLICIT NONE
+    subroutine qtcalc(n, an, ipo, ipp, gam, gth, q, qt)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL, DIMENSION(2, *) :: AN, Q
-        REAL, DIMENSION(*) :: GAM, GTH, QT
-        INTEGER, DIMENSION(*) :: IPO, IPP
+        integer :: n
+        real, dimension(2, *) :: an, q
+        real, dimension(*) :: gam, gth, qt
+        integer, dimension(*) :: ipo, ipp
         !
         ! Local variables
         !
-        REAL, DIMENSION(2) :: AT
-        REAL :: DQT, GAMC
-        INTEGER :: I, IO, IP
+        real, dimension(2) :: at
+        real :: dqt, gamc
+        integer :: i, io, ip
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -379,43 +379,43 @@ contains
         !-------------------------------------------------------------
         !
         !
-        DO I = 1, N
-            IO = IPO(I)
-            IP = IPP(I)
+        do i = 1, n
+            io = ipo(i)
+            ip = ipp(i)
             !
-            GAMC = 0.5 * (GAM(IO) + GAM(IP))
+            gamc = 0.5 * (gam(io) + gam(ip))
             !---- Add vorticity from vortex wake gamma
-            GAMC = GAMC + 0.5 * (GTH(IO) + GTH(IP))
+            gamc = gamc + 0.5 * (gth(io) + gth(ip))
             !
             !------ set tangential vector along sheet (AN  points to right side)
-            AT(1) = -AN(2, I)
-            AT(2) = AN(1, I)
+            at(1) = -an(2, i)
+            at(2) = an(1, i)
             !
             !------ 1/2 of sheet strength subtracts to right-side speed (KVSIDE=+1)
-            DQT = -0.5 * GAMC
+            dqt = -0.5 * gamc
             !
-            QT(I) = Q(1, I) * AT(1) + Q(2, I) * AT(2) + DQT
-        ENDDO
+            qt(i) = q(1, i) * at(1) + q(2, i) * at(2) + dqt
+        enddo
         !
-    END SUBROUTINE QTCALC
+    end subroutine qtcalc
     !*==QJAC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QTCALC
 
 
 
-    SUBROUTINE QJAC(DX, DY, DU, DV, QJ, QJ_DX, QJ_DY, QJ_DU, QJ_DV)
-        IMPLICIT NONE
+    subroutine qjac(dx, dy, du, dv, qj, qj_dx, qj_dy, qj_du, qj_dv)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: DU, DV, DX, DY
-        REAL, DIMENSION(2, 2) :: QJ, QJ_DU, QJ_DV, QJ_DX, QJ_DY
+        real :: du, dv, dx, dy
+        real, dimension(2, 2) :: qj, qj_du, qj_dv, qj_dx, qj_dy
         !
         ! Local variables
         !
-        REAL :: DSQ, DSQI
+        real :: dsq, dsqi
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -424,60 +424,60 @@ contains
         !     and zero velocity div and curl conditions.
         !------------------------------------------------------------------
         !
-        DSQ = DX**2 + DY**2
-        IF (DSQ==0.0) THEN
-            DSQI = 1.0
-        ELSE
-            DSQI = 1.0 / DSQ
-        ENDIF
+        dsq = dx**2 + dy**2
+        if (dsq==0.0) then
+            dsqi = 1.0
+        else
+            dsqi = 1.0 / dsq
+        endif
         !
-        QJ(1, 1) = (DU * DX - DV * DY) * DSQI
-        QJ(1, 2) = (DU * DY + DV * DX) * DSQI
+        qj(1, 1) = (du * dx - dv * dy) * dsqi
+        qj(1, 2) = (du * dy + dv * dx) * dsqi
         !
-        QJ_DX(1, 1) = (DU - 2.0 * QJ(1, 1) * DX) * DSQI
-        QJ_DY(1, 1) = (-DV - 2.0 * QJ(1, 1) * DY) * DSQI
+        qj_dx(1, 1) = (du - 2.0 * qj(1, 1) * dx) * dsqi
+        qj_dy(1, 1) = (-dv - 2.0 * qj(1, 1) * dy) * dsqi
         !
-        QJ_DX(1, 2) = (DV - 2.0 * QJ(1, 2) * DX) * DSQI
-        QJ_DY(1, 2) = (DU - 2.0 * QJ(1, 2) * DY) * DSQI
+        qj_dx(1, 2) = (dv - 2.0 * qj(1, 2) * dx) * dsqi
+        qj_dy(1, 2) = (du - 2.0 * qj(1, 2) * dy) * dsqi
         !
-        QJ_DU(1, 1) = DX * DSQI
-        QJ_DV(1, 1) = -DY * DSQI
+        qj_du(1, 1) = dx * dsqi
+        qj_dv(1, 1) = -dy * dsqi
         !
-        QJ_DU(1, 2) = DY * DSQI
-        QJ_DV(1, 2) = DX * DSQI
+        qj_du(1, 2) = dy * dsqi
+        qj_dv(1, 2) = dx * dsqi
         !
         !
-        QJ(2, 1) = QJ(1, 2)
-        QJ_DX(2, 1) = QJ_DX(1, 2)
-        QJ_DY(2, 1) = QJ_DY(1, 2)
-        QJ_DU(2, 1) = QJ_DU(1, 2)
-        QJ_DV(2, 1) = QJ_DV(1, 2)
+        qj(2, 1) = qj(1, 2)
+        qj_dx(2, 1) = qj_dx(1, 2)
+        qj_dy(2, 1) = qj_dy(1, 2)
+        qj_du(2, 1) = qj_du(1, 2)
+        qj_dv(2, 1) = qj_dv(1, 2)
         !
-        QJ(2, 2) = -QJ(1, 1)
-        QJ_DX(2, 2) = -QJ_DX(1, 1)
-        QJ_DY(2, 2) = -QJ_DY(1, 1)
-        QJ_DU(2, 2) = -QJ_DU(1, 1)
-        QJ_DV(2, 2) = -QJ_DV(1, 1)
+        qj(2, 2) = -qj(1, 1)
+        qj_dx(2, 2) = -qj_dx(1, 1)
+        qj_dy(2, 2) = -qj_dy(1, 1)
+        qj_du(2, 2) = -qj_du(1, 1)
+        qj_dv(2, 2) = -qj_dv(1, 1)
         !
-    END SUBROUTINE QJAC
+    end subroutine qjac
     !*==QCURV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QJAC
 
 
-    SUBROUTINE QCURV(U, V, QJ, CRV, CRV_U, CRV_V, CRV_QJ)
-        IMPLICIT NONE
+    subroutine qcurv(u, v, qj, crv, crv_u, crv_v, crv_qj)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: CRV, CRV_U, CRV_V, U, V
-        REAL, DIMENSION(2, 2) :: CRV_QJ, QJ
+        real :: crv, crv_u, crv_v, u, v
+        real, dimension(2, 2) :: crv_qj, qj
         !
         ! Local variables
         !
-        REAL :: CRV_QI, CRV_UN, CRV_VN, Q, QI, QI_U, QI_V, QSQ, &
-                & UN, UN_U, UN_V, VN, VN_U, VN_V
+        real :: crv_qi, crv_un, crv_vn, q, qi, qi_u, qi_v, qsq, &
+                & un, un_u, un_v, vn, vn_u, vn_v
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -486,274 +486,274 @@ contains
         !     and velocity Jacobian.
         !-----------------------------------------------------
         !
-        QSQ = U**2 + V**2
-        Q = SQRT(QSQ)
+        qsq = u**2 + v**2
+        q = sqrt(qsq)
         !
-        IF (Q==0.0) THEN
-            QI = 1.0
-        ELSE
-            QI = 1.0 / Q
-        ENDIF
+        if (q==0.0) then
+            qi = 1.0
+        else
+            qi = 1.0 / q
+        endif
         !
-        UN = U * QI
-        VN = V * QI
-        UN_U = VN * VN * QI
-        UN_V = -UN * VN * QI
-        VN_U = -UN * VN * QI
-        VN_V = UN * UN * QI
+        un = u * qi
+        vn = v * qi
+        un_u = vn * vn * qi
+        un_v = -un * vn * qi
+        vn_u = -un * vn * qi
+        vn_v = un * un * qi
         !
-        QI_U = -UN * QI**2
-        QI_V = -VN * QI**2
+        qi_u = -un * qi**2
+        qi_v = -vn * qi**2
         !
         !
-        CRV = (UN * UN * QJ(2, 1) - UN * VN * QJ(1, 1) + UN * VN * QJ(2, 2) - VN * VN * QJ(1, 2)) * QI
+        crv = (un * un * qj(2, 1) - un * vn * qj(1, 1) + un * vn * qj(2, 2) - vn * vn * qj(1, 2)) * qi
         !
         !---- CRV( QJ UN(U V) VN(U V) QI(U V) )
-        CRV_QJ(1, 1) = -UN * VN * QI
-        CRV_QJ(1, 2) = -VN * VN * QI
-        CRV_QJ(2, 1) = UN * UN * QI
-        CRV_QJ(2, 2) = UN * VN * QI
+        crv_qj(1, 1) = -un * vn * qi
+        crv_qj(1, 2) = -vn * vn * qi
+        crv_qj(2, 1) = un * un * qi
+        crv_qj(2, 2) = un * vn * qi
         !
-        CRV_UN = (2.0 * UN * QJ(2, 1) - VN * QJ(1, 1) + VN * QJ(2, 2)) * QI
-        CRV_VN = (-UN * QJ(1, 1) + UN * QJ(2, 2) - 2.0 * VN * QJ(1, 2)) * QI
-        CRV_QI = UN * UN * QJ(2, 1) - UN * VN * QJ(1, 1) + UN * VN * QJ(2, 2)            &
-                & - VN * VN * QJ(1, 2)
+        crv_un = (2.0 * un * qj(2, 1) - vn * qj(1, 1) + vn * qj(2, 2)) * qi
+        crv_vn = (-un * qj(1, 1) + un * qj(2, 2) - 2.0 * vn * qj(1, 2)) * qi
+        crv_qi = un * un * qj(2, 1) - un * vn * qj(1, 1) + un * vn * qj(2, 2)            &
+                & - vn * vn * qj(1, 2)
         !
         !---- CRV( QJ U V )
-        CRV_U = CRV_UN * UN_U + CRV_VN * VN_U + CRV_QI * QI_U
-        CRV_V = CRV_UN * UN_V + CRV_VN * VN_V + CRV_QI * QI_V
+        crv_u = crv_un * un_u + crv_vn * vn_u + crv_qi * qi_u
+        crv_v = crv_un * un_v + crv_vn * vn_v + crv_qi * qi_v
         !
-    END SUBROUTINE QCURV
+    end subroutine qcurv
     !*==CV2SET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! QCURV
 
 
 
-    SUBROUTINE CV2SET(ICM, ICO, QC, XC, YC, ANC, GAMC, SIGC, CV, CV_QC, CV_RC, &
-            & CV_ANC, CV_GAMC, CV_SIGC)
-        IMPLICIT NONE
+    subroutine cv2set(icm, ico, qc, xc, yc, anc, gamc, sigc, cv, cv_qc, cv_rc, &
+            & cv_anc, cv_gamc, cv_sigc)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: CV
-        INTEGER :: ICM, ICO
-        REAL, DIMENSION(2, *) :: ANC, QC
-        REAL, DIMENSION(2, -1:0) :: CV_ANC, CV_QC, CV_RC
-        REAL, DIMENSION(-1:0) :: CV_GAMC, CV_SIGC
-        REAL, DIMENSION(*) :: GAMC, SIGC, XC, YC
+        real :: cv
+        integer :: icm, ico
+        real, dimension(2, *) :: anc, qc
+        real, dimension(2, -1:0) :: cv_anc, cv_qc, cv_rc
+        real, dimension(-1:0) :: cv_gamc, cv_sigc
+        real, dimension(*) :: gamc, sigc, xc, yc
         !
         ! Local variables
         !
-        REAL :: CV_DQ, CV_DR, GAMCM, GAMCO, QSGN, SIGCM, SIGCO
-        REAL, DIMENSION(2) :: CV_Q, CV_QSM, CV_QSO, DQ, DR, QSA, &
-                & QSM, QSO
-        REAL, DIMENSION(2, 2) :: CV_QJ, QJ
-        INTEGER :: K
-        REAL, DIMENSION(2, 2, 2) :: QJ_DQ, QJ_DR
+        real :: cv_dq, cv_dr, gamcm, gamco, qsgn, sigcm, sigco
+        real, dimension(2) :: cv_q, cv_qsm, cv_qso, dq, dr, qsa, &
+                & qsm, qso
+        real, dimension(2, 2) :: cv_qj, qj
+        integer :: k
+        real, dimension(2, 2, 2) :: qj_dq, qj_dr
         !
         !*** End of declarations rewritten by SPAG
         !
         !
         !
-        GAMCM = GAMC(ICM)
-        SIGCM = SIGC(ICM)
+        gamcm = gamc(icm)
+        sigcm = sigc(icm)
         !
-        GAMCO = GAMC(ICO)
-        SIGCO = SIGC(ICO)
+        gamco = gamc(ico)
+        sigco = sigc(ico)
         !
         !---- 1/2 of sheet strength adds,subtracts to left,right speed
-        QSGN = +0.5
+        qsgn = +0.5
         !
-        QSM(1) = QC(1, ICM) + QSGN * (ANC(1, ICM) * SIGCM + ANC(2, ICM) * GAMCM)
-        QSM(2) = QC(2, ICM) + QSGN * (ANC(2, ICM) * SIGCM - ANC(1, ICM) * GAMCM)
+        qsm(1) = qc(1, icm) + qsgn * (anc(1, icm) * sigcm + anc(2, icm) * gamcm)
+        qsm(2) = qc(2, icm) + qsgn * (anc(2, icm) * sigcm - anc(1, icm) * gamcm)
         !
-        QSO(1) = QC(1, ICO) + QSGN * (ANC(1, ICO) * SIGCO + ANC(2, ICO) * GAMCO)
-        QSO(2) = QC(2, ICO) + QSGN * (ANC(2, ICO) * SIGCO - ANC(1, ICO) * GAMCO)
+        qso(1) = qc(1, ico) + qsgn * (anc(1, ico) * sigco + anc(2, ico) * gamco)
+        qso(2) = qc(2, ico) + qsgn * (anc(2, ico) * sigco - anc(1, ico) * gamco)
         !
-        DQ(1) = QSO(1) - QSM(1)
-        DQ(2) = QSO(2) - QSM(2)
+        dq(1) = qso(1) - qsm(1)
+        dq(2) = qso(2) - qsm(2)
         !
-        QSA(1) = (QSO(1) + QSM(1)) * 0.5
-        QSA(2) = (QSO(2) + QSM(2)) * 0.5
+        qsa(1) = (qso(1) + qsm(1)) * 0.5
+        qsa(2) = (qso(2) + qsm(2)) * 0.5
         !
-        DR(1) = XC(ICO) - XC(ICM)
-        DR(2) = YC(ICO) - YC(ICM)
+        dr(1) = xc(ico) - xc(icm)
+        dr(2) = yc(ico) - yc(icm)
         !
         !
-        CALL QJAC(DR(1), DR(2), DQ(1), DQ(2), QJ, QJ_DR(1, 1, 1), QJ_DR(1, 1, 2), &
-                & QJ_DQ(1, 1, 1), QJ_DQ(1, 1, 2))
+        call qjac(dr(1), dr(2), dq(1), dq(2), qj, qj_dr(1, 1, 1), qj_dr(1, 1, 2), &
+                & qj_dq(1, 1, 1), qj_dq(1, 1, 2))
         !
-        CALL QCURV(QSA(1), QSA(2), QJ, CV, CV_Q(1), CV_Q(2), CV_QJ)
+        call qcurv(qsa(1), qsa(2), qj, cv, cv_q(1), cv_q(2), cv_qj)
         !
-        DO K = 1, 2
-            CV_DQ = CV_QJ(1, 1) * QJ_DQ(1, 1, K) + CV_QJ(1, 2) * QJ_DQ(1, 2, K)      &
-                    & + CV_QJ(2, 1) * QJ_DQ(2, 1, K) + CV_QJ(2, 2) * QJ_DQ(2, 2, K)
-            CV_DR = CV_QJ(1, 1) * QJ_DR(1, 1, K) + CV_QJ(1, 2) * QJ_DR(1, 2, K)      &
-                    & + CV_QJ(2, 1) * QJ_DR(2, 1, K) + CV_QJ(2, 2) * QJ_DR(2, 2, K)
+        do k = 1, 2
+            cv_dq = cv_qj(1, 1) * qj_dq(1, 1, k) + cv_qj(1, 2) * qj_dq(1, 2, k)      &
+                    & + cv_qj(2, 1) * qj_dq(2, 1, k) + cv_qj(2, 2) * qj_dq(2, 2, k)
+            cv_dr = cv_qj(1, 1) * qj_dr(1, 1, k) + cv_qj(1, 2) * qj_dr(1, 2, k)      &
+                    & + cv_qj(2, 1) * qj_dr(2, 1, k) + cv_qj(2, 2) * qj_dr(2, 2, k)
             !
-            CV_QSM(K) = -CV_DQ + 0.5 * CV_Q(K)
-            CV_QSO(K) = CV_DQ + 0.5 * CV_Q(K)
+            cv_qsm(k) = -cv_dq + 0.5 * cv_q(k)
+            cv_qso(k) = cv_dq + 0.5 * cv_q(k)
             !
-            CV_QC(K, -1) = CV_QSM(K)
-            CV_QC(K, 0) = CV_QSO(K)
+            cv_qc(k, -1) = cv_qsm(k)
+            cv_qc(k, 0) = cv_qso(k)
             !
-            CV_RC(K, -1) = -CV_DR
-            CV_RC(K, 0) = CV_DR
+            cv_rc(k, -1) = -cv_dr
+            cv_rc(k, 0) = cv_dr
             !
-            CV_ANC(K, -1) = CV_QSM(K) * QSGN * SIGCM
-            CV_ANC(K, 0) = CV_QSO(K) * QSGN * SIGCO
-        ENDDO
+            cv_anc(k, -1) = cv_qsm(k) * qsgn * sigcm
+            cv_anc(k, 0) = cv_qso(k) * qsgn * sigco
+        enddo
         !
-        CV_ANC(1, -1) = CV_ANC(1, -1) - CV_QSM(2) * QSGN * GAMCM
-        CV_ANC(1, 0) = CV_ANC(1, 0) - CV_QSO(2) * QSGN * GAMCO
-        CV_ANC(2, -1) = CV_ANC(2, -1) + CV_QSM(1) * QSGN * GAMCM
-        CV_ANC(2, 0) = CV_ANC(2, 0) + CV_QSO(1) * QSGN * GAMCO
+        cv_anc(1, -1) = cv_anc(1, -1) - cv_qsm(2) * qsgn * gamcm
+        cv_anc(1, 0) = cv_anc(1, 0) - cv_qso(2) * qsgn * gamco
+        cv_anc(2, -1) = cv_anc(2, -1) + cv_qsm(1) * qsgn * gamcm
+        cv_anc(2, 0) = cv_anc(2, 0) + cv_qso(1) * qsgn * gamco
         !
-        CV_SIGC(-1) = QSGN * (CV_QSM(1) * ANC(1, ICM) + CV_QSM(2) * ANC(2, ICM))
-        CV_SIGC(0) = QSGN * (CV_QSO(1) * ANC(1, ICO) + CV_QSO(2) * ANC(2, ICO))
+        cv_sigc(-1) = qsgn * (cv_qsm(1) * anc(1, icm) + cv_qsm(2) * anc(2, icm))
+        cv_sigc(0) = qsgn * (cv_qso(1) * anc(1, ico) + cv_qso(2) * anc(2, ico))
         !
-        CV_GAMC(-1) = QSGN * (CV_QSM(1) * ANC(2, ICM) - CV_QSM(2) * ANC(1, ICM))
-        CV_GAMC(0) = QSGN * (CV_QSO(1) * ANC(2, ICO) - CV_QSO(2) * ANC(1, ICO))
+        cv_gamc(-1) = qsgn * (cv_qsm(1) * anc(2, icm) - cv_qsm(2) * anc(1, icm))
+        cv_gamc(0) = qsgn * (cv_qso(1) * anc(2, ico) - cv_qso(2) * anc(1, ico))
         !
-    END SUBROUTINE CV2SET
+    end subroutine cv2set
     !*==CV3SET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CV2SET
 
 
-    SUBROUTINE CV3SET(ICM, ICO, ICP, QC, XC, YC, ANC, ANSGN, GAMC, SIGC, CV, &
-            & CV_QC, CV_RC, CV_ANC, CV_GAMC, CV_SIGC)
-        IMPLICIT NONE
+    subroutine cv3set(icm, ico, icp, qc, xc, yc, anc, ansgn, gamc, sigc, cv, &
+            & cv_qc, cv_rc, cv_anc, cv_gamc, cv_sigc)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: ANSGN, CV
-        INTEGER :: ICM, ICO, ICP
-        REAL, DIMENSION(2, *) :: ANC, QC
-        REAL, DIMENSION(2, -1:1) :: CV_ANC, CV_QC, CV_RC
-        REAL, DIMENSION(-1:1) :: CV_GAMC, CV_SIGC
-        REAL, DIMENSION(*) :: GAMC, SIGC, XC, YC
+        real :: ansgn, cv
+        integer :: icm, ico, icp
+        real, dimension(2, *) :: anc, qc
+        real, dimension(2, -1:1) :: cv_anc, cv_qc, cv_rc
+        real, dimension(-1:1) :: cv_gamc, cv_sigc
+        real, dimension(*) :: gamc, sigc, xc, yc
         !
         ! Local variables
         !
-        REAL :: CSGN, CV_DQ, CV_DR, GAMCM, GAMCO, GAMCP, QSGN, &
-                & QXN, SIGCM, SIGCO, SIGCP
-        REAL, DIMENSION(2) :: CV_Q, CV_QSM, CV_QSO, CV_QSP, DQ, &
-                & DR, QSM, QSO, QSP
-        REAL, DIMENSION(2, 2) :: CV_QJ, QJ
-        INTEGER :: K
-        REAL, DIMENSION(2, 2, 2) :: QJ_DQ, QJ_DR
+        real :: csgn, cv_dq, cv_dr, gamcm, gamco, gamcp, qsgn, &
+                & qxn, sigcm, sigco, sigcp
+        real, dimension(2) :: cv_q, cv_qsm, cv_qso, cv_qsp, dq, &
+                & dr, qsm, qso, qsp
+        real, dimension(2, 2) :: cv_qj, qj
+        integer :: k
+        real, dimension(2, 2, 2) :: qj_dq, qj_dr
         !
         !*** End of declarations rewritten by SPAG
         !
         !
         !
-        GAMCM = GAMC(ICM)
-        SIGCM = SIGC(ICM)
+        gamcm = gamc(icm)
+        sigcm = sigc(icm)
         !
-        GAMCO = GAMC(ICO)
-        SIGCO = SIGC(ICO)
+        gamco = gamc(ico)
+        sigco = sigc(ico)
         !
-        GAMCP = GAMC(ICP)
-        SIGCP = SIGC(ICP)
+        gamcp = gamc(icp)
+        sigcp = sigc(icp)
         !
         !---- 1/2 of sheet strength adds,subtracts to left,right speed
-        QSGN = 0.5 * ANSGN
+        qsgn = 0.5 * ansgn
         !
-        QSM(1) = QC(1, ICM) + QSGN * (ANC(1, ICM) * SIGCM + ANC(2, ICM) * GAMCM)
-        QSM(2) = QC(2, ICM) + QSGN * (ANC(2, ICM) * SIGCM - ANC(1, ICM) * GAMCM)
+        qsm(1) = qc(1, icm) + qsgn * (anc(1, icm) * sigcm + anc(2, icm) * gamcm)
+        qsm(2) = qc(2, icm) + qsgn * (anc(2, icm) * sigcm - anc(1, icm) * gamcm)
         !
-        QSO(1) = QC(1, ICO) + QSGN * (ANC(1, ICO) * SIGCO + ANC(2, ICO) * GAMCO)
-        QSO(2) = QC(2, ICO) + QSGN * (ANC(2, ICO) * SIGCO - ANC(1, ICO) * GAMCO)
+        qso(1) = qc(1, ico) + qsgn * (anc(1, ico) * sigco + anc(2, ico) * gamco)
+        qso(2) = qc(2, ico) + qsgn * (anc(2, ico) * sigco - anc(1, ico) * gamco)
         !
-        QSP(1) = QC(1, ICP) + QSGN * (ANC(1, ICP) * SIGCP + ANC(2, ICP) * GAMCP)
-        QSP(2) = QC(2, ICP) + QSGN * (ANC(2, ICP) * SIGCP - ANC(1, ICP) * GAMCP)
+        qsp(1) = qc(1, icp) + qsgn * (anc(1, icp) * sigcp + anc(2, icp) * gamcp)
+        qsp(2) = qc(2, icp) + qsgn * (anc(2, icp) * sigcp - anc(1, icp) * gamcp)
         !
-        DQ(1) = QSP(1) - QSM(1)
-        DQ(2) = QSP(2) - QSM(2)
+        dq(1) = qsp(1) - qsm(1)
+        dq(2) = qsp(2) - qsm(2)
         !
-        DR(1) = XC(ICP) - XC(ICM)
-        DR(2) = YC(ICP) - YC(ICM)
+        dr(1) = xc(icp) - xc(icm)
+        dr(2) = yc(icp) - yc(icm)
         !
-        QXN = ANSGN * (QSO(1) * ANC(2, ICO) - QSO(2) * ANC(1, ICO))
-        CSGN = SIGN(1.0, QXN)
+        qxn = ansgn * (qso(1) * anc(2, ico) - qso(2) * anc(1, ico))
+        csgn = sign(1.0, qxn)
         !
-        CALL QJAC(DR(1), DR(2), DQ(1), DQ(2), QJ, QJ_DR(1, 1, 1), QJ_DR(1, 1, 2), &
-                & QJ_DQ(1, 1, 1), QJ_DQ(1, 1, 2))
+        call qjac(dr(1), dr(2), dq(1), dq(2), qj, qj_dr(1, 1, 1), qj_dr(1, 1, 2), &
+                & qj_dq(1, 1, 1), qj_dq(1, 1, 2))
         !
-        CALL QCURV(QSO(1), QSO(2), QJ, CV, CV_Q(1), CV_Q(2), CV_QJ)
+        call qcurv(qso(1), qso(2), qj, cv, cv_q(1), cv_q(2), cv_qj)
         !
-        CV = CSGN * CV
-        DO K = 1, 2
-            CV_Q(K) = CSGN * CV_Q(K)
-            CV_QJ(K, 1) = CSGN * CV_QJ(K, 1)
-            CV_QJ(K, 2) = CSGN * CV_QJ(K, 2)
-        ENDDO
+        cv = csgn * cv
+        do k = 1, 2
+            cv_q(k) = csgn * cv_q(k)
+            cv_qj(k, 1) = csgn * cv_qj(k, 1)
+            cv_qj(k, 2) = csgn * cv_qj(k, 2)
+        enddo
         !
-        DO K = 1, 2
-            CV_DQ = CV_QJ(1, 1) * QJ_DQ(1, 1, K) + CV_QJ(1, 2) * QJ_DQ(1, 2, K)      &
-                    & + CV_QJ(2, 1) * QJ_DQ(2, 1, K) + CV_QJ(2, 2) * QJ_DQ(2, 2, K)
-            CV_DR = CV_QJ(1, 1) * QJ_DR(1, 1, K) + CV_QJ(1, 2) * QJ_DR(1, 2, K)      &
-                    & + CV_QJ(2, 1) * QJ_DR(2, 1, K) + CV_QJ(2, 2) * QJ_DR(2, 2, K)
+        do k = 1, 2
+            cv_dq = cv_qj(1, 1) * qj_dq(1, 1, k) + cv_qj(1, 2) * qj_dq(1, 2, k)      &
+                    & + cv_qj(2, 1) * qj_dq(2, 1, k) + cv_qj(2, 2) * qj_dq(2, 2, k)
+            cv_dr = cv_qj(1, 1) * qj_dr(1, 1, k) + cv_qj(1, 2) * qj_dr(1, 2, k)      &
+                    & + cv_qj(2, 1) * qj_dr(2, 1, k) + cv_qj(2, 2) * qj_dr(2, 2, k)
             !
-            CV_QSM(K) = -CV_DQ
-            CV_QSO(K) = CV_Q(K)
-            CV_QSP(K) = CV_DQ
+            cv_qsm(k) = -cv_dq
+            cv_qso(k) = cv_q(k)
+            cv_qsp(k) = cv_dq
             !
-            CV_QC(K, -1) = CV_QSM(K)
-            CV_QC(K, 0) = CV_QSO(K)
-            CV_QC(K, +1) = CV_QSP(K)
+            cv_qc(k, -1) = cv_qsm(k)
+            cv_qc(k, 0) = cv_qso(k)
+            cv_qc(k, +1) = cv_qsp(k)
             !
-            CV_RC(K, -1) = -CV_DR
-            CV_RC(K, 0) = 0.
-            CV_RC(K, +1) = CV_DR
+            cv_rc(k, -1) = -cv_dr
+            cv_rc(k, 0) = 0.
+            cv_rc(k, +1) = cv_dr
             !
-            CV_ANC(K, -1) = CV_QSM(K) * QSGN * SIGCM
-            CV_ANC(K, 0) = CV_QSO(K) * QSGN * SIGCO
-            CV_ANC(K, +1) = CV_QSP(K) * QSGN * SIGCP
-        ENDDO
+            cv_anc(k, -1) = cv_qsm(k) * qsgn * sigcm
+            cv_anc(k, 0) = cv_qso(k) * qsgn * sigco
+            cv_anc(k, +1) = cv_qsp(k) * qsgn * sigcp
+        enddo
         !
-        CV_ANC(1, -1) = CV_ANC(1, -1) - CV_QSM(2) * QSGN * GAMCM
-        CV_ANC(1, 0) = CV_ANC(1, 0) - CV_QSO(2) * QSGN * GAMCO
-        CV_ANC(1, +1) = CV_ANC(1, +1) - CV_QSP(2) * QSGN * GAMCP
-        CV_ANC(2, -1) = CV_ANC(2, -1) + CV_QSM(1) * QSGN * GAMCM
-        CV_ANC(2, 0) = CV_ANC(2, 0) + CV_QSO(1) * QSGN * GAMCO
-        CV_ANC(2, +1) = CV_ANC(2, +1) + CV_QSP(1) * QSGN * GAMCP
+        cv_anc(1, -1) = cv_anc(1, -1) - cv_qsm(2) * qsgn * gamcm
+        cv_anc(1, 0) = cv_anc(1, 0) - cv_qso(2) * qsgn * gamco
+        cv_anc(1, +1) = cv_anc(1, +1) - cv_qsp(2) * qsgn * gamcp
+        cv_anc(2, -1) = cv_anc(2, -1) + cv_qsm(1) * qsgn * gamcm
+        cv_anc(2, 0) = cv_anc(2, 0) + cv_qso(1) * qsgn * gamco
+        cv_anc(2, +1) = cv_anc(2, +1) + cv_qsp(1) * qsgn * gamcp
         !
-        CV_SIGC(-1) = QSGN * (CV_QSM(1) * ANC(1, ICM) + CV_QSM(2) * ANC(2, ICM))
-        CV_SIGC(0) = QSGN * (CV_QSO(1) * ANC(1, ICO) + CV_QSO(2) * ANC(2, ICO))
-        CV_SIGC(+1) = QSGN * (CV_QSP(1) * ANC(1, ICP) + CV_QSP(2) * ANC(2, ICP))
+        cv_sigc(-1) = qsgn * (cv_qsm(1) * anc(1, icm) + cv_qsm(2) * anc(2, icm))
+        cv_sigc(0) = qsgn * (cv_qso(1) * anc(1, ico) + cv_qso(2) * anc(2, ico))
+        cv_sigc(+1) = qsgn * (cv_qsp(1) * anc(1, icp) + cv_qsp(2) * anc(2, icp))
         !
-        CV_GAMC(-1) = QSGN * (CV_QSM(1) * ANC(2, ICM) - CV_QSM(2) * ANC(1, ICM))
-        CV_GAMC(0) = QSGN * (CV_QSO(1) * ANC(2, ICO) - CV_QSO(2) * ANC(1, ICO))
-        CV_GAMC(+1) = QSGN * (CV_QSP(1) * ANC(2, ICP) - CV_QSP(2) * ANC(1, ICP))
+        cv_gamc(-1) = qsgn * (cv_qsm(1) * anc(2, icm) - cv_qsm(2) * anc(1, icm))
+        cv_gamc(0) = qsgn * (cv_qso(1) * anc(2, ico) - cv_qso(2) * anc(1, ico))
+        cv_gamc(+1) = qsgn * (cv_qsp(1) * anc(2, icp) - cv_qsp(2) * anc(1, icp))
         !
-    END SUBROUTINE CV3SET
+    end subroutine cv3set
     !*==GETUV.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CV3SET
 
 
-    SUBROUTINE GETUV(XX, YY, US, VS)
+    subroutine getuv(xx, yy, us, vs)
         use i_dfdc
         use m_qaic, only : qfcalc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: US, VS, XX, YY
+        real :: us, vs, xx, yy
         !
         ! Local variables
         !
-        INTEGER :: IP1, IP2, NF
-        INTEGER, DIMENSION(1) :: IFTYPE, IPFO, IPFP
-        REAL, DIMENSION(2) :: QF
-        REAL, DIMENSION(2, IPX) :: QF_GAM, QF_GTH, QF_SIG
-        REAL, DIMENSION(1) :: XX_TEMP, YY_TEMP
+        integer :: ip1, ip2, nf
+        integer, dimension(1) :: iftype, ipfo, ipfp
+        real, dimension(2) :: qf
+        real, dimension(2, ipx) :: qf_gam, qf_gth, qf_sig
+        real, dimension(1) :: xx_temp, yy_temp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -764,21 +764,21 @@ contains
         !---- local arrays for calling QFCALC
         !
         !------ we will evaluate only this point
-        IP1 = 1
-        IP2 = 1
-        NF = 1
+        ip1 = 1
+        ip2 = 1
+        nf = 1
         !------ assume the point is not on a panel
-        IPFO(1) = 0
-        IPFP(1) = 0
-        IFTYPE(1) = 0
+        ipfo(1) = 0
+        ipfp(1) = 0
+        iftype(1) = 0
         !------ evaluate velocity components
-        CALL QFCALC(IP1, IP2, XX_TEMP, YY_TEMP, IPFO, IPFP, IFTYPE, QF, QF_GAM, QF_SIG, &
-                & QF_GTH)
-        XX = XX_TEMP(1)
-        YY = YY_TEMP(1)
+        call qfcalc(ip1, ip2, xx_temp, yy_temp, ipfo, ipfp, iftype, qf, qf_gam, qf_sig, &
+                & qf_gth)
+        xx = xx_temp(1)
+        yy = yy_temp(1)
         !------ add freestream
-        US = QF(1) + QINF
-        VS = QF(2)
+        us = qf(1) + qinf
+        vs = qf(2)
         !
-    END SUBROUTINE GETUV
+    end subroutine getuv
 end module m_vels

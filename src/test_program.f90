@@ -1,12 +1,12 @@
-PROGRAM dfdc_test
-    USE api
-    USE m_userio, only : asks
-    IMPLICIT NONE
-    CHARACTER(128) :: FNAME
-    CALL init
-    CALL ASKS(' Enter filename to load)^', FNAME)
-    CALL set_case(fname)
-    CALL oper
-    CALL ASKS(' Enter filename to save)^', FNAME)
-    CALL get_case(fname)
-END PROGRAM DFDC_TEST
+program dfdc_test
+    use api
+    use m_userio, only : asks
+    implicit none
+    character(128) :: fname
+    call init
+    call asks(' Enter filename to load)^', fname)
+    call set_case(fname)
+    call oper
+    call asks(' Enter filename to save)^', fname)
+    call get_case(fname)
+end program dfdc_test

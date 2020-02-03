@@ -33,31 +33,31 @@ contains
     !=========================================================================
     !
 
-    SUBROUTINE ADJPANL
+    subroutine adjpanl
         use i_dfdc
         use m_sgutil2, only : sgshft, sgrenum, isgfind, sgcopy
         use m_geom, only : itpset, xypspl
         use m_spline, only : seval, sinvrt
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: ITX = 600
+        integer, parameter :: itx = 600
         !
         ! Local variables
         !
-        INTEGER :: I, IEL, IP, IP1, IP2, IPMOV, IPRCB, IPRCB2, &
-                & IPRDW, IPRDW2, ITE, N, NCB, NDUCT, NMOV, &
-                & NNEW, NOLD, NPNEW, NR, NT1, NT1NEW, NT2, &
-                & NT2NEW
-        LOGICAL :: LOVRMAX
-        REAL :: SBEG, SEND, SLE1, SLE2, SOLD, STCB, STDW, STE, &
-                & XLE1, XLE2, XLEMAX, XTE1, XTE2, XTEMIN, YCB, &
-                & YDW, YLE1, YLE2, YTE1, YTE2
-        REAL, DIMENSION(ITX) :: SS, ST1, ST2, XT1, XT2, XTS1, &
-                & XTS2, YT1, YT2, YTS1, YTS2
+        integer :: i, iel, ip, ip1, ip2, ipmov, iprcb, iprcb2, &
+                & iprdw, iprdw2, ite, n, ncb, nduct, nmov, &
+                & nnew, nold, npnew, nr, nt1, nt1new, nt2, &
+                & nt2new
+        logical :: lovrmax
+        real :: sbeg, send, sle1, sle2, sold, stcb, stdw, ste, &
+                & xle1, xle2, xlemax, xte1, xte2, xtemin, ycb, &
+                & ydw, yle1, yle2, yte1, yte2
+        real, dimension(itx) :: ss, st1, st2, xt1, xt2, xts1, &
+                & xts2, yt1, yt2, yts1, yts2
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -70,63 +70,63 @@ contains
         !
         !---- Flag for spacing in overlap area to TE (T uses max # of points from CB
         !     or duct for overlap area, F simply copies spacing from opposite body)
-        LOVRMAX = .TRUE.
+        lovrmax = .true.
         !
         !---- Copy CB panel geometry to temporary array
-        IEL = 1
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
-        N = IP2 - IP1 + 1
-        IF (N>ITX) THEN
-            WRITE (*, *) 'ADJPANL: ITX too small for N ', ITX, N
-            STOP
-        ENDIF
-        DO I = 1, N
-            IP = IP1 + I - 1
-            XT1(I) = XP(IP)
-            YT1(I) = YP(IP)
-            ST1(I) = SP(IP)
-            XTS1(I) = XPS(IP)
-            YTS1(I) = YPS(IP)
-        ENDDO
-        NT1 = N
+        iel = 1
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
+        n = ip2 - ip1 + 1
+        if (n>itx) then
+            write (*, *) 'ADJPANL: ITX too small for N ', itx, n
+            stop
+        endif
+        do i = 1, n
+            ip = ip1 + i - 1
+            xt1(i) = xp(ip)
+            yt1(i) = yp(ip)
+            st1(i) = sp(ip)
+            xts1(i) = xps(ip)
+            yts1(i) = yps(ip)
+        enddo
+        nt1 = n
         !
-        XLE1 = XPLE(IEL)
-        YLE1 = YPLE(IEL)
-        SLE1 = SPLE(IEL)
+        xle1 = xple(iel)
+        yle1 = yple(iel)
+        sle1 = sple(iel)
         !---- Use TE point for CB foil
-        XTE1 = XP(IP1)
-        YTE1 = YP(IP1)
+        xte1 = xp(ip1)
+        yte1 = yp(ip1)
         !
         !---- Copy duct panel geometry to temporary array
-        IEL = 2
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
-        N = IP2 - IP1 + 1
-        IF (N>ITX) THEN
-            WRITE (*, *) 'ADJPANL: ITX too small for N ', ITX, N
-            STOP
-        ENDIF
-        DO I = 1, N
-            IP = IP1 + I - 1
-            XT2(I) = XP(IP)
-            YT2(I) = YP(IP)
-            ST2(I) = SP(IP)
-            XTS2(I) = XPS(IP)
-            YTS2(I) = YPS(IP)
-        ENDDO
-        NT2 = N
+        iel = 2
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
+        n = ip2 - ip1 + 1
+        if (n>itx) then
+            write (*, *) 'ADJPANL: ITX too small for N ', itx, n
+            stop
+        endif
+        do i = 1, n
+            ip = ip1 + i - 1
+            xt2(i) = xp(ip)
+            yt2(i) = yp(ip)
+            st2(i) = sp(ip)
+            xts2(i) = xps(ip)
+            yts2(i) = yps(ip)
+        enddo
+        nt2 = n
         !
-        XLE2 = XPLE(IEL)
-        YLE2 = YPLE(IEL)
-        SLE2 = SPLE(IEL)
+        xle2 = xple(iel)
+        yle2 = yple(iel)
+        sle2 = sple(iel)
         !---- Use inner TE point for duct foil
-        XTE2 = XP(IP2)
-        YTE2 = YP(IP2)
+        xte2 = xp(ip2)
+        yte2 = yp(ip2)
         !
         !---- Axial region for rotor(s) defined by overlap of LE/TE's
-        XLEMAX = MAX(XLE1, XLE2)
-        XTEMIN = MIN(XTE1, XTE2)
+        xlemax = max(xle1, xle2)
+        xtemin = min(xte1, xte2)
         !
         !cc      GO TO 100
         !
@@ -137,61 +137,61 @@ contains
         !-----------------------------------------------------------------
         !---- start process with upstream rotor
         !
-        NR = 1
+        nr = 1
         !---- Check rotor station for sanity
-        IF (XDISK(NR)<XLEMAX .OR. XDISK(NR)>XTEMIN) THEN
-            WRITE (*, *) '*Rotor station out of bounds ', XDISK(NR)
-            WRITE (*, *) '  XLE1 =', XLE1, '  XTE1 =', XTE1
-            WRITE (*, *) '  XLE2 =', XLE2, '  XTE2 =', XTE2
+        if (xdisk(nr)<xlemax .or. xdisk(nr)>xtemin) then
+            write (*, *) '*Rotor station out of bounds ', xdisk(nr)
+            write (*, *) '  XLE1 =', xle1, '  XTE1 =', xte1
+            write (*, *) '  XLE2 =', xle2, '  XTE2 =', xte2
             !c        CALL ASKR('Enter rotor disk X location^',XDISK(NR))
             !---- default rotor is halfway along passage
-            XDISK(NR) = 0.5 * (XLEMAX + XTEMIN)
-            WRITE (*, *) '*Rotor station set to ', XDISK(NR)
-        ENDIF
-        IF (LDBG) WRITE (*, *) ' '
+            xdisk(nr) = 0.5 * (xlemax + xtemin)
+            write (*, *) '*Rotor station set to ', xdisk(nr)
+        endif
+        if (ldbg) write (*, *) ' '
         !
         !-----------------------------------------------------------------
         !---- find location of rotor on CB wall
-        STCB = ST1(1)
-        CALL SINVRT(STCB, XDISK(NR), XT1, XTS1, ST1, NT1)
-        YCB = SEVAL(STCB, YT1, YTS1, ST1, NT1)
-        RHUB(NR) = YCB
-        IF (LDBG) WRITE (*, *) 'Rhub,S on CB @ ', RHUB(NR), STCB
+        stcb = st1(1)
+        call sinvrt(stcb, xdisk(nr), xt1, xts1, st1, nt1)
+        ycb = seval(stcb, yt1, yts1, st1, nt1)
+        rhub(nr) = ycb
+        if (ldbg) write (*, *) 'Rhub,S on CB @ ', rhub(nr), stcb
         !---- Find nearest point on CB corresponding to rotor
-        IPRCB = ISGFIND(STCB, ST1, NT1)
-        IPROTCB(NR) = IPRCB
-        IF (LDBG) WRITE (*, *) 'Nearest CB point to rotor @ ', IPRCB, &
-                & ST1(IPRCB)
+        iprcb = isgfind(stcb, st1, nt1)
+        iprotcb(nr) = iprcb
+        if (ldbg) write (*, *) 'Nearest CB point to rotor @ ', iprcb, &
+                & st1(iprcb)
         !---- Readjust point spacing to put grid point at rotor intersection
-        SBEG = ST1(1)
-        SEND = ST1(NT1)
-        SOLD = ST1(IPRCB)
-        CALL SGSHFT(SBEG, SEND, SOLD, STCB, ST1, SS, NT1)
+        sbeg = st1(1)
+        send = st1(nt1)
+        sold = st1(iprcb)
+        call sgshft(sbeg, send, sold, stcb, st1, ss, nt1)
         !---- Generate new X,Y coordinates
-        CALL SGSPLUPD(XT1, XTS1, YT1, YTS1, ST1, NT1, XT1, XTS1, YT1, YTS1, SS, NT1)
-        CALL SGCOPY(SS, ST1, NT1)
+        call sgsplupd(xt1, xts1, yt1, yts1, st1, nt1, xt1, xts1, yt1, yts1, ss, nt1)
+        call sgcopy(ss, st1, nt1)
         !
         !
         !-----------------------------------------------------------------
         !---- find location of rotor on duct wall
-        STDW = ST2(NT2)
-        CALL SINVRT(STDW, XDISK(NR), XT2, XTS2, ST2, NT2)
-        YDW = SEVAL(STDW, YT2, YTS2, ST2, NT2)
-        RTIP(NR) = YDW
-        IF (LDBG) WRITE (*, *) 'Rtip,S on duct @ ', RTIP(NR), STDW
+        stdw = st2(nt2)
+        call sinvrt(stdw, xdisk(nr), xt2, xts2, st2, nt2)
+        ydw = seval(stdw, yt2, yts2, st2, nt2)
+        rtip(nr) = ydw
+        if (ldbg) write (*, *) 'Rtip,S on duct @ ', rtip(nr), stdw
         !---- Find nearest point on duct corresponding to rotor
-        IPRDW = ISGFIND(STDW, ST2, NT2)
-        IPROTDW(NR) = IPRDW
-        IF (LDBG) WRITE (*, *) 'Nearest Duct point to rotor @ ', IPRDW, &
-                & ST2(IPRDW)
+        iprdw = isgfind(stdw, st2, nt2)
+        iprotdw(nr) = iprdw
+        if (ldbg) write (*, *) 'Nearest Duct point to rotor @ ', iprdw, &
+                & st2(iprdw)
         !---- Readjust point spacing to put grid point at rotor intersection
-        SBEG = SLE2
-        SEND = ST2(NT2)
-        SOLD = ST2(IPRDW)
-        CALL SGSHFT(SBEG, SEND, SOLD, STDW, ST2, SS, NT2)
+        sbeg = sle2
+        send = st2(nt2)
+        sold = st2(iprdw)
+        call sgshft(sbeg, send, sold, stdw, st2, ss, nt2)
         !---- Generate new X,Y coordinates
-        CALL SGSPLUPD(XT2, XTS2, YT2, YTS2, ST2, NT2, XT2, XTS2, YT2, YTS2, SS, NT2)
-        CALL SGCOPY(SS, ST2, NT2)
+        call sgsplupd(xt2, xts2, yt2, yts2, st2, nt2, xt2, xts2, yt2, yts2, ss, nt2)
+        call sgcopy(ss, st2, nt2)
         !
         !c      GO TO 100
         !
@@ -200,124 +200,124 @@ contains
         !     to define I direction slipstream grid
         !
         !---- Duct TE upstream of CB TE
-        IF (XTE2<=XTE1) THEN
+        if (xte2<=xte1) then
             !
-            IF (LDBG) WRITE (*, *) 'XTEduct <= XTECB ', XTE2, XTE1
+            if (ldbg) write (*, *) 'XTEduct <= XTECB ', xte2, xte1
             !---- Find point on CB corresponding to duct TE
-            STE = ST1(1)
-            CALL SINVRT(STE, XTE2, XT1, XTS1, ST1, NT1)
-            IF (LDBG) WRITE (*, *) 'CB point @ Xduct TE @ ', STE
+            ste = st1(1)
+            call sinvrt(ste, xte2, xt1, xts1, st1, nt1)
+            if (ldbg) write (*, *) 'CB point @ Xduct TE @ ', ste
             !---- Find nearest point on CB corresponding to duct TE
-            ITE = 0
-            ITE = ISGFIND(STE, ST1, NT1)
-            IF (LDBG) WRITE (*, *) 'Nearest CB point to duct TE @ ', &
-                    & ITE, STE, ST1(ITE)
+            ite = 0
+            ite = isgfind(ste, st1, nt1)
+            if (ldbg) write (*, *) 'Nearest CB point to duct TE @ ', &
+                    & ite, ste, st1(ite)
             !---- If this point can be moved (not TE point!!), align to duct TE
-            IF (ITE>1) THEN
+            if (ite>1) then
                 !---- Readjust CB point spacing to put grid point at duct TE X location
-                SBEG = ST1(1)
-                SEND = ST1(IPRCB)
-                SOLD = ST1(ITE)
-                CALL SGSHFT(SBEG, SEND, SOLD, STE, ST1, SS, NT1)
+                sbeg = st1(1)
+                send = st1(iprcb)
+                sold = st1(ite)
+                call sgshft(sbeg, send, sold, ste, st1, ss, nt1)
                 !---- Update CB spline definition
-                CALL SGSPLUPD(XT1, XTS1, YT1, YTS1, ST1, NT1, XT1, XTS1, YT1, YTS1, &
-                        & SS, NT1)
-                CALL SGCOPY(SS, ST1, NT1)
-            ENDIF
+                call sgsplupd(xt1, xts1, yt1, yts1, st1, nt1, xt1, xts1, yt1, yts1, &
+                        & ss, nt1)
+                call sgcopy(ss, st1, nt1)
+            endif
             !
             !---- Respace overlap zone from rotor to CB TE point
-            NDUCT = NT2 - IPRDW + 1
-            NCB = IPRCB - ITE + 1
+            nduct = nt2 - iprdw + 1
+            ncb = iprcb - ite + 1
             !---- Check # points in overlap zone, use densest paneling from CB or duct
-            IF (NCB<NDUCT .OR. (.NOT.LOVRMAX)) THEN
+            if (ncb<nduct .or. (.not.lovrmax)) then
                 !---- Respace CB points from rotor to duct TE point with # from duct
-                NNEW = NDUCT
-                NOLD = NCB
-                CALL SGCOPY(ST1, SS, NT1)
-                CALL SGRENUM(SS(ITE), NOLD, NNEW)
-                CALL SGCOPY(ST1(IPRCB), SS(ITE + NNEW - 1), NT1 - IPRCB + 1)
-                NT1NEW = NT1 + NNEW - NOLD
+                nnew = nduct
+                nold = ncb
+                call sgcopy(st1, ss, nt1)
+                call sgrenum(ss(ite), nold, nnew)
+                call sgcopy(st1(iprcb), ss(ite + nnew - 1), nt1 - iprcb + 1)
+                nt1new = nt1 + nnew - nold
                 !---- Generate new X,Y coordinates
-                CALL SGSPLUPD(XT1, XTS1, YT1, YTS1, ST1, NT1, XT1, XTS1, YT1, YTS1, &
-                        & SS, NT1NEW)
-                CALL SGCOPY(SS, ST1, NT1NEW)
-                NT1 = NT1NEW
-                IPRCB = IPROTCB(NR) + NNEW - NOLD
-                IPROTCB(NR) = IPRCB
+                call sgsplupd(xt1, xts1, yt1, yts1, st1, nt1, xt1, xts1, yt1, yts1, &
+                        & ss, nt1new)
+                call sgcopy(ss, st1, nt1new)
+                nt1 = nt1new
+                iprcb = iprotcb(nr) + nnew - nold
+                iprotcb(nr) = iprcb
                 !
-            ELSEIF (NCB>NDUCT) THEN
+            elseif (ncb>nduct) then
                 !---- Respace duct points from rotor to duct TE point with # from CB
-                NNEW = NCB
-                NOLD = NDUCT
-                CALL SGCOPY(ST2, SS, NT2)
-                CALL SGRENUM(SS(IPRDW), NOLD, NNEW)
-                NT2NEW = NT2 + NNEW - NOLD
+                nnew = ncb
+                nold = nduct
+                call sgcopy(st2, ss, nt2)
+                call sgrenum(ss(iprdw), nold, nnew)
+                nt2new = nt2 + nnew - nold
                 !---- Generate new X,Y coordinates
-                CALL SGSPLUPD(XT2, XTS2, YT2, YTS2, ST2, NT2, XT2, XTS2, YT2, YTS2, &
-                        & SS, NT2NEW)
-                CALL SGCOPY(SS, ST2, NT2NEW)
-                NT2 = NT2NEW
-            ENDIF
+                call sgsplupd(xt2, xts2, yt2, yts2, st2, nt2, xt2, xts2, yt2, yts2, &
+                        & ss, nt2new)
+                call sgcopy(ss, st2, nt2new)
+                nt2 = nt2new
+            endif
             !
             !
             !---- CB TE upstream of duct TE
-        ELSEIF (XTE2>XTE1) THEN
+        elseif (xte2>xte1) then
             !
-            IF (LDBG) WRITE (*, *) 'XTEduct > XTECB ', XTE2, XTE1
+            if (ldbg) write (*, *) 'XTEduct > XTECB ', xte2, xte1
             !---- Find point on duct corresponding to CB TE
-            STE = ST2(NT2)
-            CALL SINVRT(STE, XTE1, XT2, XTS2, ST2, NT2)
+            ste = st2(nt2)
+            call sinvrt(ste, xte1, xt2, xts2, st2, nt2)
             !---- Find nearest point on duct corresponding to CB TE
-            ITE = ISGFIND(STE, ST2, NT2)
-            IF (LDBG) WRITE (*, *) 'Nearest Duct point to CB TE @ ', &
-                    & ITE, STE, ST2(ITE)
+            ite = isgfind(ste, st2, nt2)
+            if (ldbg) write (*, *) 'Nearest Duct point to CB TE @ ', &
+                    & ite, ste, st2(ite)
             !---- If this point can be moved (not TE point!!), align to CB TE
-            IF (ITE<NT2) THEN
+            if (ite<nt2) then
                 !---- Readjust duct point spacing to put grid point at CB TE X location
-                SBEG = ST2(IPRDW)
-                SEND = ST2(NT2)
-                SOLD = ST2(ITE)
-                CALL SGSHFT(SBEG, SEND, SOLD, STE, ST2, SS, NT2)
-                CALL SGSPLUPD(XT2, XTS2, YT2, YTS2, ST2, NT2, XT2, XTS2, YT2, YTS2, &
-                        & SS, NT2)
-                CALL SGCOPY(SS, ST2, NT2)
-            ENDIF
+                sbeg = st2(iprdw)
+                send = st2(nt2)
+                sold = st2(ite)
+                call sgshft(sbeg, send, sold, ste, st2, ss, nt2)
+                call sgsplupd(xt2, xts2, yt2, yts2, st2, nt2, xt2, xts2, yt2, yts2, &
+                        & ss, nt2)
+                call sgcopy(ss, st2, nt2)
+            endif
             !
             !---- Respace overlap zone from rotor to CB TE point
-            NDUCT = ITE - IPRDW + 1
-            NCB = IPRCB
+            nduct = ite - iprdw + 1
+            ncb = iprcb
             !---- Check # points in overlap zone, use densest paneling from CB or duct
-            IF (NCB>NDUCT .OR. (.NOT.LOVRMAX)) THEN
+            if (ncb>nduct .or. (.not.lovrmax)) then
                 !---- Respace duct points from rotor to CB TE point with # from CB
-                NNEW = NCB
-                NOLD = NDUCT
-                CALL SGCOPY(ST2, SS, NT2)
-                CALL SGRENUM(SS(IPRDW), NOLD, NNEW)
-                CALL SGCOPY(ST2(ITE), SS(IPRDW + NNEW - 1), NT2 - ITE + 1)
-                NT2NEW = NT2 + NNEW - NOLD
+                nnew = ncb
+                nold = nduct
+                call sgcopy(st2, ss, nt2)
+                call sgrenum(ss(iprdw), nold, nnew)
+                call sgcopy(st2(ite), ss(iprdw + nnew - 1), nt2 - ite + 1)
+                nt2new = nt2 + nnew - nold
                 !---- Generate new X,Y coordinates
-                CALL SGSPLUPD(XT2, XTS2, YT2, YTS2, ST2, NT2, XT2, XTS2, YT2, YTS2, &
-                        & SS, NT2NEW)
-                CALL SGCOPY(SS, ST2, NT2NEW)
-                NT2 = NT2NEW
-            ELSEIF (NCB<NDUCT) THEN
+                call sgsplupd(xt2, xts2, yt2, yts2, st2, nt2, xt2, xts2, yt2, yts2, &
+                        & ss, nt2new)
+                call sgcopy(ss, st2, nt2new)
+                nt2 = nt2new
+            elseif (ncb<nduct) then
                 !---- Respace CB points from rotor to CB TE point with # from duct
-                NNEW = NDUCT
-                NOLD = NCB
-                CALL SGCOPY(ST1, SS, NT1)
-                CALL SGRENUM(SS(1), NOLD, NNEW)
-                CALL SGCOPY(ST1(NOLD + 1), SS(NNEW + 1), NT1 - NOLD)
-                NT1NEW = NT1 + NNEW - NOLD
+                nnew = nduct
+                nold = ncb
+                call sgcopy(st1, ss, nt1)
+                call sgrenum(ss(1), nold, nnew)
+                call sgcopy(st1(nold + 1), ss(nnew + 1), nt1 - nold)
+                nt1new = nt1 + nnew - nold
                 !---- Generate new X,Y coordinates
-                CALL SGSPLUPD(XT1, XTS1, YT1, YTS1, ST1, NT1, XT1, XTS1, YT1, YTS1, &
-                        & SS, NT1NEW)
-                CALL SGCOPY(SS, ST1, NT1NEW)
-                NT1 = NT1NEW
-                IPRCB = IPROTCB(NR) + NNEW - NOLD
-                IPROTCB(NR) = IPRCB
-            ENDIF
+                call sgsplupd(xt1, xts1, yt1, yts1, st1, nt1, xt1, xts1, yt1, yts1, &
+                        & ss, nt1new)
+                call sgcopy(ss, st1, nt1new)
+                nt1 = nt1new
+                iprcb = iprotcb(nr) + nnew - nold
+                iprotcb(nr) = iprcb
+            endif
             !
-        ENDIF
+        endif
         !
         !      GO TO 100
         !
@@ -325,66 +325,66 @@ contains
         !-----------------------------------------------------------------
         !---- Process downstream rotor(s), fiddling grid to put move points
         !     to match downstream rotor line
-        DO NR = 2, NROTOR
+        do nr = 2, nrotor
             !
             !---- Check rotor station for sanity
-            IF (LDBG) WRITE (*, *) ' '
-            IF (XDISK(NR)<XLEMAX .OR. XDISK(NR)>XTEMIN) THEN
-                WRITE (*, *) '*Rotor#N station out of bounds ', XDISK(NR)
-                WRITE (*, *) '  XLE1 =', XLE1, '  XTE1 =', XTE1
-                WRITE (*, *) '  XLE2 =', XLE2, '  XTE2 =', XTE2
+            if (ldbg) write (*, *) ' '
+            if (xdisk(nr)<xlemax .or. xdisk(nr)>xtemin) then
+                write (*, *) '*Rotor#N station out of bounds ', xdisk(nr)
+                write (*, *) '  XLE1 =', xle1, '  XTE1 =', xte1
+                write (*, *) '  XLE2 =', xle2, '  XTE2 =', xte2
                 !c        CALL ASKR('Enter rotor disk X location^',XDISK)
                 !---- default rotor #2 is halfway along passage
-                XDISK(NR) = 0.5 * (XDISK(1) + XTEMIN)
-                WRITE (*, *) '*Rotor#N station set to ', XDISK(NR)
-            ENDIF
+                xdisk(nr) = 0.5 * (xdisk(1) + xtemin)
+                write (*, *) '*Rotor#N station set to ', xdisk(nr)
+            endif
             !
             !-----------------------------------------------------------------
             !---- find location of rotor on CB wall
-            STCB = ST1(1)
-            CALL SINVRT(STCB, XDISK(NR), XT1, XTS1, ST1, NT1)
-            YCB = SEVAL(STCB, YT1, YTS1, ST1, NT1)
-            RHUB(NR) = YCB
-            IF (LDBG) WRITE (*, *) 'Rhub,S #N on CB @ ', RHUB(NR), STCB
+            stcb = st1(1)
+            call sinvrt(stcb, xdisk(nr), xt1, xts1, st1, nt1)
+            ycb = seval(stcb, yt1, yts1, st1, nt1)
+            rhub(nr) = ycb
+            if (ldbg) write (*, *) 'Rhub,S #N on CB @ ', rhub(nr), stcb
             !---- Find nearest point on CB corresponding to rotor
-            IPRCB2 = ISGFIND(STCB, ST1, NT1)
-            IPROTCB(NR) = IPRCB2
-            IF (LDBG) WRITE (*, *) 'Nearest CB point to rotor @ ', &
-                    & IPRCB2, ST1(IPRCB2)
+            iprcb2 = isgfind(stcb, st1, nt1)
+            iprotcb(nr) = iprcb2
+            if (ldbg) write (*, *) 'Nearest CB point to rotor @ ', &
+                    & iprcb2, st1(iprcb2)
             !---- Readjust point spacing to put grid point at rotor intersection
-            SBEG = ST1(1)
-            SEND = ST1(IPRCB)
-            SOLD = ST1(IPRCB2)
-            CALL SGSHFT(SBEG, SEND, SOLD, STCB, ST1, SS, NT1)
+            sbeg = st1(1)
+            send = st1(iprcb)
+            sold = st1(iprcb2)
+            call sgshft(sbeg, send, sold, stcb, st1, ss, nt1)
             !---- Generate new X,Y coordinates
-            CALL SGSPLUPD(XT1, XTS1, YT1, YTS1, ST1, NT1, XT1, XTS1, YT1, YTS1, SS, &
-                    & NT1)
-            CALL SGCOPY(SS, ST1, NT1)
+            call sgsplupd(xt1, xts1, yt1, yts1, st1, nt1, xt1, xts1, yt1, yts1, ss, &
+                    & nt1)
+            call sgcopy(ss, st1, nt1)
             !
             !-----------------------------------------------------------------
             !---- find location of rotor on duct wall
-            STDW = ST2(IPRDW)
-            CALL SINVRT(STDW, XDISK(NR), XT2, XTS2, ST2, NT2)
-            YDW = SEVAL(STDW, YT2, YTS2, ST2, NT2)
-            RTIP(NR) = YDW
-            IF (LDBG) WRITE (*, *) 'Rtip,S #N on duct @ ', RTIP(NR), &
-                    & STDW
+            stdw = st2(iprdw)
+            call sinvrt(stdw, xdisk(nr), xt2, xts2, st2, nt2)
+            ydw = seval(stdw, yt2, yts2, st2, nt2)
+            rtip(nr) = ydw
+            if (ldbg) write (*, *) 'Rtip,S #N on duct @ ', rtip(nr), &
+                    & stdw
             !---- index of rotor#2 from rotor#1 must match offset from rotor#1 on CB
-            IPRDW2 = IPRDW + (IPRCB - IPRCB2)
-            IPROTDW(NR) = IPRDW2
-            IF (LDBG) WRITE (*, *) 'Nearest Duct point to rotor @ ', &
-                    & IPRDW2, ST2(IPRDW2)
+            iprdw2 = iprdw + (iprcb - iprcb2)
+            iprotdw(nr) = iprdw2
+            if (ldbg) write (*, *) 'Nearest Duct point to rotor @ ', &
+                    & iprdw2, st2(iprdw2)
             !---- Readjust point spacing to put grid point at rotor intersection
-            SBEG = ST2(IPRDW)
-            SEND = ST2(NT2)
-            SOLD = ST2(IPRDW2)
-            CALL SGSHFT(SBEG, SEND, SOLD, STDW, ST2, SS, NT2)
+            sbeg = st2(iprdw)
+            send = st2(nt2)
+            sold = st2(iprdw2)
+            call sgshft(sbeg, send, sold, stdw, st2, ss, nt2)
             !---- Generate new X,Y coordinates
-            CALL SGSPLUPD(XT2, XTS2, YT2, YTS2, ST2, NT2, XT2, XTS2, YT2, YTS2, SS, &
-                    & NT2)
-            CALL SGCOPY(SS, ST2, NT2)
+            call sgsplupd(xt2, xts2, yt2, yts2, st2, nt2, xt2, xts2, yt2, yts2, ss, &
+                    & nt2)
+            call sgcopy(ss, st2, nt2)
             !
-        ENDDO ! loop over NROTOR=>2
+        enddo ! loop over NROTOR=>2
         !
         !---- Paneling (points) modified to match on CB and duct and
         !     to match rotor lines
@@ -392,139 +392,139 @@ contains
         !-----------------------------------------------------------------
         !---- Before installing new panel geometry check IEL>2 to save old
         !     geometry
-        IF (NEL>=3) THEN
-            NPNEW = NT1 + NT2
-            NMOV = NPNEW - IPFRST(3) + 1
-            IF (NMOV>0) THEN
+        if (nel>=3) then
+            npnew = nt1 + nt2
+            nmov = npnew - ipfrst(3) + 1
+            if (nmov>0) then
                 !---- Move existing elements up to give room for modified elements 1 and 2
-                DO IEL = NEL, 3, -1
-                    IP1 = IPFRST(IEL)
-                    IP2 = IPLAST(IEL)
-                    DO IP = IP2, IP1, -1
-                        IPMOV = IP + NMOV
-                        XP(IPMOV) = XP(IP)
-                        YP(IPMOV) = YP(IP)
-                    ENDDO
-                    IPFRST(IEL) = IP1 + NMOV
-                    IPLAST(IEL) = IP2 + NMOV
-                ENDDO
-            ENDIF
-        ENDIF
+                do iel = nel, 3, -1
+                    ip1 = ipfrst(iel)
+                    ip2 = iplast(iel)
+                    do ip = ip2, ip1, -1
+                        ipmov = ip + nmov
+                        xp(ipmov) = xp(ip)
+                        yp(ipmov) = yp(ip)
+                    enddo
+                    ipfrst(iel) = ip1 + nmov
+                    iplast(iel) = ip2 + nmov
+                enddo
+            endif
+        endif
         !
         !-----------------------------------------------------------------
         !---- Put adjusted body wall points back into paneled point arrays
-        IP = 0
+        ip = 0
         !---- CB element
-        IEL = 1
-        IP1 = IP + 1
-        DO I = 1, NT1
-            IP = IP + 1
-            XP(IP) = XT1(I)
-            YP(IP) = YT1(I)
-        ENDDO
-        IP2 = IP
-        IPFRST(IEL) = IP1
-        IPLAST(IEL) = IP2
-        I = IP1
-        N = IP2 - IP1 + 1
+        iel = 1
+        ip1 = ip + 1
+        do i = 1, nt1
+            ip = ip + 1
+            xp(ip) = xt1(i)
+            yp(ip) = yt1(i)
+        enddo
+        ip2 = ip
+        ipfrst(iel) = ip1
+        iplast(iel) = ip2
+        i = ip1
+        n = ip2 - ip1 + 1
         !---- spline and set other stuff for element IEL
-        CALL XYPSPL(IEL)
+        call xypspl(iel)
         !---- set indices of TE panel, if any
-        CALL ITPSET(IEL)
+        call itpset(iel)
         !---- update pointers to CB wall point at rotor line(s)
-        DO NR = 1, NROTOR
-            IPROTCB(NR) = IP1 - 1 + IPROTCB(NR)
-        ENDDO
+        do nr = 1, nrotor
+            iprotcb(nr) = ip1 - 1 + iprotcb(nr)
+        enddo
         !
         !---- Put new duct wall points back into paneled point arrays
-        IEL = 2
-        IP1 = IP + 1
-        DO I = 1, NT2
-            IP = IP + 1
-            XP(IP) = XT2(I)
-            YP(IP) = YT2(I)
-        ENDDO
-        IP2 = IP
-        IPFRST(IEL) = IP1
-        IPLAST(IEL) = IP2
-        I = IP1
-        N = IP2 - IP1 + 1
+        iel = 2
+        ip1 = ip + 1
+        do i = 1, nt2
+            ip = ip + 1
+            xp(ip) = xt2(i)
+            yp(ip) = yt2(i)
+        enddo
+        ip2 = ip
+        ipfrst(iel) = ip1
+        iplast(iel) = ip2
+        i = ip1
+        n = ip2 - ip1 + 1
         !---- spline and set other stuff for element IEL
-        CALL XYPSPL(IEL)
+        call xypspl(iel)
         !---- set indices of TE panel, if any
-        CALL ITPSET(IEL)
+        call itpset(iel)
         !---- update pointer to duct wall point at rotor line
-        DO NR = 1, NROTOR
-            IPROTDW(NR) = IP1 - 1 + IPROTDW(NR)
-            IF (LDBG) WRITE (*, *) 'NR IPROTCB IPROTDW  ', NR, &
-                    & IPROTCB(NR), IPROTDW(NR)
-        ENDDO
+        do nr = 1, nrotor
+            iprotdw(nr) = ip1 - 1 + iprotdw(nr)
+            if (ldbg) write (*, *) 'NR IPROTCB IPROTDW  ', nr, &
+                    & iprotcb(nr), iprotdw(nr)
+        enddo
         !
         !---- Shift old points in any remaining defined elements to match new ordering
-        IF (NEL>=3) THEN
-            NPNEW = NT1 + NT2
-            NMOV = NPNEW + 1 - IPFRST(3)
-            IF (NMOV<0) THEN
+        if (nel>=3) then
+            npnew = nt1 + nt2
+            nmov = npnew + 1 - ipfrst(3)
+            if (nmov<0) then
                 !---- Move existing elements down to give room for modified elements 1 and 2
-                DO IEL = 3, NEL
-                    IP1 = IPFRST(IEL)
-                    IP2 = IPLAST(IEL)
-                    DO IP = IP1, IP2
-                        IPMOV = IP + NMOV
-                        XP(IPMOV) = XP(IP)
-                        YP(IPMOV) = YP(IP)
-                    ENDDO
-                    IPFRST(IEL) = IP1 + NMOV
-                    IPLAST(IEL) = IP2 + NMOV
-                ENDDO
-            ENDIF
-        ENDIF
+                do iel = 3, nel
+                    ip1 = ipfrst(iel)
+                    ip2 = iplast(iel)
+                    do ip = ip1, ip2
+                        ipmov = ip + nmov
+                        xp(ipmov) = xp(ip)
+                        yp(ipmov) = yp(ip)
+                    enddo
+                    ipfrst(iel) = ip1 + nmov
+                    iplast(iel) = ip2 + nmov
+                enddo
+            endif
+        endif
         !---- Reset total # of paneled points
-        NPTOT = IPLAST(NEL)
+        nptot = iplast(nel)
         !
         !cc        write(14,99) i,xt1(i),xx(i),xdisk(nr)
-        99   FORMAT (i5, 5(1x, f12.6))
+        99   format (i5, 5(1x, f12.6))
         !
         !---- Set flag for rotor defined (at least geometrically)
         !c      LROTOR = .TRUE.
         !
         !---- invalidate any existing solution
-        LNCVP = .FALSE.
-        LQAIC = .FALSE.
-        LQGIC = .FALSE.
-        LQCNT = .FALSE.
-        LSYSP = .FALSE.
-        LGSYS = .FALSE.
-        LGAMU = .FALSE.
-        LGAMA = .FALSE.
-        LSIGP = .FALSE.
-        LSIGM = .FALSE.
+        lncvp = .false.
+        lqaic = .false.
+        lqgic = .false.
+        lqcnt = .false.
+        lsysp = .false.
+        lgsys = .false.
+        lgamu = .false.
+        lgama = .false.
+        lsigp = .false.
+        lsigm = .false.
         !
-    END SUBROUTINE ADJPANL
+    end subroutine adjpanl
     !*==SGSPLUPD.f90  processed by SPAG 7.25DB at 08:51 on  3 Feb 2020
     ! ADJPANL
 
 
-    SUBROUTINE SGSPLUPD(X1, XS1, Y1, YS1, S1, N1, X2, XS2, Y2, YS2, S2, N2)
+    subroutine sgsplupd(x1, xs1, y1, ys1, s1, n1, x2, xs2, y2, ys2, s2, n2)
         use m_spline, only : segspl, seval
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: IX = 600
+        integer, parameter :: ix = 600
         !
         ! Dummy arguments
         !
-        INTEGER :: N1, N2
-        REAL, DIMENSION(*) :: S1, S2, X1, X2, XS1, XS2, Y1, Y2, &
-                & YS1, YS2
+        integer :: n1, n2
+        real, dimension(*) :: s1, s2, x1, x2, xs1, xs2, y1, y2, &
+                & ys1, ys2
         !
         ! Local variables
         !
-        INTEGER :: I
-        REAL, DIMENSION(IX) :: XX, YY
+        integer :: i
+        real, dimension(ix) :: xx, yy
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -537,26 +537,26 @@ contains
         !
         !
         !
-        IF (N1>IX .OR. N2>IX) THEN
-            WRITE (*, *) 'SGSPLUPD number of input points exceeds IX ', &
-                    & N1, N2
-            STOP
-        ENDIF
+        if (n1>ix .or. n2>ix) then
+            write (*, *) 'SGSPLUPD number of input points exceeds IX ', &
+                    & n1, n2
+            stop
+        endif
         !
         !---- Generate new X,Y coordinates at S2 locations
-        DO I = 1, N2
-            XX(I) = SEVAL(S2(I), X1, XS1, S1, N1)
-            YY(I) = SEVAL(S2(I), Y1, YS1, S1, N1)
-        ENDDO
+        do i = 1, n2
+            xx(i) = seval(s2(i), x1, xs1, s1, n1)
+            yy(i) = seval(s2(i), y1, ys1, s1, n1)
+        enddo
         !
         !---- Replace points in output arrays for redefined curve
-        DO I = 1, N2
-            X2(I) = XX(I)
-            Y2(I) = YY(I)
-        ENDDO
+        do i = 1, n2
+            x2(i) = xx(i)
+            y2(i) = yy(i)
+        enddo
         !---- Respline new points
-        CALL SEGSPL(X2, XS2, S2, N2)
-        CALL SEGSPL(Y2, YS2, S2, N2)
+        call segspl(x2, xs2, s2, n2)
+        call segspl(y2, ys2, s2, n2)
         !
-    END SUBROUTINE SGSPLUPD
+    end subroutine sgsplupd
 end module m_adjpanl

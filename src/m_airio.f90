@@ -44,27 +44,27 @@ contains
     !=========================================================================
     !
     !
-    SUBROUTINE AREAD(FNAME, LU, IBX, NBX, XB, YB, NB, NBL, NAME, ISPARS, IFTYPE)
+    subroutine aread(fname, lu, ibx, nbx, xb, yb, nb, nbl, name, ispars, iftype)
         use m_userio, only : getflt
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: FNAME, ISPARS, NAME
-        INTEGER :: IBX, IFTYPE, LU, NBL, NBX
-        INTEGER, DIMENSION(NBX) :: NB
-        REAL, DIMENSION(IBX, NBX) :: XB, YB
+        character(*) :: fname, ispars, name
+        integer :: ibx, iftype, lu, nbl, nbx
+        integer, dimension(nbx) :: nb
+        real, dimension(ibx, nbx) :: xb, yb
         !
         ! Local variables
         !
-        REAL, DIMENSION(10) :: AINPUT
-        LOGICAL :: ERROR, LOPEN
-        INTEGER :: IB, K, N, NF, NINPUT
-        CHARACTER(128) :: LINE
-        CHARACTER(20), SAVE :: NCHARS
-        REAL :: XBT, YBT
+        real, dimension(10) :: ainput
+        logical :: error, lopen
+        integer :: ib, k, n, nf, ninput
+        character(128) :: line
+        character(20), save :: nchars
+        real :: xbt, ybt
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -92,148 +92,148 @@ contains
         !
         !
         !---- permitted characters in string containing Fortran-readable numbers
-        DATA NCHARS/'0123456789-+.,EDed  '/
+        data nchars/'0123456789-+.,EDed  '/
         !
         !---- tab character is also permitted
-        NCHARS(20:20) = CHAR(9)
+        nchars(20:20) = char(9)
         !
         !
         !---- first assume that there will be a read error
-        IFTYPE = 0
+        iftype = 0
         !
-        LOPEN = FNAME(1:1)/=' '
-        IF (LOPEN) THEN
-            NF = INDEX(FNAME, ' ') + 1
-            OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 98)
-            REWIND (LU)
-        ENDIF
+        lopen = fname(1:1)/=' '
+        if (lopen) then
+            nf = index(fname, ' ') + 1
+            open (lu, file = fname, status = 'OLD', err = 98)
+            rewind (lu)
+        endif
         !
-        READ (LU, 1000) LINE
+        read (lu, 1000) line
         !
         !---- if first line has any non-numeric character, go treat it as the name
-        DO K = 1, 80
-            IF (INDEX(NCHARS, LINE(K:K))==0) GOTO 20
-        ENDDO
+        do k = 1, 80
+            if (index(nchars, line(k:k))==0) goto 20
+        enddo
         !
         !---- plain unlabeled file: rewind, and just read in X,Y coordinates
-        NAME = ' '
+        name = ' '
         !
-        REWIND (LU)
-        WRITE (*, *)
-        WRITE (*, *) 'Reading plain coordinate file'
-        IFTYPE = 1
-        GOTO 40
+        rewind (lu)
+        write (*, *)
+        write (*, *) 'Reading plain coordinate file'
+        iftype = 1
+        goto 40
         !
         !---- first line interpreted as label string
-        20   NAME = LINE
+        20   name = line
         !
         !---- read second line
-        READ (LU, 1000) LINE
-        NINPUT = 10
-        CALL GETFLT(LINE, AINPUT, NINPUT, ERROR)
-        IF (ERROR) GOTO 99
+        read (lu, 1000) line
+        ninput = 10
+        call getflt(line, ainput, ninput, error)
+        if (error) goto 99
         !
-        IF (NINPUT<4) THEN
+        if (ninput<4) then
             !------ no domain parameters: re-read name string and then read X,Y coordinates
-            REWIND (LU)
-            READ (LU, 1000) NAME
-            IFTYPE = 2
-        ENDIF
+            rewind (lu)
+            read (lu, 1000) name
+            iftype = 2
+        endif
         !
-        WRITE (*, 1010) NAME
-        1010 FORMAT (/1X, 'Reading airfoil: ', A32)
+        write (*, 1010) name
+        1010 format (/1x, 'Reading airfoil: ', a32)
         !
         !
         !---- read in airfoil coordinates
-        40   DO N = 1, NBX + 1
-            DO IB = 1, IBX + 1
-                READ (LU, *, END = 56, ERR = 99) XBT, YBT
+        40   do n = 1, nbx + 1
+            do ib = 1, ibx + 1
+                read (lu, *, end = 56, err = 99) xbt, ybt
                 !
-                IF (XBT==999.0) THEN
+                if (xbt==999.0) then
                     !--------- save number of points and type for element which was just read in
-                    NB(N) = IB - 1
+                    nb(n) = ib - 1
                     !--------- go try to read next element
-                    GOTO 55
-                ENDIF
+                    goto 55
+                endif
                 !
-                IF (N>NBX) THEN
-                    WRITE (*, *)                                              &
+                if (n>nbx) then
+                    write (*, *)                                              &
                             &'AREAD: Too many airfoil elements. Increase NBX.'
-                    STOP
-                ENDIF
+                    stop
+                endif
                 !
                 !-------- uneventful XBT,YBT coordinates... just store them
-                XB(IB, N) = XBT
-                YB(IB, N) = YBT
+                xb(ib, n) = xbt
+                yb(ib, n) = ybt
                 !
-            ENDDO
-            WRITE (*, *) 'AREAD: Too many airfoil points.  Increase IBX.'
-            STOP
+            enddo
+            write (*, *) 'AREAD: Too many airfoil points.  Increase IBX.'
+            stop
             !
-        55   ENDDO
-        N = NBX
+        55   enddo
+        n = nbx
         !
-        56   IF (IB==1) THEN
+        56   if (ib==1) then
             !----- coordinate file has "999.0 999.0" at the end ...
-            NBL = N - 1
-        ELSE
+            nbl = n - 1
+        else
             !----- coordinate file has no special ending line
-            NBL = N
-            NB(N) = IB - 1
-        ENDIF
+            nbl = n
+            nb(n) = ib - 1
+        endif
         !
         !---- set type if coordinate file this was
-        IF (IFTYPE==0) THEN
-            IF (NBL==1) THEN
-                IFTYPE = 3
-            ELSE
-                IFTYPE = 4
-            ENDIF
-        ENDIF
+        if (iftype==0) then
+            if (nbl==1) then
+                iftype = 3
+            else
+                iftype = 4
+            endif
+        endif
         !
-        IF (LOPEN) CLOSE (LU)
-        RETURN
+        if (lopen) close (lu)
+        return
         !
-        98   WRITE (*, 1050) FNAME(1:NF)
-        IFTYPE = 0
-        RETURN
+        98   write (*, 1050) fname(1:nf)
+        iftype = 0
+        return
         !
-        99   WRITE (*, 1100) FNAME(1:NF)
-        IFTYPE = 0
-        IF (LOPEN) CLOSE (LU)
-        RETURN
+        99   write (*, 1100) fname(1:nf)
+        iftype = 0
+        if (lopen) close (lu)
+        return
         !...............................................................
-        1000 FORMAT (A)
-        1050 FORMAT (/' File OPEN error:  ', A)
-        1100 FORMAT (/' File READ error:  ', A)
-    END SUBROUTINE AREAD
+        1000 format (a)
+        1050 format (/' File OPEN error:  ', a)
+        1100 format (/' File READ error:  ', a)
+    end subroutine aread
     !*==AREADNR.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! AREAD
 
 
 
-    SUBROUTINE AREADNR(LU, IBX, NBX, XB, YB, NB, NBL, NAME, ISPARS, IFTYPE)
+    subroutine areadnr(lu, ibx, nbx, xb, yb, nb, nbl, name, ispars, iftype)
         use m_userio, only : getflt
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IBX, IFTYPE, LU, NBL, NBX
-        CHARACTER(*) :: ISPARS
-        CHARACTER(80) :: NAME
-        INTEGER, DIMENSION(NBX) :: NB
-        REAL, DIMENSION(IBX, NBX) :: XB, YB
+        integer :: ibx, iftype, lu, nbl, nbx
+        character(*) :: ispars
+        character(80) :: name
+        integer, dimension(nbx) :: nb
+        real, dimension(ibx, nbx) :: xb, yb
         !
         ! Local variables
         !
-        REAL, DIMENSION(10) :: AINPUT
-        LOGICAL :: ERROR
-        INTEGER :: IB, K, N, NINPUT
-        CHARACTER(128) :: LINE
-        CHARACTER(20), SAVE :: NCHARS
-        REAL :: XBT, YBT
+        real, dimension(10) :: ainput
+        logical :: error
+        integer :: ib, k, n, ninput
+        character(128) :: line
+        character(20), save :: nchars
+        real :: xbt, ybt
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -261,133 +261,133 @@ contains
         !
         !
         !---- permitted characters in string containing Fortran-readable numbers
-        DATA NCHARS/'0123456789-+.,EDed  '/
+        data nchars/'0123456789-+.,EDed  '/
         !
         !---- tab character is also permitted
-        NCHARS(20:20) = CHAR(9)
+        nchars(20:20) = char(9)
         !
         !
         !---- first assume that there will be a read error
-        IFTYPE = 0
-        READ (LU, 1000) LINE
+        iftype = 0
+        read (lu, 1000) line
         !---- if first line has any non-numeric character, go treat it as the name
-        DO K = 1, 80
-            IF (INDEX(NCHARS, LINE(K:K))==0) GOTO 20
-        ENDDO
+        do k = 1, 80
+            if (index(nchars, line(k:k))==0) goto 20
+        enddo
         !
         !---- plain unlabeled file: rewind, and just read in X,Y coordinates
-        NAME = ' '
-        WRITE (*, *)
-        WRITE (*, *) 'Reading plain coordinate file'
-        IFTYPE = 1
-        GOTO 40
+        name = ' '
+        write (*, *)
+        write (*, *) 'Reading plain coordinate file'
+        iftype = 1
+        goto 40
         !
         !---- first line interpreted as label string
-        20   NAME = LINE(1:60)
+        20   name = line(1:60)
         !      CALL STRIP(NAME,NNM)
         !
         !---- read second line
-        READ (LU, 1000) LINE
-        NINPUT = 10
-        CALL GETFLT(LINE, AINPUT, NINPUT, ERROR)
-        IF (ERROR) GOTO 99
+        read (lu, 1000) line
+        ninput = 10
+        call getflt(line, ainput, ninput, error)
+        if (error) goto 99
         !
-        IF (NINPUT<4) THEN
+        if (ninput<4) then
             !------ no domain parameters: read X,Y coordinates directly with this line
-            IFTYPE = 2
-        ELSE
+            iftype = 2
+        else
             !---- second line had parameters, read third line (coordinates line)
-            READ (LU, 1000) LINE
-        ENDIF
+            read (lu, 1000) line
+        endif
         !
-        WRITE (*, 1010) NAME
-        1010 FORMAT (/1X, 'Reading airfoil: ', A32)
+        write (*, 1010) name
+        1010 format (/1x, 'Reading airfoil: ', a32)
         !
         !
         !---- read in airfoil coordinates assuming first line has been read into
         !     character variable LINE
-        40   DO N = 1, NBX + 1
-            DO IB = 1, IBX + 1
-                IF (N==1 .AND. IB==1) THEN
-                    READ (LINE, *, END = 56, ERR = 99) XBT, YBT
-                ELSE
-                    READ (LU, 1000, END = 56, ERR = 99) LINE
-                    IF (INDEX(LINE, 'END')/=0) GOTO 56
-                    READ (LINE, *, END = 56, ERR = 99) XBT, YBT
-                ENDIF
+        40   do n = 1, nbx + 1
+            do ib = 1, ibx + 1
+                if (n==1 .and. ib==1) then
+                    read (line, *, end = 56, err = 99) xbt, ybt
+                else
+                    read (lu, 1000, end = 56, err = 99) line
+                    if (index(line, 'END')/=0) goto 56
+                    read (line, *, end = 56, err = 99) xbt, ybt
+                endif
                 !
-                IF (XBT==999.0) THEN
+                if (xbt==999.0) then
                     !--------- save number of points and type for element which was just read in
-                    NB(N) = IB - 1
+                    nb(n) = ib - 1
                     !--------- go try to read next element
-                    GOTO 55
-                ENDIF
+                    goto 55
+                endif
                 !
-                IF (N>NBX) THEN
-                    WRITE (*, *)                                              &
+                if (n>nbx) then
+                    write (*, *)                                              &
                             &'AREAD: Too many airfoil elements. Increase NBX.'
-                    STOP
-                ENDIF
+                    stop
+                endif
                 !
                 !-------- uneventful XBT,YBT coordinates... just store them
-                XB(IB, N) = XBT
-                YB(IB, N) = YBT
+                xb(ib, n) = xbt
+                yb(ib, n) = ybt
                 !
-            ENDDO
-            WRITE (*, *) 'AREAD: Too many airfoil points.  Increase IBX.'
-            STOP
+            enddo
+            write (*, *) 'AREAD: Too many airfoil points.  Increase IBX.'
+            stop
             !
-        55   ENDDO
-        N = NBX
+        55   enddo
+        n = nbx
         !
-        56   IF (IB==1) THEN
+        56   if (ib==1) then
             !----- coordinate file has "999.0 999.0" at the end ...
-            NBL = N - 1
-        ELSE
+            nbl = n - 1
+        else
             !----- coordinate file has no special ending line
-            NBL = N
-            NB(N) = IB - 1
-        ENDIF
+            nbl = n
+            nb(n) = ib - 1
+        endif
         !
         !---- set type if coordinate file this was
-        IF (IFTYPE==0) THEN
-            IF (NBL==1) THEN
-                IFTYPE = 3
-            ELSE
-                IFTYPE = 4
-            ENDIF
-        ENDIF
+        if (iftype==0) then
+            if (nbl==1) then
+                iftype = 3
+            else
+                iftype = 4
+            endif
+        endif
         !
-        RETURN
+        return
         !
-        99   WRITE (*, 1100)
-        IFTYPE = 0
-        RETURN
+        99   write (*, 1100)
+        iftype = 0
+        return
         !...............................................................
-        1000 FORMAT (A)
-        1100 FORMAT (/' File READ error:  ')
-    END SUBROUTINE AREADNR
+        1000 format (a)
+        1100 format (/' File READ error:  ')
+    end subroutine areadnr
     !*==AWRITE.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! AREADNR
 
 
 
-    SUBROUTINE AWRITE(FNAME, LU, NEL, IFRST, ILAST, X, Y, NAME, ISPARS, IFTYPE)
-        IMPLICIT NONE
+    subroutine awrite(fname, lu, nel, ifrst, ilast, x, y, name, ispars, iftype)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: FNAME, ISPARS, NAME
-        INTEGER :: IFTYPE, LU, NEL
-        INTEGER, DIMENSION(*) :: IFRST, ILAST
-        REAL, DIMENSION(*) :: X, Y
+        character(*) :: fname, ispars, name
+        integer :: iftype, lu, nel
+        integer, dimension(*) :: ifrst, ilast
+        real, dimension(*) :: x, y
         !
         ! Local variables
         !
-        INTEGER :: I, IEL, NF
-        LOGICAL :: LOPEN
+        integer :: i, iel, nf
+        logical :: lopen
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -414,34 +414,34 @@ contains
         !            4    MSES multi-element.
         !--------------------------------------------------------
         !
-        LOPEN = FNAME(1:1)/=' '
-        IF (LOPEN) THEN
-            NF = INDEX(FNAME, ' ') + 1
-            OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 98)
-            REWIND (LU)
-        ENDIF
+        lopen = fname(1:1)/=' '
+        if (lopen) then
+            nf = index(fname, ' ') + 1
+            open (lu, file = fname, status = 'OLD', err = 98)
+            rewind (lu)
+        endif
         !
-        IF (IFTYPE/=1) WRITE (LU, 1000) NAME
-        IF (IFTYPE==3 .OR. IFTYPE==4) WRITE (LU, 1000) ISPARS
+        if (iftype/=1) write (lu, 1000) name
+        if (iftype==3 .or. iftype==4) write (lu, 1000) ispars
         !
-        DO IEL = 1, NEL
-            DO I = IFRST(IEL), ILAST(IEL)
-                WRITE (LU, 1500) X(I), Y(I)
-            ENDDO
+        do iel = 1, nel
+            do i = ifrst(iel), ilast(iel)
+                write (lu, 1500) x(i), y(i)
+            enddo
             !
-            IF (IEL<NEL) WRITE (LU, 1550) 999.0, 999.0
-        ENDDO
+            if (iel<nel) write (lu, 1550) 999.0, 999.0
+        enddo
         !
-        IF (LOPEN) CLOSE (LU)
-        RETURN
+        if (lopen) close (lu)
+        return
         !
-        98   WRITE (*, 1050) FNAME(1:NF)
-        RETURN
+        98   write (*, 1050) fname(1:nf)
+        return
         !...............................................................
-        1000 FORMAT (A)
-        1050 FORMAT (/' File OPEN error:  ', A)
+        1000 format (a)
+        1050 format (/' File OPEN error:  ', a)
         !
-        1500 FORMAT (1X, 2F12.6)
-        1550 FORMAT (1X, 2F6.1)
-    END SUBROUTINE AWRITE
+        1500 format (1x, 2f12.6)
+        1550 format (1x, 2f6.1)
+    end subroutine awrite
 end module m_airio

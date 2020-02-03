@@ -35,22 +35,22 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE SETEXP(S, DS1, SMAX, NN)
-        IMPLICIT NONE
+    subroutine setexp(s, ds1, smax, nn)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: DS1, SMAX
-        INTEGER :: NN
-        REAL, DIMENSION(NN) :: S
+        real :: ds1, smax
+        integer :: nn
+        real, dimension(nn) :: s
         !
         ! Local variables
         !
-        REAL :: AAA, BBB, CCC, DISC, DRATIO, DRESDR, DS, RATIO, &
-                & RES, RNEX, RNI, SIGMA, SIGMAN
-        INTEGER :: ITER, N, NEX
+        real :: aaa, bbb, ccc, disc, dratio, dresdr, ds, ratio, &
+                & res, rnex, rni, sigma, sigman
+        integer :: iter, n, nex
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -65,59 +65,59 @@ contains
         !       NN    (input)   number of points
         !........................................................
         !
-        SIGMA = SMAX / DS1
-        NEX = NN - 1
-        RNEX = FLOAT(NEX)
-        RNI = 1.0 / RNEX
+        sigma = smax / ds1
+        nex = nn - 1
+        rnex = float(nex)
+        rni = 1.0 / rnex
         !
         !---- solve quadratic for initial geometric ratio guess
-        AAA = RNEX * (RNEX - 1.0) * (RNEX - 2.0) / 6.0
-        BBB = RNEX * (RNEX - 1.0) / 2.0
-        CCC = RNEX - SIGMA
+        aaa = rnex * (rnex - 1.0) * (rnex - 2.0) / 6.0
+        bbb = rnex * (rnex - 1.0) / 2.0
+        ccc = rnex - sigma
         !
-        DISC = BBB**2 - 4.0 * AAA * CCC
-        DISC = MAX(0.0, DISC)
+        disc = bbb**2 - 4.0 * aaa * ccc
+        disc = max(0.0, disc)
         !
-        IF (NEX<=1) THEN
-            STOP 'SETEXP: Cannot fill array.  N too small.'
-        ELSEIF (NEX==2) THEN
-            RATIO = -CCC / BBB + 1.0
-        ELSE
-            RATIO = (-BBB + SQRT(DISC)) / (2.0 * AAA) + 1.0
-        ENDIF
+        if (nex<=1) then
+            stop 'SETEXP: Cannot fill array.  N too small.'
+        elseif (nex==2) then
+            ratio = -ccc / bbb + 1.0
+        else
+            ratio = (-bbb + sqrt(disc)) / (2.0 * aaa) + 1.0
+        endif
         !
-        IF (RATIO/=1.0) THEN
+        if (ratio/=1.0) then
             !
             !---- Newton iteration for actual geometric ratio
-            DO ITER = 1, 100
-                SIGMAN = (RATIO**NEX - 1.0) / (RATIO - 1.0)
-                RES = SIGMAN**RNI - SIGMA**RNI
-                DRESDR = RNI * SIGMAN**RNI * (RNEX * RATIO**(NEX - 1) - SIGMAN)       &
-                        & / (RATIO**NEX - 1.0)
+            do iter = 1, 100
+                sigman = (ratio**nex - 1.0) / (ratio - 1.0)
+                res = sigman**rni - sigma**rni
+                dresdr = rni * sigman**rni * (rnex * ratio**(nex - 1) - sigman)       &
+                        & / (ratio**nex - 1.0)
                 !
-                DRATIO = -RES / DRESDR
-                RATIO = RATIO + DRATIO
+                dratio = -res / dresdr
+                ratio = ratio + dratio
                 !
-                IF (ABS(DRATIO)<1.0E-5) GOTO 11
+                if (abs(dratio)<1.0e-5) goto 11
                 !
-            ENDDO
-            WRITE (*, *)                                                    &
+            enddo
+            write (*, *)                                                    &
                     &'SETEXP: Convergence failed.  Continuing anyway ...'
-        ENDIF
+        endif
         !
         !---- set up stretched array using converged geometric ratio
-        11   S(1) = 0.0
-        DS = DS1
-        DO N = 2, NN
-            S(N) = S(N - 1) + DS
-            DS = DS * RATIO
-        ENDDO
+        11   s(1) = 0.0
+        ds = ds1
+        do n = 2, nn
+            s(n) = s(n - 1) + ds
+            ds = ds * ratio
+        enddo
         !
-    END SUBROUTINE SETEXP
+    end subroutine setexp
     !*==SETEX2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SETEX2(S, DS1, DSN, SMAX, N)
+    subroutine setex2(s, ds1, dsn, smax, n)
         !==========================================================
         !     Sets array S stretched so that a prescribed spacing is
         !     obtained at each end.  The interior spacing is a blend
@@ -130,26 +130,26 @@ contains
         !       N     (input)   number of points
         !==========================================================
         !
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NDIM = 500
+        integer, parameter :: ndim = 500
         !
         ! Dummy arguments
         !
-        REAL :: DS1, DSN, SMAX
-        INTEGER :: N
-        REAL, DIMENSION(N) :: S
+        real :: ds1, dsn, smax
+        integer :: n
+        real, dimension(n) :: s
         !
         ! Local variables
         !
-        REAL, SAVE :: FEND
-        INTEGER :: I, IN
-        REAL, DIMENSION(NDIM) :: S1, SN
-        REAL :: SGN, SS1, SSN, WT1, WTN
+        real, save :: fend
+        integer :: i, in
+        real, dimension(ndim) :: s1, sn
+        real :: sgn, ss1, ssn, wt1, wtn
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -157,63 +157,63 @@ contains
         !
         !---- with bigger FEND, the actual end increments will get closer
         !-    to DS1 & DSN, but the interior spacing might get screwy.
-        DATA FEND/2.0/
+        data fend/2.0/
         !
-        IF (N>NDIM) STOP 'SETEX2:  Array overflow.'
+        if (n>ndim) stop 'SETEX2:  Array overflow.'
         !
         !---- calculate spacing arrays each having the prescribed end increment
-        CALL SETEXP(S1, DS1, SMAX, N)
-        CALL SETEXP(SN, DSN, SMAX, N)
+        call setexp(s1, ds1, smax, n)
+        call setexp(sn, dsn, smax, n)
         !
         !c      S(1) = 0.
         !c      S(N) = SMAX
         !
         !---- blend spacing arrays with power-function weights
-        DO I = 1, N
-            IN = N - I + 1
-            SS1 = S1(I)
-            SSN = SMAX - SN(IN)
+        do i = 1, n
+            in = n - i + 1
+            ss1 = s1(i)
+            ssn = smax - sn(in)
             !
             !------ power function of integer index
-            WT1 = FLOAT(N - I)**FEND
-            WTN = FLOAT(I - 1)**FEND
+            wt1 = float(n - i)**fend
+            wtn = float(i - 1)**fend
             !
             !------ power function of coordinate
             !CC     WT1 = (1.0 - SSN/SMAX)**FEND
             !CC     WTN = (      SS1/SMAX)**FEND
             !
-            S(I) = (SS1 * WT1 + SSN * WTN) / (WT1 + WTN)
-        ENDDO
+            s(i) = (ss1 * wt1 + ssn * wtn) / (wt1 + wtn)
+        enddo
         !
         !---- check for monotonicity
-        SGN = SIGN(1.0, S(N) - S(1))
-        DO I = 2, N
-            IF (SGN * S(I)<=SGN * S(I - 1)) THEN
-                WRITE (*, *) 'SETEX2: Warning. Returned array not monotonic.'
-                RETURN
-            ENDIF
-        ENDDO
+        sgn = sign(1.0, s(n) - s(1))
+        do i = 2, n
+            if (sgn * s(i)<=sgn * s(i - 1)) then
+                write (*, *) 'SETEX2: Warning. Returned array not monotonic.'
+                return
+            endif
+        enddo
         !
-    END SUBROUTINE SETEX2
+    end subroutine setex2
     !*==ATANC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! SETEX2
 
 
 
-    FUNCTION ATANC(Y, X, THOLD)
-        IMPLICIT NONE
+    function atanc(y, x, thold)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: THOLD, X, Y
-        REAL :: ATANC
+        real :: thold, x, y
+        real :: atanc
         !
         ! Local variables
         !
-        REAL :: DTCORR, DTHET, THNEW
-        REAL, SAVE :: PI, TPI
+        real :: dtcorr, dthet, thnew
+        real, save :: pi, tpi
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -245,41 +245,41 @@ contains
         !     Output:
         !       ATANC   position angle of X,Y
         !---------------------------------------------------------------
-        DATA PI/3.1415926535897932384/
-        DATA TPI/6.2831853071795864769/
+        data pi/3.1415926535897932384/
+        data tpi/6.2831853071795864769/
         !
         !---- set new position angle, ignoring branch cut in ATAN2 function for now
-        THNEW = ATAN2(Y, X)
-        DTHET = THNEW - THOLD
+        thnew = atan2(y, x)
+        dthet = thnew - thold
         !
         !---- angle change cannot exceed +/- pi, so get rid of any multiples of 2 pi
-        DTCORR = DTHET - TPI * INT((DTHET + SIGN(PI, DTHET)) / TPI)
+        dtcorr = dthet - tpi * int((dthet + sign(pi, dthet)) / tpi)
         !
         !---- set correct new angle
-        ATANC = THOLD + DTCORR
+        atanc = thold + dtcorr
         !
-    END FUNCTION ATANC
+    end function atanc
     !*==HSORT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ATANC
 
 
 
 
-    SUBROUTINE HSORT(N, A, INDX)
-        IMPLICIT NONE
+    subroutine hsort(n, a, indx)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL, DIMENSION(N) :: A
-        INTEGER, DIMENSION(N) :: INDX
+        integer :: n
+        real, dimension(n) :: a
+        integer, dimension(n) :: indx
         !
         ! Local variables
         !
-        INTEGER :: I, INDXT, IR, J, L
-        REAL :: Q
+        integer :: i, indxt, ir, j, l
+        real :: q
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -292,55 +292,55 @@ contains
         !     Stolen from Numerical Recipes.
         !--------------------------------------
         !
-        DO I = 1, N
-            INDX(I) = I
-        ENDDO
+        do i = 1, n
+            indx(i) = i
+        enddo
         !
-        IF (N<=1) RETURN
+        if (n<=1) return
         !
-        L = N / 2 + 1
-        IR = N
-        DO
+        l = n / 2 + 1
+        ir = n
+        do
             !
-            IF (L>1) THEN
-                L = L - 1
-                INDXT = INDX(L)
-                Q = A(INDXT)
-            ELSE
-                INDXT = INDX(IR)
-                Q = A(INDXT)
-                INDX(IR) = INDX(1)
+            if (l>1) then
+                l = l - 1
+                indxt = indx(l)
+                q = a(indxt)
+            else
+                indxt = indx(ir)
+                q = a(indxt)
+                indx(ir) = indx(1)
                 !
-                IR = IR - 1
-                IF (IR==1) THEN
-                    INDX(1) = INDXT
-                    RETURN
-                ENDIF
-            ENDIF
+                ir = ir - 1
+                if (ir==1) then
+                    indx(1) = indxt
+                    return
+                endif
+            endif
             !
-            I = L
-            J = L + L
-            DO
+            i = l
+            j = l + l
+            do
                 !
-                IF (J<=IR) THEN
-                    IF (J<IR) THEN
-                        IF (A(INDX(J))<A(INDX(J + 1))) J = J + 1
-                    ENDIF
-                    IF (Q<A(INDX(J))) THEN
-                        INDX(I) = INDX(J)
+                if (j<=ir) then
+                    if (j<ir) then
+                        if (a(indx(j))<a(indx(j + 1))) j = j + 1
+                    endif
+                    if (q<a(indx(j))) then
+                        indx(i) = indx(j)
                         !
-                        I = J
-                        J = J + J
-                    ELSE
-                        J = IR + 1
-                    ENDIF
-                    CYCLE
-                ENDIF
+                        i = j
+                        j = j + j
+                    else
+                        j = ir + 1
+                    endif
+                    cycle
+                endif
                 !
-                INDX(I) = INDXT
-                GOTO 100
-            ENDDO
-            EXIT
-        100  ENDDO
-    END SUBROUTINE HSORT
+                indx(i) = indxt
+                goto 100
+            enddo
+            exit
+        100  enddo
+    end subroutine hsort
 end module m_xutils

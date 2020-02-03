@@ -33,29 +33,29 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE LAMP(X1, R1, X2, R2, XF, RF, UG1, VG1, UG2, VG2, US1, VS1, US2, VS2)
-        IMPLICIT NONE
+    subroutine lamp(x1, r1, x2, r2, xf, rf, ug1, vg1, ug2, vg2, us1, vs1, us2, vs2)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NROMX = 10
+        integer, parameter :: nromx = 10
         !
         ! Dummy arguments
         !
-        REAL :: R1, R2, RF, UG1, UG2, US1, US2, VG1, VG2, VS1, &
-                & VS2, X1, X2, XF
+        real :: r1, r2, rf, ug1, ug2, us1, us2, vg1, vg2, vs1, &
+                & vs2, x1, x2, xf
         !
         ! Local variables
         !
-        REAL :: DELS, DELSQ, DT, ERR, ERRUG1, ERRUG2, ERRUS1, &
-                & ERRUS2, ERRVG1, ERRVG2, ERRVS1, ERRVS2, REFL, RT, &
-                & T, TB, UGT, UST, VGT, VST, W, XT
-        INTEGER :: IROM, IT, KROM, NT
-        REAL, SAVE :: ROMTOL
-        REAL, DIMENSION(NROMX) :: UG1I, UG2I, US1I, US2I, VG1I, &
-                & VG2I, VS1I, VS2I
+        real :: dels, delsq, dt, err, errug1, errug2, errus1, &
+                & errus2, errvg1, errvg2, errvs1, errvs2, refl, rt, &
+                & t, tb, ugt, ust, vgt, vst, w, xt
+        integer :: irom, it, krom, nt
+        real, save :: romtol
+        real, dimension(nromx) :: ug1i, ug2i, us1i, us2i, vg1i, &
+                & vg2i, vs1i, vs2i
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -145,78 +145,78 @@ contains
         !
         !
         !---- Romberg convergence tolerance
-        DATA ROMTOL/1.0E-6/
+        data romtol/1.0e-6/
         !cc      DATA ROMTOL / 1.0E-12 /
         !
         !---- reference length for convergence tolerance
-        REFL = 0.5 * (R1 + R2)
+        refl = 0.5 * (r1 + r2)
         !
         !---- evaluate integrals over  0..t..1  on increasingly fine grids
-        DO IROM = 1, NROMX
-            NT = 2**IROM / 2
+        do irom = 1, nromx
+            nt = 2**irom / 2
             !
-            UG1I(IROM) = 0.
-            VG1I(IROM) = 0.
-            UG2I(IROM) = 0.
-            VG2I(IROM) = 0.
-            US1I(IROM) = 0.
-            VS1I(IROM) = 0.
-            US2I(IROM) = 0.
-            VS2I(IROM) = 0.
+            ug1i(irom) = 0.
+            vg1i(irom) = 0.
+            ug2i(irom) = 0.
+            vg2i(irom) = 0.
+            us1i(irom) = 0.
+            vs1i(irom) = 0.
+            us2i(irom) = 0.
+            vs2i(irom) = 0.
             !
             !------ visit the midpoints of each of the NT intervals
-            DO IT = 1, NT
-                T = (FLOAT(IT) - 0.5) / FLOAT(NT)
-                TB = 1.0 - T
+            do it = 1, nt
+                t = (float(it) - 0.5) / float(nt)
+                tb = 1.0 - t
                 !
-                DT = 1.0 / FLOAT(NT)
+                dt = 1.0 / float(nt)
                 !
-                XT = X1 * TB + X2 * T
-                RT = R1 * TB + R2 * T
+                xt = x1 * tb + x2 * t
+                rt = r1 * tb + r2 * t
                 !
                 !-------- get induced velocities for vortex,source ring at XT,RT
-                CALL RING(XT, RT, XF, RF, UGT, VGT, UST, VST)
+                call ring(xt, rt, xf, rf, ugt, vgt, ust, vst)
                 !
                 !-------- accumulate the separate unit-gamma, unit-sigma integrals
-                UG1I(IROM) = UG1I(IROM) + DT * UGT * TB
-                VG1I(IROM) = VG1I(IROM) + DT * VGT * TB
-                UG2I(IROM) = UG2I(IROM) + DT * UGT * T
-                VG2I(IROM) = VG2I(IROM) + DT * VGT * T
-                US1I(IROM) = US1I(IROM) + DT * UST * TB
-                VS1I(IROM) = VS1I(IROM) + DT * VST * TB
-                US2I(IROM) = US2I(IROM) + DT * UST * T
-                VS2I(IROM) = VS2I(IROM) + DT * VST * T
-            ENDDO
+                ug1i(irom) = ug1i(irom) + dt * ugt * tb
+                vg1i(irom) = vg1i(irom) + dt * vgt * tb
+                ug2i(irom) = ug2i(irom) + dt * ugt * t
+                vg2i(irom) = vg2i(irom) + dt * vgt * t
+                us1i(irom) = us1i(irom) + dt * ust * tb
+                vs1i(irom) = vs1i(irom) + dt * vst * tb
+                us2i(irom) = us2i(irom) + dt * ust * t
+                vs2i(irom) = vs2i(irom) + dt * vst * t
+            enddo
             !
             !------ Romberg sequence using all previous grid results
-            DO KROM = IROM, 2, -1
+            do krom = irom, 2, -1
                 !-------- weight needed to cancel lowest-order error terms in KROM level
-                W = 2.0**(2 * (IROM - KROM + 1))
+                w = 2.0**(2 * (irom - krom + 1))
                 !
                 !-------- put Richardson extrapolation for KROM level into KROM-1 level
-                UG1I(KROM - 1) = (W * UG1I(KROM) - UG1I(KROM - 1)) / (W - 1.0)
-                VG1I(KROM - 1) = (W * VG1I(KROM) - VG1I(KROM - 1)) / (W - 1.0)
-                UG2I(KROM - 1) = (W * UG2I(KROM) - UG2I(KROM - 1)) / (W - 1.0)
-                VG2I(KROM - 1) = (W * VG2I(KROM) - VG2I(KROM - 1)) / (W - 1.0)
-                US1I(KROM - 1) = (W * US1I(KROM) - US1I(KROM - 1)) / (W - 1.0)
-                VS1I(KROM - 1) = (W * VS1I(KROM) - VS1I(KROM - 1)) / (W - 1.0)
-                US2I(KROM - 1) = (W * US2I(KROM) - US2I(KROM - 1)) / (W - 1.0)
-                VS2I(KROM - 1) = (W * VS2I(KROM) - VS2I(KROM - 1)) / (W - 1.0)
-            ENDDO
+                ug1i(krom - 1) = (w * ug1i(krom) - ug1i(krom - 1)) / (w - 1.0)
+                vg1i(krom - 1) = (w * vg1i(krom) - vg1i(krom - 1)) / (w - 1.0)
+                ug2i(krom - 1) = (w * ug2i(krom) - ug2i(krom - 1)) / (w - 1.0)
+                vg2i(krom - 1) = (w * vg2i(krom) - vg2i(krom - 1)) / (w - 1.0)
+                us1i(krom - 1) = (w * us1i(krom) - us1i(krom - 1)) / (w - 1.0)
+                vs1i(krom - 1) = (w * vs1i(krom) - vs1i(krom - 1)) / (w - 1.0)
+                us2i(krom - 1) = (w * us2i(krom) - us2i(krom - 1)) / (w - 1.0)
+                vs2i(krom - 1) = (w * vs2i(krom) - vs2i(krom - 1)) / (w - 1.0)
+            enddo
             !
-            IF (IROM>1) THEN
+            if (irom>1) then
                 !------- compare the best-current and best-previous integrals
-                ERRUG1 = UG1I(1) - UG1I(2)
-                ERRVG1 = VG1I(1) - VG1I(2)
-                ERRUG2 = UG2I(1) - UG2I(2)
-                ERRVG2 = VG2I(1) - VG2I(2)
-                ERRUS1 = US1I(1) - US1I(2)
-                ERRVS1 = VS1I(1) - VS1I(2)
-                ERRUS2 = US2I(1) - US2I(2)
-                ERRVS2 = VS2I(1) - VS2I(2)
+                errug1 = ug1i(1) - ug1i(2)
+                errvg1 = vg1i(1) - vg1i(2)
+                errug2 = ug2i(1) - ug2i(2)
+                errvg2 = vg2i(1) - vg2i(2)
+                errus1 = us1i(1) - us1i(2)
+                errvs1 = vs1i(1) - vs1i(2)
+                errus2 = us2i(1) - us2i(2)
+                errvs2 = vs2i(1) - vs2i(2)
                 !
-                ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
-                        & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
+                err = max(abs(errug1), abs(errvg1), abs(errug2), abs(errvg2), &
+                        & abs(errus1), abs(errvs1), abs(errus2), abs(errvs2))
 
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
@@ -229,59 +229,59 @@ contains
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
 
-                IF (ERR * REFL<ROMTOL) GOTO 101
-            ENDIF
-        ENDDO
-        WRITE (*, *) 'LAMP: Romberg convergence failed.  Error =', ERR
+                if (err * refl<romtol) goto 101
+            endif
+        enddo
+        write (*, *) 'LAMP: Romberg convergence failed.  Error =', err
         !
 
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
-        101  DELSQ = (X1 - X2)**2 + (R1 - R2)**2
-        DELS = SQRT(DELSQ)
+        101  delsq = (x1 - x2)**2 + (r1 - r2)**2
+        dels = sqrt(delsq)
         !
-        UG1 = UG1I(1) * DELS
-        VG1 = VG1I(1) * DELS
-        UG2 = UG2I(1) * DELS
-        VG2 = VG2I(1) * DELS
-        US1 = US1I(1) * DELS
-        VS1 = VS1I(1) * DELS
-        US2 = US2I(1) * DELS
-        VS2 = VS2I(1) * DELS
+        ug1 = ug1i(1) * dels
+        vg1 = vg1i(1) * dels
+        ug2 = ug2i(1) * dels
+        vg2 = vg2i(1) * dels
+        us1 = us1i(1) * dels
+        vs1 = vs1i(1) * dels
+        us2 = us2i(1) * dels
+        vs2 = vs2i(1) * dels
         !
-    END SUBROUTINE LAMP
+    end subroutine lamp
     !*==LAMPC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LAMP
 
 
 
-    SUBROUTINE LAMPC(X1, R1, X2, R2, UG1, VG1, UG2, VG2, US1, VS1, US2, VS2)
-        IMPLICIT NONE
+    subroutine lampc(x1, r1, x2, r2, ug1, vg1, ug2, vg2, us1, vs1, us2, vs2)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NROMX = 9
-        REAL, PARAMETER :: PI = 3.14159265358979
+        integer, parameter :: nromx = 9
+        real, parameter :: pi = 3.14159265358979
         !
         ! Dummy arguments
         !
-        REAL :: R1, R2, UG1, UG2, US1, US2, VG1, VG2, VS1, &
-                & VS2, X1, X2
+        real :: r1, r2, ug1, ug2, us1, us2, vg1, vg2, vs1, &
+                & vs2, x1, x2
         !
         ! Local variables
         !
-        REAL :: DELS, DELSQ, DSQ, DT, ERR, ERRUG1, ERRUG2, &
-                & ERRUS1, ERRUS2, ERRVG1, ERRVG2, ERRVS1, ERRVS2, &
-                & REFL, RF, RT, T, TB, UGA, UGAI, UGT, USA, &
-                & USAI, UST, VGA, VGAI, VGT, VSA, VSAI, VST, W, &
-                & WM1, XF, XT
-        INTEGER :: IROM, IT, KROM, NT
-        REAL, SAVE :: ROMTOL
-        REAL, DIMENSION(NROMX) :: UG1I, UG2I, US1I, US2I, VG1I, &
-                & VG2I, VS1I, VS2I
+        real :: dels, delsq, dsq, dt, err, errug1, errug2, &
+                & errus1, errus2, errvg1, errvg2, errvs1, errvs2, &
+                & refl, rf, rt, t, tb, uga, ugai, ugt, usa, &
+                & usai, ust, vga, vgai, vgt, vsa, vsai, vst, w, &
+                & wm1, xf, xt
+        integer :: irom, it, krom, nt
+        real, save :: romtol
+        real, dimension(nromx) :: ug1i, ug2i, us1i, us2i, vg1i, &
+                & vg2i, vs1i, vs2i
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -304,154 +304,154 @@ contains
         !
         !
         !---- Romberg convergence tolerance (actual error may be much less than this)
-        DATA ROMTOL/1.0E-6/
+        data romtol/1.0e-6/
         !cc      DATA ROMTOL / 1.0E-12 /
         !
         !---- lampshade meridional length**2
-        DELSQ = (X1 - X2)**2 + (R1 - R2)**2
+        delsq = (x1 - x2)**2 + (r1 - r2)**2
         !
         !---- reference length for convergence tolerance
-        REFL = 0.5 * (R1 + R2)
+        refl = 0.5 * (r1 + r2)
         !
         !
         !---- field point is assumed to be at midpoint
-        XF = 0.5 * (X1 + X2)
-        RF = 0.5 * (R1 + R2)
+        xf = 0.5 * (x1 + x2)
+        rf = 0.5 * (r1 + r2)
         !
         !---- evaluate integrals on increasingly fine grids
         !-     (start with two intervals to avoid landing right on the midpoint)
-        DO IROM = 1, NROMX
-            NT = 2**IROM
+        do irom = 1, nromx
+            nt = 2**irom
             !
-            UG1I(IROM) = 0.
-            VG1I(IROM) = 0.
-            UG2I(IROM) = 0.
-            VG2I(IROM) = 0.
-            US1I(IROM) = 0.
-            VS1I(IROM) = 0.
-            US2I(IROM) = 0.
-            VS2I(IROM) = 0.
+            ug1i(irom) = 0.
+            vg1i(irom) = 0.
+            ug2i(irom) = 0.
+            vg2i(irom) = 0.
+            us1i(irom) = 0.
+            vs1i(irom) = 0.
+            us2i(irom) = 0.
+            vs2i(irom) = 0.
             !
             !------ visit the midpoints of each of the NT intervals
-            DO IT = 1, NT
-                T = (FLOAT(IT) - 0.5) / FLOAT(NT)
-                TB = 1.0 - T
+            do it = 1, nt
+                t = (float(it) - 0.5) / float(nt)
+                tb = 1.0 - t
                 !
-                DT = 1.0 / FLOAT(NT)
+                dt = 1.0 / float(nt)
                 !
-                XT = X1 * TB + X2 * T
-                RT = R1 * TB + R2 * T
+                xt = x1 * tb + x2 * t
+                rt = r1 * tb + r2 * t
                 !
-                CALL RING(XT, RT, XF, RF, UGT, VGT, UST, VST)
+                call ring(xt, rt, xf, rf, ugt, vgt, ust, vst)
                 !
                 !-------- singular parts of velocities in the limit  XT,RT -> XF,RF
-                DSQ = (XT - XF)**2 + (RT - RF)**2
-                UGA = (RT - RF) / (4.0 * PI * DSQ) - 0.5 * LOG(DSQ / (64.0 * RF**2))      &
-                        & / (8.0 * PI * RF)
-                VGA = -(XT - XF) / (4.0 * PI * DSQ)
-                USA = -(XT - XF) / (4.0 * PI * DSQ)
-                VSA = -(RT - RF) / (4.0 * PI * DSQ) - 0.5 * LOG(DSQ / RF**2) / (8.0 * PI * RF)
+                dsq = (xt - xf)**2 + (rt - rf)**2
+                uga = (rt - rf) / (4.0 * pi * dsq) - 0.5 * log(dsq / (64.0 * rf**2))      &
+                        & / (8.0 * pi * rf)
+                vga = -(xt - xf) / (4.0 * pi * dsq)
+                usa = -(xt - xf) / (4.0 * pi * dsq)
+                vsa = -(rt - rf) / (4.0 * pi * dsq) - 0.5 * log(dsq / rf**2) / (8.0 * pi * rf)
                 !
                 !-------- accumulate integrals, with singular parts (at t=0.5) removed
-                UG1I(IROM) = UG1I(IROM) + DT * (UGT * TB - UGA)
-                VG1I(IROM) = VG1I(IROM) + DT * (VGT * TB - VGA)
-                UG2I(IROM) = UG2I(IROM) + DT * (UGT * T - UGA)
-                VG2I(IROM) = VG2I(IROM) + DT * (VGT * T - VGA)
-                US1I(IROM) = US1I(IROM) + DT * (UST * TB - USA)
-                VS1I(IROM) = VS1I(IROM) + DT * (VST * TB - VSA)
-                US2I(IROM) = US2I(IROM) + DT * (UST * T - USA)
-                VS2I(IROM) = VS2I(IROM) + DT * (VST * T - VSA)
-            ENDDO
+                ug1i(irom) = ug1i(irom) + dt * (ugt * tb - uga)
+                vg1i(irom) = vg1i(irom) + dt * (vgt * tb - vga)
+                ug2i(irom) = ug2i(irom) + dt * (ugt * t - uga)
+                vg2i(irom) = vg2i(irom) + dt * (vgt * t - vga)
+                us1i(irom) = us1i(irom) + dt * (ust * tb - usa)
+                vs1i(irom) = vs1i(irom) + dt * (vst * tb - vsa)
+                us2i(irom) = us2i(irom) + dt * (ust * t - usa)
+                vs2i(irom) = vs2i(irom) + dt * (vst * t - vsa)
+            enddo
             !
             !------ Romberg sequence using all previous grid results
-            DO KROM = IROM, 2, -1
+            do krom = irom, 2, -1
                 !-------- weight needed to cancel lowest-order error terms in KROM level
-                W = 2.0**(2 * (IROM - KROM + 1))
-                WM1 = W - 1.0
+                w = 2.0**(2 * (irom - krom + 1))
+                wm1 = w - 1.0
                 !
                 !-------- put Richardson extrapolation for KROM level into KROM-1 level
-                UG1I(KROM - 1) = (W * UG1I(KROM) - UG1I(KROM - 1)) / WM1
-                VG1I(KROM - 1) = (W * VG1I(KROM) - VG1I(KROM - 1)) / WM1
-                UG2I(KROM - 1) = (W * UG2I(KROM) - UG2I(KROM - 1)) / WM1
-                VG2I(KROM - 1) = (W * VG2I(KROM) - VG2I(KROM - 1)) / WM1
-                US1I(KROM - 1) = (W * US1I(KROM) - US1I(KROM - 1)) / WM1
-                VS1I(KROM - 1) = (W * VS1I(KROM) - VS1I(KROM - 1)) / WM1
-                US2I(KROM - 1) = (W * US2I(KROM) - US2I(KROM - 1)) / WM1
-                VS2I(KROM - 1) = (W * VS2I(KROM) - VS2I(KROM - 1)) / WM1
-            ENDDO
+                ug1i(krom - 1) = (w * ug1i(krom) - ug1i(krom - 1)) / wm1
+                vg1i(krom - 1) = (w * vg1i(krom) - vg1i(krom - 1)) / wm1
+                ug2i(krom - 1) = (w * ug2i(krom) - ug2i(krom - 1)) / wm1
+                vg2i(krom - 1) = (w * vg2i(krom) - vg2i(krom - 1)) / wm1
+                us1i(krom - 1) = (w * us1i(krom) - us1i(krom - 1)) / wm1
+                vs1i(krom - 1) = (w * vs1i(krom) - vs1i(krom - 1)) / wm1
+                us2i(krom - 1) = (w * us2i(krom) - us2i(krom - 1)) / wm1
+                vs2i(krom - 1) = (w * vs2i(krom) - vs2i(krom - 1)) / wm1
+            enddo
             !
-            IF (IROM>1) THEN
+            if (irom>1) then
                 !------- compare the best-current and best-previous integrals
-                ERRUG1 = UG1I(1) - UG1I(2)
-                ERRVG1 = VG1I(1) - VG1I(2)
-                ERRUG2 = UG2I(1) - UG2I(2)
-                ERRVG2 = VG2I(1) - VG2I(2)
-                ERRUS1 = US1I(1) - US1I(2)
-                ERRVS1 = VS1I(1) - VS1I(2)
-                ERRUS2 = US2I(1) - US2I(2)
-                ERRVS2 = VS2I(1) - VS2I(2)
+                errug1 = ug1i(1) - ug1i(2)
+                errvg1 = vg1i(1) - vg1i(2)
+                errug2 = ug2i(1) - ug2i(2)
+                errvg2 = vg2i(1) - vg2i(2)
+                errus1 = us1i(1) - us1i(2)
+                errvs1 = vs1i(1) - vs1i(2)
+                errus2 = us2i(1) - us2i(2)
+                errvs2 = vs2i(1) - vs2i(2)
                 !
-                ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
-                        & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
+                err = max(abs(errug1), abs(errvg1), abs(errug2), abs(errvg2), &
+                        & abs(errus1), abs(errvs1), abs(errus2), abs(errvs2))
                 !
-                IF (ERR * REFL<ROMTOL) GOTO 101
-            ENDIF
-        ENDDO
-        WRITE (*, *) 'LAMPC: Romberg convergence failed.  Error =', ERR
+                if (err * refl<romtol) goto 101
+            endif
+        enddo
+        write (*, *) 'LAMPC: Romberg convergence failed.  Error =', err
         !
         !
-        101  DELSQ = (X1 - X2)**2 + (R1 - R2)**2
-        DELS = SQRT(DELSQ)
+        101  delsq = (x1 - x2)**2 + (r1 - r2)**2
+        dels = sqrt(delsq)
         !
         !---- analytically-integrated singular parts which were removed
-        UGAI = (1.0 + LOG(16.0 * RF / DELS)) / (4.0 * PI * RF)
-        VGAI = 0.
-        USAI = 0.
-        VSAI = (1.0 + LOG(2.0 * RF / DELS)) / (4.0 * PI * RF)
+        ugai = (1.0 + log(16.0 * rf / dels)) / (4.0 * pi * rf)
+        vgai = 0.
+        usai = 0.
+        vsai = (1.0 + log(2.0 * rf / dels)) / (4.0 * pi * rf)
         !
         !---- return final results, with removed parts added back on
-        UG1 = (UG1I(1) + UGAI * 0.5) * DELS
-        VG1 = (VG1I(1) + VGAI * 0.5) * DELS
-        UG2 = (UG2I(1) + UGAI * 0.5) * DELS
-        VG2 = (VG2I(1) + VGAI * 0.5) * DELS
-        US1 = (US1I(1) + USAI * 0.5) * DELS
-        VS1 = (VS1I(1) + VSAI * 0.5) * DELS
-        US2 = (US2I(1) + USAI * 0.5) * DELS
-        VS2 = (VS2I(1) + VSAI * 0.5) * DELS
+        ug1 = (ug1i(1) + ugai * 0.5) * dels
+        vg1 = (vg1i(1) + vgai * 0.5) * dels
+        ug2 = (ug2i(1) + ugai * 0.5) * dels
+        vg2 = (vg2i(1) + vgai * 0.5) * dels
+        us1 = (us1i(1) + usai * 0.5) * dels
+        vs1 = (vs1i(1) + vsai * 0.5) * dels
+        us2 = (us2i(1) + usai * 0.5) * dels
+        vs2 = (vs2i(1) + vsai * 0.5) * dels
         !
-    END SUBROUTINE LAMPC
+    end subroutine lampc
     !*==GLAMP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! LAMPC
 
 
 
-    SUBROUTINE GLAMP(R1, R2, RF, QG1, QG1_RF, QG2, QG2_RF, QS1, QS1_RF, QS2, &
-            & QS2_RF)
-        IMPLICIT NONE
+    subroutine glamp(r1, r2, rf, qg1, qg1_rf, qg2, qg2_rf, qs1, qs1_rf, qs2, &
+            & qs2_rf)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NROMX = 10
+        integer, parameter :: nromx = 10
         !
         ! Dummy arguments
         !
-        REAL, DIMENSION(2) :: QG1, QG2, QS1, QS2, R1, R2, RF
-        REAL, DIMENSION(2, 2) :: QG1_RF, QG2_RF, QS1_RF, QS2_RF
+        real, dimension(2) :: qg1, qg2, qs1, qs2, r1, r2, rf
+        real, dimension(2, 2) :: qg1_rf, qg2_rf, qs1_rf, qs2_rf
         !
         ! Local variables
         !
-        REAL :: DELS, DELSQ, DT, ERR, ERRUG1, ERRUG2, ERRUS1, &
-                & ERRUS2, ERRVG1, ERRVG2, ERRVS1, ERRVS2, REFL, T, &
-                & TB, W, WM1
-        INTEGER :: IROM, IT, J, K, KROM, NT
-        REAL, DIMENSION(2, NROMX) :: QG1I, QG2I, QS1I, QS2I
-        REAL, DIMENSION(2, 2, NROMX) :: QG1I_RF, QG2I_RF, QS1I_RF, &
-                & QS2I_RF
-        REAL, DIMENSION(2) :: QGT, QST, RT
-        REAL, DIMENSION(2, 2) :: QGT_RF, QGT_RT, QST_RF, QST_RT
-        REAL, SAVE :: ROMTOL
+        real :: dels, delsq, dt, err, errug1, errug2, errus1, &
+                & errus2, errvg1, errvg2, errvs1, errvs2, refl, t, &
+                & tb, w, wm1
+        integer :: irom, it, j, k, krom, nt
+        real, dimension(2, nromx) :: qg1i, qg2i, qs1i, qs2i
+        real, dimension(2, 2, nromx) :: qg1i_rf, qg2i_rf, qs1i_rf, &
+                & qs2i_rf
+        real, dimension(2) :: qgt, qst, rt
+        real, dimension(2, 2) :: qgt_rf, qgt_rt, qst_rf, qst_rt
+        real, save :: romtol
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -464,104 +464,104 @@ contains
         !
         !
         !---- Romberg convergence tolerance
-        DATA ROMTOL/1.0E-6/
+        data romtol/1.0e-6/
         !cc   DATA ROMTOL / 1.0E-12 /
         !
         !---- reference length for convergence tolerance
-        REFL = 0.5 * (R1(2) + R2(2))
+        refl = 0.5 * (r1(2) + r2(2))
         !
         !---- evaluate integrals over  0..t..1  on increasingly fine grids
-        DO IROM = 1, NROMX
-            NT = 2**IROM / 2
+        do irom = 1, nromx
+            nt = 2**irom / 2
             !
-            DO K = 1, 2
-                QG1I(K, IROM) = 0.
-                QG2I(K, IROM) = 0.
-                QS1I(K, IROM) = 0.
-                QS2I(K, IROM) = 0.
-                DO J = 1, 2
-                    QG1I_RF(K, J, IROM) = 0.
-                    QG2I_RF(K, J, IROM) = 0.
-                    QS1I_RF(K, J, IROM) = 0.
-                    QS2I_RF(K, J, IROM) = 0.
-                ENDDO
-            ENDDO
+            do k = 1, 2
+                qg1i(k, irom) = 0.
+                qg2i(k, irom) = 0.
+                qs1i(k, irom) = 0.
+                qs2i(k, irom) = 0.
+                do j = 1, 2
+                    qg1i_rf(k, j, irom) = 0.
+                    qg2i_rf(k, j, irom) = 0.
+                    qs1i_rf(k, j, irom) = 0.
+                    qs2i_rf(k, j, irom) = 0.
+                enddo
+            enddo
             !
             !------ visit the midpoints of each of the NT intervals
-            DO IT = 1, NT
-                T = (FLOAT(IT) - 0.5) / FLOAT(NT)
-                TB = 1.0 - T
+            do it = 1, nt
+                t = (float(it) - 0.5) / float(nt)
+                tb = 1.0 - t
                 !
-                DT = 1.0 / FLOAT(NT)
+                dt = 1.0 / float(nt)
                 !
-                RT(1) = R1(1) * TB + R2(1) * T
-                RT(2) = R1(2) * TB + R2(2) * T
+                rt(1) = r1(1) * tb + r2(1) * t
+                rt(2) = r1(2) * tb + r2(2) * t
                 !
                 !-------- get induced velocities for vortex,source ring at XT,RT
-                CALL DRING(RT(1), RT(2), RF(1), RF(2), QGT(1), QGT_RT(1, 1), &
-                        & QGT_RT(1, 2), QGT_RF(1, 1), QGT_RF(1, 2), QGT(2), &
-                        & QGT_RT(2, 1), QGT_RT(2, 2), QGT_RF(2, 1), QGT_RF(2, 2), &
-                        & QST(1), QST_RT(1, 1), QST_RT(1, 2), QST_RF(1, 1), &
-                        & QST_RF(1, 2), QST(2), QST_RT(2, 1), QST_RT(2, 2), &
-                        & QST_RF(2, 1), QST_RF(2, 2))
+                call dring(rt(1), rt(2), rf(1), rf(2), qgt(1), qgt_rt(1, 1), &
+                        & qgt_rt(1, 2), qgt_rf(1, 1), qgt_rf(1, 2), qgt(2), &
+                        & qgt_rt(2, 1), qgt_rt(2, 2), qgt_rf(2, 1), qgt_rf(2, 2), &
+                        & qst(1), qst_rt(1, 1), qst_rt(1, 2), qst_rf(1, 1), &
+                        & qst_rf(1, 2), qst(2), qst_rt(2, 1), qst_rt(2, 2), &
+                        & qst_rf(2, 1), qst_rf(2, 2))
                 !
                 !-------- accumulate the separate unit-gamma, unit-sigma integrals
-                DO K = 1, 2
-                    QG1I(K, IROM) = QG1I(K, IROM) + DT * QGT(K) * TB
-                    QG2I(K, IROM) = QG2I(K, IROM) + DT * QGT(K) * T
-                    QS1I(K, IROM) = QS1I(K, IROM) + DT * QST(K) * TB
-                    QS2I(K, IROM) = QS2I(K, IROM) + DT * QST(K) * T
-                    DO J = 1, 2
-                        QG1I_RF(K, J, IROM) = QG1I_RF(K, J, IROM) + DT * QGT_RF(K, J)&
-                                & * TB
-                        QG2I_RF(K, J, IROM) = QG2I_RF(K, J, IROM) + DT * QGT_RF(K, J)&
-                                & * T
-                        QS1I_RF(K, J, IROM) = QS1I_RF(K, J, IROM) + DT * QST_RF(K, J)&
-                                & * TB
-                        QS2I_RF(K, J, IROM) = QS2I_RF(K, J, IROM) + DT * QST_RF(K, J)&
-                                & * T
-                    ENDDO
-                ENDDO
-            ENDDO
+                do k = 1, 2
+                    qg1i(k, irom) = qg1i(k, irom) + dt * qgt(k) * tb
+                    qg2i(k, irom) = qg2i(k, irom) + dt * qgt(k) * t
+                    qs1i(k, irom) = qs1i(k, irom) + dt * qst(k) * tb
+                    qs2i(k, irom) = qs2i(k, irom) + dt * qst(k) * t
+                    do j = 1, 2
+                        qg1i_rf(k, j, irom) = qg1i_rf(k, j, irom) + dt * qgt_rf(k, j)&
+                                & * tb
+                        qg2i_rf(k, j, irom) = qg2i_rf(k, j, irom) + dt * qgt_rf(k, j)&
+                                & * t
+                        qs1i_rf(k, j, irom) = qs1i_rf(k, j, irom) + dt * qst_rf(k, j)&
+                                & * tb
+                        qs2i_rf(k, j, irom) = qs2i_rf(k, j, irom) + dt * qst_rf(k, j)&
+                                & * t
+                    enddo
+                enddo
+            enddo
             !
             !------ Romberg sequence using all previous grid results
-            DO KROM = IROM, 2, -1
+            do krom = irom, 2, -1
                 !-------- weight needed to cancel lowest-order error terms in KROM level
-                W = 2.0**(2 * (IROM - KROM + 1))
-                WM1 = W - 1.0
+                w = 2.0**(2 * (irom - krom + 1))
+                wm1 = w - 1.0
                 !
                 !-------- put Richardson extrapolation for KROM level into KROM-1 level
-                DO K = 1, 2
-                    QG1I(K, KROM - 1) = (W * QG1I(K, KROM) - QG1I(K, KROM - 1)) / WM1
-                    QG2I(K, KROM - 1) = (W * QG2I(K, KROM) - QG2I(K, KROM - 1)) / WM1
-                    QS1I(K, KROM - 1) = (W * QS1I(K, KROM) - QS1I(K, KROM - 1)) / WM1
-                    QS2I(K, KROM - 1) = (W * QS2I(K, KROM) - QS2I(K, KROM - 1)) / WM1
-                    DO J = 1, 2
-                        QG1I_RF(K, J, KROM - 1) = (W * QG1I_RF(K, J, KROM) - QG1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_RF(K, J, KROM - 1) = (W * QG2I_RF(K, J, KROM) - QG2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_RF(K, J, KROM - 1) = (W * QS1I_RF(K, J, KROM) - QS1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_RF(K, J, KROM - 1) = (W * QS2I_RF(K, J, KROM) - QS2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                    ENDDO
-                ENDDO
-            ENDDO
+                do k = 1, 2
+                    qg1i(k, krom - 1) = (w * qg1i(k, krom) - qg1i(k, krom - 1)) / wm1
+                    qg2i(k, krom - 1) = (w * qg2i(k, krom) - qg2i(k, krom - 1)) / wm1
+                    qs1i(k, krom - 1) = (w * qs1i(k, krom) - qs1i(k, krom - 1)) / wm1
+                    qs2i(k, krom - 1) = (w * qs2i(k, krom) - qs2i(k, krom - 1)) / wm1
+                    do j = 1, 2
+                        qg1i_rf(k, j, krom - 1) = (w * qg1i_rf(k, j, krom) - qg1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_rf(k, j, krom - 1) = (w * qg2i_rf(k, j, krom) - qg2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_rf(k, j, krom - 1) = (w * qs1i_rf(k, j, krom) - qs1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_rf(k, j, krom - 1) = (w * qs2i_rf(k, j, krom) - qs2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                    enddo
+                enddo
+            enddo
             !
-            IF (IROM>1) THEN
+            if (irom>1) then
                 !------- compare the best-current and best-previous integrals
-                ERRUG1 = QG1I(1, 1) - QG1I(1, 2)
-                ERRVG1 = QG1I(2, 1) - QG1I(2, 2)
-                ERRUG2 = QG2I(1, 1) - QG2I(1, 2)
-                ERRVG2 = QG2I(2, 1) - QG2I(2, 2)
-                ERRUS1 = QS1I(1, 1) - QS1I(1, 2)
-                ERRVS1 = QS1I(2, 1) - QS1I(2, 2)
-                ERRUS2 = QS2I(1, 1) - QS2I(1, 2)
-                ERRVS2 = QS2I(2, 1) - QS2I(2, 2)
+                errug1 = qg1i(1, 1) - qg1i(1, 2)
+                errvg1 = qg1i(2, 1) - qg1i(2, 2)
+                errug2 = qg2i(1, 1) - qg2i(1, 2)
+                errvg2 = qg2i(2, 1) - qg2i(2, 2)
+                errus1 = qs1i(1, 1) - qs1i(1, 2)
+                errvs1 = qs1i(2, 1) - qs1i(2, 2)
+                errus2 = qs2i(1, 1) - qs2i(1, 2)
+                errvs2 = qs2i(2, 1) - qs2i(2, 2)
                 !
-                ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
-                        & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
+                err = max(abs(errug1), abs(errvg1), abs(errug2), abs(errvg2), &
+                        & abs(errus1), abs(errvs1), abs(errus2), abs(errvs2))
 
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
@@ -574,66 +574,66 @@ contains
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
 
-                IF (ERR * REFL<ROMTOL) GOTO 101
-            ENDIF
-        ENDDO
-        WRITE (*, *) 'GLAMP: Romberg convergence failed.  Error =', ERR
+                if (err * refl<romtol) goto 101
+            endif
+        enddo
+        write (*, *) 'GLAMP: Romberg convergence failed.  Error =', err
         !
 
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
-        101  DELSQ = (R1(1) - R2(1))**2 + (R1(2) - R2(2))**2
-        DELS = SQRT(DELSQ)
+        101  delsq = (r1(1) - r2(1))**2 + (r1(2) - r2(2))**2
+        dels = sqrt(delsq)
         !
-        DO K = 1, 2
-            QG1(K) = QG1I(K, 1) * DELS
-            QG2(K) = QG2I(K, 1) * DELS
-            QS1(K) = QS1I(K, 1) * DELS
-            QS2(K) = QS2I(K, 1) * DELS
-            DO J = 1, 2
-                QG1_RF(K, J) = QG1I_RF(K, J, 1) * DELS
-                QG2_RF(K, J) = QG2I_RF(K, J, 1) * DELS
-                QS1_RF(K, J) = QS1I_RF(K, J, 1) * DELS
-                QS2_RF(K, J) = QS2I_RF(K, J, 1) * DELS
-            ENDDO
-        ENDDO
+        do k = 1, 2
+            qg1(k) = qg1i(k, 1) * dels
+            qg2(k) = qg2i(k, 1) * dels
+            qs1(k) = qs1i(k, 1) * dels
+            qs2(k) = qs2i(k, 1) * dels
+            do j = 1, 2
+                qg1_rf(k, j) = qg1i_rf(k, j, 1) * dels
+                qg2_rf(k, j) = qg2i_rf(k, j, 1) * dels
+                qs1_rf(k, j) = qs1i_rf(k, j, 1) * dels
+                qs2_rf(k, j) = qs2i_rf(k, j, 1) * dels
+            enddo
+        enddo
         !
-    END SUBROUTINE GLAMP
+    end subroutine glamp
     !*==GLAMPC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GLAMP
 
 
-    SUBROUTINE GLAMPC(R1, R2, QG1, QG1_RF, QG2, QG2_RF, QS1, QS1_RF, QS2, &
-            & QS2_RF)
-        IMPLICIT NONE
+    subroutine glampc(r1, r2, qg1, qg1_rf, qg2, qg2_rf, qs1, qs1_rf, qs2, &
+            & qs2_rf)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NROMX = 10
-        REAL, PARAMETER :: PI = 3.14159265358979
+        integer, parameter :: nromx = 10
+        real, parameter :: pi = 3.14159265358979
         !
         ! Dummy arguments
         !
-        REAL, DIMENSION(2) :: QG1, QG2, QS1, QS2, R1, R2
-        REAL, DIMENSION(2, 2) :: QG1_RF, QG2_RF, QS1_RF, QS2_RF
+        real, dimension(2) :: qg1, qg2, qs1, qs2, r1, r2
+        real, dimension(2, 2) :: qg1_rf, qg2_rf, qs1_rf, qs2_rf
         !
         ! Local variables
         !
-        REAL :: DELS, DELSQ, DR1, DR2, DRSQ, DSQ, DT, ERR, &
-                & ERRUG1, ERRUG2, ERRUS1, ERRUS2, ERRVG1, ERRVG2, &
-                & ERRVS1, ERRVS2, PID4, PIR8, REFL, T, TB, W, WM1
-        REAL, DIMENSION(2) :: DSQ_RF, QGA, QGAI, QGT, QSA, QSAI, &
-                & QST, RF, RT
-        INTEGER :: IROM, IT, J, K, KROM, NT
-        REAL, DIMENSION(2, NROMX) :: QG1I, QG2I, QS1I, QS2I
-        REAL, DIMENSION(2, 2, NROMX) :: QG1I_RF, QG2I_RF, QS1I_RF, &
-                & QS2I_RF
-        REAL, DIMENSION(2, 2) :: QGAI_RF, QGA_RF, QGT_RF, QGT_RT, &
-                & QSAI_RF, QSA_RF, QST_RF, QST_RT
-        REAL, SAVE :: ROMTOL
+        real :: dels, delsq, dr1, dr2, drsq, dsq, dt, err, &
+                & errug1, errug2, errus1, errus2, errvg1, errvg2, &
+                & errvs1, errvs2, pid4, pir8, refl, t, tb, w, wm1
+        real, dimension(2) :: dsq_rf, qga, qgai, qgt, qsa, qsai, &
+                & qst, rf, rt
+        integer :: irom, it, j, k, krom, nt
+        real, dimension(2, nromx) :: qg1i, qg2i, qs1i, qs2i
+        real, dimension(2, 2, nromx) :: qg1i_rf, qg2i_rf, qs1i_rf, &
+                & qs2i_rf
+        real, dimension(2, 2) :: qgai_rf, qga_rf, qgt_rf, qgt_rt, &
+                & qsai_rf, qsa_rf, qst_rf, qst_rt
+        real, save :: romtol
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -647,139 +647,139 @@ contains
         !
         !
         !---- Romberg convergence tolerance
-        DATA ROMTOL/1.0E-6/
+        data romtol/1.0e-6/
         !cc   DATA ROMTOL / 1.0E-12 /
         !
         !---- reference length for convergence tolerance
-        REFL = 0.5 * (R1(2) + R2(2))
+        refl = 0.5 * (r1(2) + r2(2))
         !
-        RF(1) = 0.5 * (R1(1) + R2(1))
-        RF(2) = 0.5 * (R1(2) + R2(2))
+        rf(1) = 0.5 * (r1(1) + r2(1))
+        rf(2) = 0.5 * (r1(2) + r2(2))
         !
         !---- evaluate integrals over  0..t..1  on increasingly fine grids
-        DO IROM = 1, NROMX
-            NT = 2**IROM
+        do irom = 1, nromx
+            nt = 2**irom
             !
-            DO K = 1, 2
-                QG1I(K, IROM) = 0.
-                QG2I(K, IROM) = 0.
-                QS1I(K, IROM) = 0.
-                QS2I(K, IROM) = 0.
-                DO J = 1, 2
-                    QG1I_RF(K, J, IROM) = 0.
-                    QG2I_RF(K, J, IROM) = 0.
-                    QS1I_RF(K, J, IROM) = 0.
-                    QS2I_RF(K, J, IROM) = 0.
-                ENDDO
-            ENDDO
+            do k = 1, 2
+                qg1i(k, irom) = 0.
+                qg2i(k, irom) = 0.
+                qs1i(k, irom) = 0.
+                qs2i(k, irom) = 0.
+                do j = 1, 2
+                    qg1i_rf(k, j, irom) = 0.
+                    qg2i_rf(k, j, irom) = 0.
+                    qs1i_rf(k, j, irom) = 0.
+                    qs2i_rf(k, j, irom) = 0.
+                enddo
+            enddo
             !
             !------ visit the midpoints of each of the NT intervals
-            DO IT = 1, NT
-                T = (FLOAT(IT) - 0.5) / FLOAT(NT)
-                TB = 1.0 - T
+            do it = 1, nt
+                t = (float(it) - 0.5) / float(nt)
+                tb = 1.0 - t
                 !
-                DT = 1.0 / FLOAT(NT)
+                dt = 1.0 / float(nt)
                 !
-                RT(1) = R1(1) * TB + R2(1) * T
-                RT(2) = R1(2) * TB + R2(2) * T
+                rt(1) = r1(1) * tb + r2(1) * t
+                rt(2) = r1(2) * tb + r2(2) * t
                 !
                 !-------- get induced velocities for vortex,source ring at XT,RT
-                CALL DRING(RT(1), RT(2), RF(1), RF(2), QGT(1), QGT_RT(1, 1), &
-                        & QGT_RT(1, 2), QGT_RF(1, 1), QGT_RF(1, 2), QGT(2), &
-                        & QGT_RT(2, 1), QGT_RT(2, 2), QGT_RF(2, 1), QGT_RF(2, 2), &
-                        & QST(1), QST_RT(1, 1), QST_RT(1, 2), QST_RF(1, 1), &
-                        & QST_RF(1, 2), QST(2), QST_RT(2, 1), QST_RT(2, 2), &
-                        & QST_RF(2, 1), QST_RF(2, 2))
+                call dring(rt(1), rt(2), rf(1), rf(2), qgt(1), qgt_rt(1, 1), &
+                        & qgt_rt(1, 2), qgt_rf(1, 1), qgt_rf(1, 2), qgt(2), &
+                        & qgt_rt(2, 1), qgt_rt(2, 2), qgt_rf(2, 1), qgt_rf(2, 2), &
+                        & qst(1), qst_rt(1, 1), qst_rt(1, 2), qst_rf(1, 1), &
+                        & qst_rf(1, 2), qst(2), qst_rt(2, 1), qst_rt(2, 2), &
+                        & qst_rf(2, 1), qst_rf(2, 2))
                 !
                 !-------- singular parts of velocities in the limit  XT,RT -> XF,RF
-                DSQ = (RT(1) - RF(1))**2 + (RT(2) - RF(2))**2
-                DSQ_RF(1) = -2.0 * (RT(1) - RF(1))
-                DSQ_RF(2) = -2.0 * (RT(2) - RF(2))
+                dsq = (rt(1) - rf(1))**2 + (rt(2) - rf(2))**2
+                dsq_rf(1) = -2.0 * (rt(1) - rf(1))
+                dsq_rf(2) = -2.0 * (rt(2) - rf(2))
                 !
                 !
-                PID4 = 4.0 * PI * DSQ
-                PIR8 = 8.0 * PI * RF(2)
-                DRSQ = DSQ / RF(2)**2
+                pid4 = 4.0 * pi * dsq
+                pir8 = 8.0 * pi * rf(2)
+                drsq = dsq / rf(2)**2
                 !
-                DR1 = (RT(1) - RF(1)) / PID4
-                DR2 = (RT(2) - RF(2)) / PID4
+                dr1 = (rt(1) - rf(1)) / pid4
+                dr2 = (rt(2) - rf(2)) / pid4
                 !
-                QGA(1) = DR2 - 0.5 * LOG(DRSQ / 64.0) / PIR8
-                QGA(2) = -DR1
-                QSA(1) = -DR1
-                QSA(2) = -DR2 - 0.5 * LOG(DRSQ) / PIR8
+                qga(1) = dr2 - 0.5 * log(drsq / 64.0) / pir8
+                qga(2) = -dr1
+                qsa(1) = -dr1
+                qsa(2) = -dr2 - 0.5 * log(drsq) / pir8
                 !
-                QGA_RF(1, 1) = (-DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(1)
-                QGA_RF(1, 2) = (-DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(2) - 1.0 / PID4 + &
-                        & (1.0 + 0.5 * LOG(DRSQ / 64.0)) / (RF(2) * PIR8)
+                qga_rf(1, 1) = (-dr2 - 0.5 / pir8) / dsq * dsq_rf(1)
+                qga_rf(1, 2) = (-dr2 - 0.5 / pir8) / dsq * dsq_rf(2) - 1.0 / pid4 + &
+                        & (1.0 + 0.5 * log(drsq / 64.0)) / (rf(2) * pir8)
                 !
-                QGA_RF(2, 1) = DR1 / DSQ * DSQ_RF(1) + 1.0 / PID4
-                QGA_RF(2, 2) = DR1 / DSQ * DSQ_RF(2)
+                qga_rf(2, 1) = dr1 / dsq * dsq_rf(1) + 1.0 / pid4
+                qga_rf(2, 2) = dr1 / dsq * dsq_rf(2)
                 !
-                QSA_RF(1, 1) = DR1 / DSQ * DSQ_RF(1) + 1.0 / PID4
-                QSA_RF(1, 2) = DR1 / DSQ * DSQ_RF(2)
+                qsa_rf(1, 1) = dr1 / dsq * dsq_rf(1) + 1.0 / pid4
+                qsa_rf(1, 2) = dr1 / dsq * dsq_rf(2)
                 !
-                QSA_RF(2, 1) = (DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(1)
-                QSA_RF(2, 2) = (DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(2) + 1.0 / PID4 + &
-                        & (1.0 + 0.5 * LOG(DRSQ)) / (RF(2) * PIR8)
+                qsa_rf(2, 1) = (dr2 - 0.5 / pir8) / dsq * dsq_rf(1)
+                qsa_rf(2, 2) = (dr2 - 0.5 / pir8) / dsq * dsq_rf(2) + 1.0 / pid4 + &
+                        & (1.0 + 0.5 * log(drsq)) / (rf(2) * pir8)
                 !
                 !-------- accumulate integrals, with singular parts (at t=0.5) removed
-                DO K = 1, 2
-                    QG1I(K, IROM) = QG1I(K, IROM) + DT * (QGT(K) * TB - QGA(K))
-                    QG2I(K, IROM) = QG2I(K, IROM) + DT * (QGT(K) * T - QGA(K))
-                    QS1I(K, IROM) = QS1I(K, IROM) + DT * (QST(K) * TB - QSA(K))
-                    QS2I(K, IROM) = QS2I(K, IROM) + DT * (QST(K) * T - QSA(K))
-                    DO J = 1, 2
-                        QG1I_RF(K, J, IROM) = QG1I_RF(K, J, IROM)                 &
-                                & + DT * (QGT_RF(K, J) * TB - QGA_RF(K, J))
-                        QG2I_RF(K, J, IROM) = QG2I_RF(K, J, IROM)                 &
-                                & + DT * (QGT_RF(K, J) * T - QGA_RF(K, J))
-                        QS1I_RF(K, J, IROM) = QS1I_RF(K, J, IROM)                 &
-                                & + DT * (QST_RF(K, J) * TB - QSA_RF(K, J))
-                        QS2I_RF(K, J, IROM) = QS2I_RF(K, J, IROM)                 &
-                                & + DT * (QST_RF(K, J) * T - QSA_RF(K, J))
-                    ENDDO
-                ENDDO
-            ENDDO
+                do k = 1, 2
+                    qg1i(k, irom) = qg1i(k, irom) + dt * (qgt(k) * tb - qga(k))
+                    qg2i(k, irom) = qg2i(k, irom) + dt * (qgt(k) * t - qga(k))
+                    qs1i(k, irom) = qs1i(k, irom) + dt * (qst(k) * tb - qsa(k))
+                    qs2i(k, irom) = qs2i(k, irom) + dt * (qst(k) * t - qsa(k))
+                    do j = 1, 2
+                        qg1i_rf(k, j, irom) = qg1i_rf(k, j, irom)                 &
+                                & + dt * (qgt_rf(k, j) * tb - qga_rf(k, j))
+                        qg2i_rf(k, j, irom) = qg2i_rf(k, j, irom)                 &
+                                & + dt * (qgt_rf(k, j) * t - qga_rf(k, j))
+                        qs1i_rf(k, j, irom) = qs1i_rf(k, j, irom)                 &
+                                & + dt * (qst_rf(k, j) * tb - qsa_rf(k, j))
+                        qs2i_rf(k, j, irom) = qs2i_rf(k, j, irom)                 &
+                                & + dt * (qst_rf(k, j) * t - qsa_rf(k, j))
+                    enddo
+                enddo
+            enddo
             !
             !------ Romberg sequence using all previous grid results
-            DO KROM = IROM, 2, -1
+            do krom = irom, 2, -1
                 !-------- weight needed to cancel lowest-order error terms in KROM level
-                W = 2.0**(2 * (IROM - KROM + 1))
-                WM1 = W - 1.0
+                w = 2.0**(2 * (irom - krom + 1))
+                wm1 = w - 1.0
                 !
                 !-------- put Richardson extrapolation for KROM level into KROM-1 level
-                DO K = 1, 2
-                    QG1I(K, KROM - 1) = (W * QG1I(K, KROM) - QG1I(K, KROM - 1)) / WM1
-                    QG2I(K, KROM - 1) = (W * QG2I(K, KROM) - QG2I(K, KROM - 1)) / WM1
-                    QS1I(K, KROM - 1) = (W * QS1I(K, KROM) - QS1I(K, KROM - 1)) / WM1
-                    QS2I(K, KROM - 1) = (W * QS2I(K, KROM) - QS2I(K, KROM - 1)) / WM1
-                    DO J = 1, 2
-                        QG1I_RF(K, J, KROM - 1) = (W * QG1I_RF(K, J, KROM) - QG1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_RF(K, J, KROM - 1) = (W * QG2I_RF(K, J, KROM) - QG2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_RF(K, J, KROM - 1) = (W * QS1I_RF(K, J, KROM) - QS1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_RF(K, J, KROM - 1) = (W * QS2I_RF(K, J, KROM) - QS2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                    ENDDO
-                ENDDO
-            ENDDO
+                do k = 1, 2
+                    qg1i(k, krom - 1) = (w * qg1i(k, krom) - qg1i(k, krom - 1)) / wm1
+                    qg2i(k, krom - 1) = (w * qg2i(k, krom) - qg2i(k, krom - 1)) / wm1
+                    qs1i(k, krom - 1) = (w * qs1i(k, krom) - qs1i(k, krom - 1)) / wm1
+                    qs2i(k, krom - 1) = (w * qs2i(k, krom) - qs2i(k, krom - 1)) / wm1
+                    do j = 1, 2
+                        qg1i_rf(k, j, krom - 1) = (w * qg1i_rf(k, j, krom) - qg1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_rf(k, j, krom - 1) = (w * qg2i_rf(k, j, krom) - qg2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_rf(k, j, krom - 1) = (w * qs1i_rf(k, j, krom) - qs1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_rf(k, j, krom - 1) = (w * qs2i_rf(k, j, krom) - qs2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                    enddo
+                enddo
+            enddo
             !
-            IF (IROM>1) THEN
+            if (irom>1) then
                 !------- compare the best-current and best-previous integrals
-                ERRUG1 = QG1I(1, 1) - QG1I(1, 2)
-                ERRVG1 = QG1I(2, 1) - QG1I(2, 2)
-                ERRUG2 = QG2I(1, 1) - QG2I(1, 2)
-                ERRVG2 = QG2I(2, 1) - QG2I(2, 2)
-                ERRUS1 = QS1I(1, 1) - QS1I(1, 2)
-                ERRVS1 = QS1I(2, 1) - QS1I(2, 2)
-                ERRUS2 = QS2I(1, 1) - QS2I(1, 2)
-                ERRVS2 = QS2I(2, 1) - QS2I(2, 2)
+                errug1 = qg1i(1, 1) - qg1i(1, 2)
+                errvg1 = qg1i(2, 1) - qg1i(2, 2)
+                errug2 = qg2i(1, 1) - qg2i(1, 2)
+                errvg2 = qg2i(2, 1) - qg2i(2, 2)
+                errus1 = qs1i(1, 1) - qs1i(1, 2)
+                errvs1 = qs1i(2, 1) - qs1i(2, 2)
+                errus2 = qs2i(1, 1) - qs2i(1, 2)
+                errvs2 = qs2i(2, 1) - qs2i(2, 2)
                 !
-                ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
-                        & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
+                err = max(abs(errug1), abs(errvg1), abs(errug2), abs(errvg2), &
+                        & abs(errus1), abs(errvs1), abs(errus2), abs(errvs2))
 
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
@@ -792,86 +792,86 @@ contains
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
 
-                IF (ERR * REFL<ROMTOL) GOTO 101
-            ENDIF
-        ENDDO
-        WRITE (*, *) 'GLAMPC: Romberg convergence failed.  Error =', ERR
+                if (err * refl<romtol) goto 101
+            endif
+        enddo
+        write (*, *) 'GLAMPC: Romberg convergence failed.  Error =', err
         !
 
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
-        101  DELSQ = (R1(1) - R2(1))**2 + (R1(2) - R2(2))**2
-        DELS = SQRT(DELSQ)
+        101  delsq = (r1(1) - r2(1))**2 + (r1(2) - r2(2))**2
+        dels = sqrt(delsq)
         !
         !---- analytically-integrated singular parts which were removed
-        QGAI(1) = (1.0 + LOG(16.0 * RF(2) / DELS)) / (8.0 * PI * RF(2))
-        QGAI(2) = 0.
-        QSAI(1) = 0.
-        QSAI(2) = (1.0 + LOG(2.0 * RF(2) / DELS)) / (8.0 * PI * RF(2))
+        qgai(1) = (1.0 + log(16.0 * rf(2) / dels)) / (8.0 * pi * rf(2))
+        qgai(2) = 0.
+        qsai(1) = 0.
+        qsai(2) = (1.0 + log(2.0 * rf(2) / dels)) / (8.0 * pi * rf(2))
         !
-        QGAI_RF(1, 1) = 0.
-        QGAI_RF(2, 1) = 0.
-        QSAI_RF(1, 1) = 0.
-        QSAI_RF(2, 1) = 0.
+        qgai_rf(1, 1) = 0.
+        qgai_rf(2, 1) = 0.
+        qsai_rf(1, 1) = 0.
+        qsai_rf(2, 1) = 0.
         !
-        QGAI_RF(1, 2) = (1.0 / RF(2)) / (8.0 * PI * RF(2)) - QGAI(1) / RF(2)
-        QGAI_RF(2, 2) = 0.
-        QSAI_RF(1, 2) = 0.
-        QSAI_RF(2, 2) = (1.0 / RF(2)) / (8.0 * PI * RF(2)) - QSAI(2) / RF(2)
+        qgai_rf(1, 2) = (1.0 / rf(2)) / (8.0 * pi * rf(2)) - qgai(1) / rf(2)
+        qgai_rf(2, 2) = 0.
+        qsai_rf(1, 2) = 0.
+        qsai_rf(2, 2) = (1.0 / rf(2)) / (8.0 * pi * rf(2)) - qsai(2) / rf(2)
         !
         !
-        DO K = 1, 2
-            QG1(K) = (QG1I(K, 1) + QGAI(K)) * DELS
-            QG2(K) = (QG2I(K, 1) + QGAI(K)) * DELS
-            QS1(K) = (QS1I(K, 1) + QSAI(K)) * DELS
-            QS2(K) = (QS2I(K, 1) + QSAI(K)) * DELS
-            DO J = 1, 2
-                QG1_RF(K, J) = (QG1I_RF(K, J, 1) + QGAI_RF(K, J)) * DELS
-                QG2_RF(K, J) = (QG2I_RF(K, J, 1) + QGAI_RF(K, J)) * DELS
-                QS1_RF(K, J) = (QS1I_RF(K, J, 1) + QSAI_RF(K, J)) * DELS
-                QS2_RF(K, J) = (QS2I_RF(K, J, 1) + QSAI_RF(K, J)) * DELS
-            ENDDO
-        ENDDO
+        do k = 1, 2
+            qg1(k) = (qg1i(k, 1) + qgai(k)) * dels
+            qg2(k) = (qg2i(k, 1) + qgai(k)) * dels
+            qs1(k) = (qs1i(k, 1) + qsai(k)) * dels
+            qs2(k) = (qs2i(k, 1) + qsai(k)) * dels
+            do j = 1, 2
+                qg1_rf(k, j) = (qg1i_rf(k, j, 1) + qgai_rf(k, j)) * dels
+                qg2_rf(k, j) = (qg2i_rf(k, j, 1) + qgai_rf(k, j)) * dels
+                qs1_rf(k, j) = (qs1i_rf(k, j, 1) + qsai_rf(k, j)) * dels
+                qs2_rf(k, j) = (qs2i_rf(k, j, 1) + qsai_rf(k, j)) * dels
+            enddo
+        enddo
         !
-    END SUBROUTINE GLAMPC
+    end subroutine glampc
     !*==DLAMP.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GLAMPC
 
 
 
-    SUBROUTINE DLAMP(R1, R2, RF, QG1, QG1_R1, QG1_R2, QG1_RF, QG2, QG2_R1, &
-            & QG2_R2, QG2_RF, QS1, QS1_R1, QS1_R2, QS1_RF, QS2, &
-            & QS2_R1, QS2_R2, QS2_RF)
-        IMPLICIT NONE
+    subroutine dlamp(r1, r2, rf, qg1, qg1_r1, qg1_r2, qg1_rf, qg2, qg2_r1, &
+            & qg2_r2, qg2_rf, qs1, qs1_r1, qs1_r2, qs1_rf, qs2, &
+            & qs2_r1, qs2_r2, qs2_rf)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NROMX = 10
+        integer, parameter :: nromx = 10
         !
         ! Dummy arguments
         !
-        REAL, DIMENSION(2) :: QG1, QG2, QS1, QS2, R1, R2, RF
-        REAL, DIMENSION(2, 2) :: QG1_R1, QG1_R2, QG1_RF, QG2_R1, &
-                & QG2_R2, QG2_RF, QS1_R1, QS1_R2, &
-                & QS1_RF, QS2_R1, QS2_R2, QS2_RF
+        real, dimension(2) :: qg1, qg2, qs1, qs2, r1, r2, rf
+        real, dimension(2, 2) :: qg1_r1, qg1_r2, qg1_rf, qg2_r1, &
+                & qg2_r2, qg2_rf, qs1_r1, qs1_r2, &
+                & qs1_rf, qs2_r1, qs2_r2, qs2_rf
         !
         ! Local variables
         !
-        REAL :: DELS, DELSQ, DT, ERR, ERRUG1, ERRUG2, ERRUS1, &
-                & ERRUS2, ERRVG1, ERRVG2, ERRVS1, ERRVS2, REFL, T, &
-                & TB, W, WM1
-        REAL, DIMENSION(2) :: DELS_R1, DELS_R2, QGT, QST, RT
-        INTEGER :: IROM, IT, J, K, KROM, NT
-        REAL, DIMENSION(2, NROMX) :: QG1I, QG2I, QS1I, QS2I
-        REAL, DIMENSION(2, 2, NROMX) :: QG1I_R1, QG1I_R2, QG1I_RF, &
-                & QG2I_R1, QG2I_R2, QG2I_RF, &
-                & QS1I_R1, QS1I_R2, QS1I_RF, &
-                & QS2I_R1, QS2I_R2, QS2I_RF
-        REAL, DIMENSION(2, 2) :: QGT_RF, QGT_RT, QST_RF, QST_RT
-        REAL, SAVE :: ROMTOL
+        real :: dels, delsq, dt, err, errug1, errug2, errus1, &
+                & errus2, errvg1, errvg2, errvs1, errvs2, refl, t, &
+                & tb, w, wm1
+        real, dimension(2) :: dels_r1, dels_r2, qgt, qst, rt
+        integer :: irom, it, j, k, krom, nt
+        real, dimension(2, nromx) :: qg1i, qg2i, qs1i, qs2i
+        real, dimension(2, 2, nromx) :: qg1i_r1, qg1i_r2, qg1i_rf, &
+                & qg2i_r1, qg2i_r2, qg2i_rf, &
+                & qs1i_r1, qs1i_r2, qs1i_rf, &
+                & qs2i_r1, qs2i_r2, qs2i_rf
+        real, dimension(2, 2) :: qgt_rf, qgt_rt, qst_rf, qst_rt
+        real, save :: romtol
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -884,148 +884,148 @@ contains
         !
         !
         !---- Romberg convergence tolerance
-        DATA ROMTOL/1.0E-6/
+        data romtol/1.0e-6/
         !cc   DATA ROMTOL / 1.0E-12 /
         !
         !---- reference length for convergence tolerance
-        REFL = 0.5 * (R1(2) + R2(2))
+        refl = 0.5 * (r1(2) + r2(2))
         !
         !---- evaluate integrals over  0..t..1  on increasingly fine grids
-        DO IROM = 1, NROMX
-            NT = 2**IROM / 2
+        do irom = 1, nromx
+            nt = 2**irom / 2
             !
-            DO K = 1, 2
-                QG1I(K, IROM) = 0.
-                QG2I(K, IROM) = 0.
-                QS1I(K, IROM) = 0.
-                QS2I(K, IROM) = 0.
-                DO J = 1, 2
-                    QG1I_R1(K, J, IROM) = 0.
-                    QG2I_R1(K, J, IROM) = 0.
-                    QS1I_R1(K, J, IROM) = 0.
-                    QS2I_R1(K, J, IROM) = 0.
-                    QG1I_R2(K, J, IROM) = 0.
-                    QG2I_R2(K, J, IROM) = 0.
-                    QS1I_R2(K, J, IROM) = 0.
-                    QS2I_R2(K, J, IROM) = 0.
-                    QG1I_RF(K, J, IROM) = 0.
-                    QG2I_RF(K, J, IROM) = 0.
-                    QS1I_RF(K, J, IROM) = 0.
-                    QS2I_RF(K, J, IROM) = 0.
-                ENDDO
-            ENDDO
+            do k = 1, 2
+                qg1i(k, irom) = 0.
+                qg2i(k, irom) = 0.
+                qs1i(k, irom) = 0.
+                qs2i(k, irom) = 0.
+                do j = 1, 2
+                    qg1i_r1(k, j, irom) = 0.
+                    qg2i_r1(k, j, irom) = 0.
+                    qs1i_r1(k, j, irom) = 0.
+                    qs2i_r1(k, j, irom) = 0.
+                    qg1i_r2(k, j, irom) = 0.
+                    qg2i_r2(k, j, irom) = 0.
+                    qs1i_r2(k, j, irom) = 0.
+                    qs2i_r2(k, j, irom) = 0.
+                    qg1i_rf(k, j, irom) = 0.
+                    qg2i_rf(k, j, irom) = 0.
+                    qs1i_rf(k, j, irom) = 0.
+                    qs2i_rf(k, j, irom) = 0.
+                enddo
+            enddo
             !
             !------ visit the midpoints of each of the NT intervals
-            DO IT = 1, NT
-                T = (FLOAT(IT) - 0.5) / FLOAT(NT)
-                TB = 1.0 - T
+            do it = 1, nt
+                t = (float(it) - 0.5) / float(nt)
+                tb = 1.0 - t
                 !
-                DT = 1.0 / FLOAT(NT)
+                dt = 1.0 / float(nt)
                 !
-                RT(1) = R1(1) * TB + R2(1) * T
-                RT(2) = R1(2) * TB + R2(2) * T
+                rt(1) = r1(1) * tb + r2(1) * t
+                rt(2) = r1(2) * tb + r2(2) * t
                 !
                 !-------- get induced velocities for vortex,source ring at XT,RT
-                CALL DRING(RT(1), RT(2), RF(1), RF(2), QGT(1), QGT_RT(1, 1), &
-                        & QGT_RT(1, 2), QGT_RF(1, 1), QGT_RF(1, 2), QGT(2), &
-                        & QGT_RT(2, 1), QGT_RT(2, 2), QGT_RF(2, 1), QGT_RF(2, 2), &
-                        & QST(1), QST_RT(1, 1), QST_RT(1, 2), QST_RF(1, 1), &
-                        & QST_RF(1, 2), QST(2), QST_RT(2, 1), QST_RT(2, 2), &
-                        & QST_RF(2, 1), QST_RF(2, 2))
+                call dring(rt(1), rt(2), rf(1), rf(2), qgt(1), qgt_rt(1, 1), &
+                        & qgt_rt(1, 2), qgt_rf(1, 1), qgt_rf(1, 2), qgt(2), &
+                        & qgt_rt(2, 1), qgt_rt(2, 2), qgt_rf(2, 1), qgt_rf(2, 2), &
+                        & qst(1), qst_rt(1, 1), qst_rt(1, 2), qst_rf(1, 1), &
+                        & qst_rf(1, 2), qst(2), qst_rt(2, 1), qst_rt(2, 2), &
+                        & qst_rf(2, 1), qst_rf(2, 2))
                 !
                 !-------- accumulate the separate unit-gamma, unit-sigma integrals
-                DO K = 1, 2
-                    QG1I(K, IROM) = QG1I(K, IROM) + DT * QGT(K) * TB
-                    QG2I(K, IROM) = QG2I(K, IROM) + DT * QGT(K) * T
-                    QS1I(K, IROM) = QS1I(K, IROM) + DT * QST(K) * TB
-                    QS2I(K, IROM) = QS2I(K, IROM) + DT * QST(K) * T
-                    DO J = 1, 2
-                        QG1I_R1(K, J, IROM) = QG1I_R1(K, J, IROM) + DT * QGT_RT(K, J)&
-                                & * TB * TB
-                        QG2I_R1(K, J, IROM) = QG2I_R1(K, J, IROM) + DT * QGT_RT(K, J)&
-                                & * T * TB
-                        QS1I_R1(K, J, IROM) = QS1I_R1(K, J, IROM) + DT * QST_RT(K, J)&
-                                & * TB * TB
-                        QS2I_R1(K, J, IROM) = QS2I_R1(K, J, IROM) + DT * QST_RT(K, J)&
-                                & * T * TB
+                do k = 1, 2
+                    qg1i(k, irom) = qg1i(k, irom) + dt * qgt(k) * tb
+                    qg2i(k, irom) = qg2i(k, irom) + dt * qgt(k) * t
+                    qs1i(k, irom) = qs1i(k, irom) + dt * qst(k) * tb
+                    qs2i(k, irom) = qs2i(k, irom) + dt * qst(k) * t
+                    do j = 1, 2
+                        qg1i_r1(k, j, irom) = qg1i_r1(k, j, irom) + dt * qgt_rt(k, j)&
+                                & * tb * tb
+                        qg2i_r1(k, j, irom) = qg2i_r1(k, j, irom) + dt * qgt_rt(k, j)&
+                                & * t * tb
+                        qs1i_r1(k, j, irom) = qs1i_r1(k, j, irom) + dt * qst_rt(k, j)&
+                                & * tb * tb
+                        qs2i_r1(k, j, irom) = qs2i_r1(k, j, irom) + dt * qst_rt(k, j)&
+                                & * t * tb
                         !
-                        QG1I_R2(K, J, IROM) = QG1I_R2(K, J, IROM) + DT * QGT_RT(K, J)&
-                                & * TB * T
-                        QG2I_R2(K, J, IROM) = QG2I_R2(K, J, IROM) + DT * QGT_RT(K, J)&
-                                & * T * T
-                        QS1I_R2(K, J, IROM) = QS1I_R2(K, J, IROM) + DT * QST_RT(K, J)&
-                                & * TB * T
-                        QS2I_R2(K, J, IROM) = QS2I_R2(K, J, IROM) + DT * QST_RT(K, J)&
-                                & * T * T
+                        qg1i_r2(k, j, irom) = qg1i_r2(k, j, irom) + dt * qgt_rt(k, j)&
+                                & * tb * t
+                        qg2i_r2(k, j, irom) = qg2i_r2(k, j, irom) + dt * qgt_rt(k, j)&
+                                & * t * t
+                        qs1i_r2(k, j, irom) = qs1i_r2(k, j, irom) + dt * qst_rt(k, j)&
+                                & * tb * t
+                        qs2i_r2(k, j, irom) = qs2i_r2(k, j, irom) + dt * qst_rt(k, j)&
+                                & * t * t
                         !
-                        QG1I_RF(K, J, IROM) = QG1I_RF(K, J, IROM) + DT * QGT_RF(K, J)&
-                                & * TB
-                        QG2I_RF(K, J, IROM) = QG2I_RF(K, J, IROM) + DT * QGT_RF(K, J)&
-                                & * T
-                        QS1I_RF(K, J, IROM) = QS1I_RF(K, J, IROM) + DT * QST_RF(K, J)&
-                                & * TB
-                        QS2I_RF(K, J, IROM) = QS2I_RF(K, J, IROM) + DT * QST_RF(K, J)&
-                                & * T
-                    ENDDO
-                ENDDO
-            ENDDO
+                        qg1i_rf(k, j, irom) = qg1i_rf(k, j, irom) + dt * qgt_rf(k, j)&
+                                & * tb
+                        qg2i_rf(k, j, irom) = qg2i_rf(k, j, irom) + dt * qgt_rf(k, j)&
+                                & * t
+                        qs1i_rf(k, j, irom) = qs1i_rf(k, j, irom) + dt * qst_rf(k, j)&
+                                & * tb
+                        qs2i_rf(k, j, irom) = qs2i_rf(k, j, irom) + dt * qst_rf(k, j)&
+                                & * t
+                    enddo
+                enddo
+            enddo
             !
             !------ Romberg sequence using all previous grid results
-            DO KROM = IROM, 2, -1
+            do krom = irom, 2, -1
                 !-------- weight needed to cancel lowest-order error terms in KROM level
-                W = 2.0**(2 * (IROM - KROM + 1))
-                WM1 = W - 1.0
+                w = 2.0**(2 * (irom - krom + 1))
+                wm1 = w - 1.0
                 !
                 !-------- put Richardson extrapolation for KROM level into KROM-1 level
-                DO K = 1, 2
-                    QG1I(K, KROM - 1) = (W * QG1I(K, KROM) - QG1I(K, KROM - 1)) / WM1
-                    QG2I(K, KROM - 1) = (W * QG2I(K, KROM) - QG2I(K, KROM - 1)) / WM1
-                    QS1I(K, KROM - 1) = (W * QS1I(K, KROM) - QS1I(K, KROM - 1)) / WM1
-                    QS2I(K, KROM - 1) = (W * QS2I(K, KROM) - QS2I(K, KROM - 1)) / WM1
-                    DO J = 1, 2
-                        QG1I_R1(K, J, KROM - 1) = (W * QG1I_R1(K, J, KROM) - QG1I_R1(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_R1(K, J, KROM - 1) = (W * QG2I_R1(K, J, KROM) - QG2I_R1(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_R1(K, J, KROM - 1) = (W * QS1I_R1(K, J, KROM) - QS1I_R1(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_R1(K, J, KROM - 1) = (W * QS2I_R1(K, J, KROM) - QS2I_R1(K, J&
-                                &, KROM - 1)) / WM1
+                do k = 1, 2
+                    qg1i(k, krom - 1) = (w * qg1i(k, krom) - qg1i(k, krom - 1)) / wm1
+                    qg2i(k, krom - 1) = (w * qg2i(k, krom) - qg2i(k, krom - 1)) / wm1
+                    qs1i(k, krom - 1) = (w * qs1i(k, krom) - qs1i(k, krom - 1)) / wm1
+                    qs2i(k, krom - 1) = (w * qs2i(k, krom) - qs2i(k, krom - 1)) / wm1
+                    do j = 1, 2
+                        qg1i_r1(k, j, krom - 1) = (w * qg1i_r1(k, j, krom) - qg1i_r1(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_r1(k, j, krom - 1) = (w * qg2i_r1(k, j, krom) - qg2i_r1(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_r1(k, j, krom - 1) = (w * qs1i_r1(k, j, krom) - qs1i_r1(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_r1(k, j, krom - 1) = (w * qs2i_r1(k, j, krom) - qs2i_r1(k, j&
+                                &, krom - 1)) / wm1
                         !
-                        QG1I_R2(K, J, KROM - 1) = (W * QG1I_R2(K, J, KROM) - QG1I_R2(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_R2(K, J, KROM - 1) = (W * QG2I_R2(K, J, KROM) - QG2I_R2(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_R2(K, J, KROM - 1) = (W * QS1I_R2(K, J, KROM) - QS1I_R2(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_R2(K, J, KROM - 1) = (W * QS2I_R2(K, J, KROM) - QS2I_R2(K, J&
-                                &, KROM - 1)) / WM1
+                        qg1i_r2(k, j, krom - 1) = (w * qg1i_r2(k, j, krom) - qg1i_r2(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_r2(k, j, krom - 1) = (w * qg2i_r2(k, j, krom) - qg2i_r2(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_r2(k, j, krom - 1) = (w * qs1i_r2(k, j, krom) - qs1i_r2(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_r2(k, j, krom - 1) = (w * qs2i_r2(k, j, krom) - qs2i_r2(k, j&
+                                &, krom - 1)) / wm1
                         !
-                        QG1I_RF(K, J, KROM - 1) = (W * QG1I_RF(K, J, KROM) - QG1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_RF(K, J, KROM - 1) = (W * QG2I_RF(K, J, KROM) - QG2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_RF(K, J, KROM - 1) = (W * QS1I_RF(K, J, KROM) - QS1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_RF(K, J, KROM - 1) = (W * QS2I_RF(K, J, KROM) - QS2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                    ENDDO
-                ENDDO
-            ENDDO
+                        qg1i_rf(k, j, krom - 1) = (w * qg1i_rf(k, j, krom) - qg1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_rf(k, j, krom - 1) = (w * qg2i_rf(k, j, krom) - qg2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_rf(k, j, krom - 1) = (w * qs1i_rf(k, j, krom) - qs1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_rf(k, j, krom - 1) = (w * qs2i_rf(k, j, krom) - qs2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                    enddo
+                enddo
+            enddo
             !
-            IF (IROM>1) THEN
+            if (irom>1) then
                 !------- compare the best-current and best-previous integrals
-                ERRUG1 = QG1I(1, 1) - QG1I(1, 2)
-                ERRVG1 = QG1I(2, 1) - QG1I(2, 2)
-                ERRUG2 = QG2I(1, 1) - QG2I(1, 2)
-                ERRVG2 = QG2I(2, 1) - QG2I(2, 2)
-                ERRUS1 = QS1I(1, 1) - QS1I(1, 2)
-                ERRVS1 = QS1I(2, 1) - QS1I(2, 2)
-                ERRUS2 = QS2I(1, 1) - QS2I(1, 2)
-                ERRVS2 = QS2I(2, 1) - QS2I(2, 2)
+                errug1 = qg1i(1, 1) - qg1i(1, 2)
+                errvg1 = qg1i(2, 1) - qg1i(2, 2)
+                errug2 = qg2i(1, 1) - qg2i(1, 2)
+                errvg2 = qg2i(2, 1) - qg2i(2, 2)
+                errus1 = qs1i(1, 1) - qs1i(1, 2)
+                errvs1 = qs1i(2, 1) - qs1i(2, 2)
+                errus2 = qs2i(1, 1) - qs2i(1, 2)
+                errvs2 = qs2i(2, 1) - qs2i(2, 2)
                 !
-                ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
-                        & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
+                err = max(abs(errug1), abs(errvg1), abs(errug2), abs(errvg2), &
+                        & abs(errus1), abs(errvs1), abs(errus2), abs(errvs2))
 
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
@@ -1038,87 +1038,87 @@ contains
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
 
-                IF (ERR * REFL<ROMTOL) GOTO 101
-            ENDIF
-        ENDDO
-        WRITE (*, *) 'DLAMP: Romberg convergence failed.  Error =', ERR
+                if (err * refl<romtol) goto 101
+            endif
+        enddo
+        write (*, *) 'DLAMP: Romberg convergence failed.  Error =', err
         !
 
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
-        101  DELSQ = (R1(1) - R2(1))**2 + (R1(2) - R2(2))**2
-        DELS = SQRT(DELSQ)
-        DELS_R1(1) = (R1(1) - R2(1)) / DELS
-        DELS_R2(1) = -(R1(1) - R2(1)) / DELS
-        DELS_R1(2) = (R1(2) - R2(2)) / DELS
-        DELS_R2(2) = -(R1(2) - R2(2)) / DELS
+        101  delsq = (r1(1) - r2(1))**2 + (r1(2) - r2(2))**2
+        dels = sqrt(delsq)
+        dels_r1(1) = (r1(1) - r2(1)) / dels
+        dels_r2(1) = -(r1(1) - r2(1)) / dels
+        dels_r1(2) = (r1(2) - r2(2)) / dels
+        dels_r2(2) = -(r1(2) - r2(2)) / dels
         !
-        DO K = 1, 2
-            QG1(K) = QG1I(K, 1) * DELS
-            QG2(K) = QG2I(K, 1) * DELS
-            QS1(K) = QS1I(K, 1) * DELS
-            QS2(K) = QS2I(K, 1) * DELS
-            DO J = 1, 2
-                QG1_R1(K, J) = QG1I_R1(K, J, 1) * DELS + QG1I(K, 1) * DELS_R1(J)
-                QG2_R1(K, J) = QG2I_R1(K, J, 1) * DELS + QG2I(K, 1) * DELS_R1(J)
-                QS1_R1(K, J) = QS1I_R1(K, J, 1) * DELS + QS1I(K, 1) * DELS_R1(J)
-                QS2_R1(K, J) = QS2I_R1(K, J, 1) * DELS + QS2I(K, 1) * DELS_R1(J)
+        do k = 1, 2
+            qg1(k) = qg1i(k, 1) * dels
+            qg2(k) = qg2i(k, 1) * dels
+            qs1(k) = qs1i(k, 1) * dels
+            qs2(k) = qs2i(k, 1) * dels
+            do j = 1, 2
+                qg1_r1(k, j) = qg1i_r1(k, j, 1) * dels + qg1i(k, 1) * dels_r1(j)
+                qg2_r1(k, j) = qg2i_r1(k, j, 1) * dels + qg2i(k, 1) * dels_r1(j)
+                qs1_r1(k, j) = qs1i_r1(k, j, 1) * dels + qs1i(k, 1) * dels_r1(j)
+                qs2_r1(k, j) = qs2i_r1(k, j, 1) * dels + qs2i(k, 1) * dels_r1(j)
                 !
-                QG1_R2(K, J) = QG1I_R2(K, J, 1) * DELS + QG1I(K, 1) * DELS_R2(J)
-                QG2_R2(K, J) = QG2I_R2(K, J, 1) * DELS + QG2I(K, 1) * DELS_R2(J)
-                QS1_R2(K, J) = QS1I_R2(K, J, 1) * DELS + QS1I(K, 1) * DELS_R2(J)
-                QS2_R2(K, J) = QS2I_R2(K, J, 1) * DELS + QS2I(K, 1) * DELS_R2(J)
+                qg1_r2(k, j) = qg1i_r2(k, j, 1) * dels + qg1i(k, 1) * dels_r2(j)
+                qg2_r2(k, j) = qg2i_r2(k, j, 1) * dels + qg2i(k, 1) * dels_r2(j)
+                qs1_r2(k, j) = qs1i_r2(k, j, 1) * dels + qs1i(k, 1) * dels_r2(j)
+                qs2_r2(k, j) = qs2i_r2(k, j, 1) * dels + qs2i(k, 1) * dels_r2(j)
                 !
-                QG1_RF(K, J) = QG1I_RF(K, J, 1) * DELS
-                QG2_RF(K, J) = QG2I_RF(K, J, 1) * DELS
-                QS1_RF(K, J) = QS1I_RF(K, J, 1) * DELS
-                QS2_RF(K, J) = QS2I_RF(K, J, 1) * DELS
-            ENDDO
-        ENDDO
+                qg1_rf(k, j) = qg1i_rf(k, j, 1) * dels
+                qg2_rf(k, j) = qg2i_rf(k, j, 1) * dels
+                qs1_rf(k, j) = qs1i_rf(k, j, 1) * dels
+                qs2_rf(k, j) = qs2i_rf(k, j, 1) * dels
+            enddo
+        enddo
         !
-    END SUBROUTINE DLAMP
+    end subroutine dlamp
     !*==DLAMPC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DLAMP
 
 
 
-    SUBROUTINE DLAMPC(R1, R2, QG1, QG1_R1, QG1_R2, QG2, QG2_R1, QG2_R2, QS1, &
-            & QS1_R1, QS1_R2, QS2, QS2_R1, QS2_R2)
-        IMPLICIT NONE
+    subroutine dlampc(r1, r2, qg1, qg1_r1, qg1_r2, qg2, qg2_r1, qg2_r2, qs1, &
+            & qs1_r1, qs1_r2, qs2, qs2_r1, qs2_r2)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NROMX = 10
-        REAL, PARAMETER :: PI = 3.14159265358979
+        integer, parameter :: nromx = 10
+        real, parameter :: pi = 3.14159265358979
         !
         ! Dummy arguments
         !
-        REAL, DIMENSION(2) :: QG1, QG2, QS1, QS2, R1, R2
-        REAL, DIMENSION(2, 2) :: QG1_R1, QG1_R2, QG2_R1, QG2_R2, &
-                & QS1_R1, QS1_R2, QS2_R1, QS2_R2
+        real, dimension(2) :: qg1, qg2, qs1, qs2, r1, r2
+        real, dimension(2, 2) :: qg1_r1, qg1_r2, qg2_r1, qg2_r2, &
+                & qs1_r1, qs1_r2, qs2_r1, qs2_r2
         !
         ! Local variables
         !
-        REAL :: DELS, DELSQ, DR1, DR2, DRSQ, DSQ, DT, ERR, &
-                & ERRUG1, ERRUG2, ERRUS1, ERRUS2, ERRVG1, ERRVG2, &
-                & ERRVS1, ERRVS2, PID4, PIR8, REFL, T, TB, W, WM1
-        REAL, DIMENSION(2) :: DELS_R1, DELS_R2, DSQ_RF, DSQ_RT, &
-                & QGA, QGAI, QGT, QSA, QSAI, QST, &
-                & RF, RT
-        INTEGER :: IROM, IT, J, K, KROM, NT
-        REAL, DIMENSION(2, NROMX) :: QG1I, QG2I, QS1I, QS2I
-        REAL, DIMENSION(2, 2, NROMX) :: QG1I_R1, QG1I_R2, QG1I_RF, &
-                & QG2I_R1, QG2I_R2, QG2I_RF, &
-                & QS1I_R1, QS1I_R2, QS1I_RF, &
-                & QS2I_R1, QS2I_R2, QS2I_RF
-        REAL, DIMENSION(2, 2) :: QGAI_R1, QGAI_R2, QGAI_RF, QGA_RF, &
-                & QGA_RT, QGT_RF, QGT_RT, QSAI_R1, &
-                & QSAI_R2, QSAI_RF, QSA_RF, QSA_RT, &
-                & QST_RF, QST_RT
-        REAL, SAVE :: ROMTOL
+        real :: dels, delsq, dr1, dr2, drsq, dsq, dt, err, &
+                & errug1, errug2, errus1, errus2, errvg1, errvg2, &
+                & errvs1, errvs2, pid4, pir8, refl, t, tb, w, wm1
+        real, dimension(2) :: dels_r1, dels_r2, dsq_rf, dsq_rt, &
+                & qga, qgai, qgt, qsa, qsai, qst, &
+                & rf, rt
+        integer :: irom, it, j, k, krom, nt
+        real, dimension(2, nromx) :: qg1i, qg2i, qs1i, qs2i
+        real, dimension(2, 2, nromx) :: qg1i_r1, qg1i_r2, qg1i_rf, &
+                & qg2i_r1, qg2i_r2, qg2i_rf, &
+                & qs1i_r1, qs1i_r2, qs1i_rf, &
+                & qs2i_r1, qs2i_r2, qs2i_rf
+        real, dimension(2, 2) :: qgai_r1, qgai_r2, qgai_rf, qga_rf, &
+                & qga_rt, qgt_rf, qgt_rt, qsai_r1, &
+                & qsai_r2, qsai_rf, qsa_rf, qsa_rt, &
+                & qst_rf, qst_rt
+        real, save :: romtol
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -1132,199 +1132,199 @@ contains
         !
         !
         !---- Romberg convergence tolerance
-        DATA ROMTOL/1.0E-6/
+        data romtol/1.0e-6/
         !cc   DATA ROMTOL / 1.0E-12 /
         !
         !---- reference length for convergence tolerance
-        REFL = 0.5 * (R1(2) + R2(2))
+        refl = 0.5 * (r1(2) + r2(2))
         !
-        RF(1) = 0.5 * (R1(1) + R2(1))
-        RF(2) = 0.5 * (R1(2) + R2(2))
+        rf(1) = 0.5 * (r1(1) + r2(1))
+        rf(2) = 0.5 * (r1(2) + r2(2))
         !
         !---- evaluate integrals over  0..t..1  on increasingly fine grids
-        DO IROM = 1, NROMX
-            NT = 2**IROM
+        do irom = 1, nromx
+            nt = 2**irom
             !
-            DO K = 1, 2
-                QG1I(K, IROM) = 0.
-                QG2I(K, IROM) = 0.
-                QS1I(K, IROM) = 0.
-                QS2I(K, IROM) = 0.
-                DO J = 1, 2
-                    QG1I_R1(K, J, IROM) = 0.
-                    QG2I_R1(K, J, IROM) = 0.
-                    QS1I_R1(K, J, IROM) = 0.
-                    QS2I_R1(K, J, IROM) = 0.
-                    QG1I_R2(K, J, IROM) = 0.
-                    QG2I_R2(K, J, IROM) = 0.
-                    QS1I_R2(K, J, IROM) = 0.
-                    QS2I_R2(K, J, IROM) = 0.
-                    QG1I_RF(K, J, IROM) = 0.
-                    QG2I_RF(K, J, IROM) = 0.
-                    QS1I_RF(K, J, IROM) = 0.
-                    QS2I_RF(K, J, IROM) = 0.
-                ENDDO
-            ENDDO
+            do k = 1, 2
+                qg1i(k, irom) = 0.
+                qg2i(k, irom) = 0.
+                qs1i(k, irom) = 0.
+                qs2i(k, irom) = 0.
+                do j = 1, 2
+                    qg1i_r1(k, j, irom) = 0.
+                    qg2i_r1(k, j, irom) = 0.
+                    qs1i_r1(k, j, irom) = 0.
+                    qs2i_r1(k, j, irom) = 0.
+                    qg1i_r2(k, j, irom) = 0.
+                    qg2i_r2(k, j, irom) = 0.
+                    qs1i_r2(k, j, irom) = 0.
+                    qs2i_r2(k, j, irom) = 0.
+                    qg1i_rf(k, j, irom) = 0.
+                    qg2i_rf(k, j, irom) = 0.
+                    qs1i_rf(k, j, irom) = 0.
+                    qs2i_rf(k, j, irom) = 0.
+                enddo
+            enddo
             !
             !------ visit the midpoints of each of the NT intervals
-            DO IT = 1, NT
-                T = (FLOAT(IT) - 0.5) / FLOAT(NT)
-                TB = 1.0 - T
+            do it = 1, nt
+                t = (float(it) - 0.5) / float(nt)
+                tb = 1.0 - t
                 !
-                DT = 1.0 / FLOAT(NT)
+                dt = 1.0 / float(nt)
                 !
-                RT(1) = R1(1) * TB + R2(1) * T
-                RT(2) = R1(2) * TB + R2(2) * T
+                rt(1) = r1(1) * tb + r2(1) * t
+                rt(2) = r1(2) * tb + r2(2) * t
                 !
                 !-------- get induced velocities for vortex,source ring at XT,RT
-                CALL DRING(RT(1), RT(2), RF(1), RF(2), QGT(1), QGT_RT(1, 1), &
-                        & QGT_RT(1, 2), QGT_RF(1, 1), QGT_RF(1, 2), QGT(2), &
-                        & QGT_RT(2, 1), QGT_RT(2, 2), QGT_RF(2, 1), QGT_RF(2, 2), &
-                        & QST(1), QST_RT(1, 1), QST_RT(1, 2), QST_RF(1, 1), &
-                        & QST_RF(1, 2), QST(2), QST_RT(2, 1), QST_RT(2, 2), &
-                        & QST_RF(2, 1), QST_RF(2, 2))
+                call dring(rt(1), rt(2), rf(1), rf(2), qgt(1), qgt_rt(1, 1), &
+                        & qgt_rt(1, 2), qgt_rf(1, 1), qgt_rf(1, 2), qgt(2), &
+                        & qgt_rt(2, 1), qgt_rt(2, 2), qgt_rf(2, 1), qgt_rf(2, 2), &
+                        & qst(1), qst_rt(1, 1), qst_rt(1, 2), qst_rf(1, 1), &
+                        & qst_rf(1, 2), qst(2), qst_rt(2, 1), qst_rt(2, 2), &
+                        & qst_rf(2, 1), qst_rf(2, 2))
                 !
                 !-------- singular parts of velocities in the limit  XT,RT -> XF,RF
-                DSQ = (RT(1) - RF(1))**2 + (RT(2) - RF(2))**2
-                DSQ_RT(1) = 2.0 * (RT(1) - RF(1))
-                DSQ_RT(2) = 2.0 * (RT(2) - RF(2))
-                DSQ_RF(1) = -2.0 * (RT(1) - RF(1))
-                DSQ_RF(2) = -2.0 * (RT(2) - RF(2))
+                dsq = (rt(1) - rf(1))**2 + (rt(2) - rf(2))**2
+                dsq_rt(1) = 2.0 * (rt(1) - rf(1))
+                dsq_rt(2) = 2.0 * (rt(2) - rf(2))
+                dsq_rf(1) = -2.0 * (rt(1) - rf(1))
+                dsq_rf(2) = -2.0 * (rt(2) - rf(2))
                 !
                 !
-                PID4 = 4.0 * PI * DSQ
-                PIR8 = 8.0 * PI * RF(2)
-                DRSQ = DSQ / RF(2)**2
+                pid4 = 4.0 * pi * dsq
+                pir8 = 8.0 * pi * rf(2)
+                drsq = dsq / rf(2)**2
                 !
-                DR1 = (RT(1) - RF(1)) / PID4
-                DR2 = (RT(2) - RF(2)) / PID4
+                dr1 = (rt(1) - rf(1)) / pid4
+                dr2 = (rt(2) - rf(2)) / pid4
                 !
-                QGA(1) = DR2 - 0.5 * LOG(DRSQ / 64.0) / PIR8
-                QGA(2) = -DR1
-                QSA(1) = -DR1
-                QSA(2) = -DR2 - 0.5 * LOG(DRSQ) / PIR8
+                qga(1) = dr2 - 0.5 * log(drsq / 64.0) / pir8
+                qga(2) = -dr1
+                qsa(1) = -dr1
+                qsa(2) = -dr2 - 0.5 * log(drsq) / pir8
                 !
-                QGA_RT(1, 1) = (-DR2 - 0.5 / PIR8) / DSQ * DSQ_RT(1)
-                QGA_RT(1, 2) = (-DR2 - 0.5 / PIR8) / DSQ * DSQ_RT(2) + 1.0 / PID4
-                QGA_RF(1, 1) = (-DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(1)
-                QGA_RF(1, 2) = (-DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(2) - 1.0 / PID4 + &
-                        & (1.0 + 0.5 * LOG(DRSQ / 64.0)) / (RF(2) * PIR8)
+                qga_rt(1, 1) = (-dr2 - 0.5 / pir8) / dsq * dsq_rt(1)
+                qga_rt(1, 2) = (-dr2 - 0.5 / pir8) / dsq * dsq_rt(2) + 1.0 / pid4
+                qga_rf(1, 1) = (-dr2 - 0.5 / pir8) / dsq * dsq_rf(1)
+                qga_rf(1, 2) = (-dr2 - 0.5 / pir8) / dsq * dsq_rf(2) - 1.0 / pid4 + &
+                        & (1.0 + 0.5 * log(drsq / 64.0)) / (rf(2) * pir8)
                 !
-                QGA_RT(2, 1) = DR1 / DSQ * DSQ_RT(1) - 1.0 / PID4
-                QGA_RT(2, 2) = DR1 / DSQ * DSQ_RT(2)
-                QGA_RF(2, 1) = DR1 / DSQ * DSQ_RF(1) + 1.0 / PID4
-                QGA_RF(2, 2) = DR1 / DSQ * DSQ_RF(2)
+                qga_rt(2, 1) = dr1 / dsq * dsq_rt(1) - 1.0 / pid4
+                qga_rt(2, 2) = dr1 / dsq * dsq_rt(2)
+                qga_rf(2, 1) = dr1 / dsq * dsq_rf(1) + 1.0 / pid4
+                qga_rf(2, 2) = dr1 / dsq * dsq_rf(2)
                 !
-                QSA_RT(1, 1) = DR1 / DSQ * DSQ_RT(1) - 1.0 / PID4
-                QSA_RT(1, 2) = DR1 / DSQ * DSQ_RT(2)
-                QSA_RF(1, 1) = DR1 / DSQ * DSQ_RF(1) + 1.0 / PID4
-                QSA_RF(1, 2) = DR1 / DSQ * DSQ_RF(2)
+                qsa_rt(1, 1) = dr1 / dsq * dsq_rt(1) - 1.0 / pid4
+                qsa_rt(1, 2) = dr1 / dsq * dsq_rt(2)
+                qsa_rf(1, 1) = dr1 / dsq * dsq_rf(1) + 1.0 / pid4
+                qsa_rf(1, 2) = dr1 / dsq * dsq_rf(2)
                 !
-                QSA_RT(2, 1) = (DR2 - 0.5 / PIR8) / DSQ * DSQ_RT(1)
-                QSA_RT(2, 2) = (DR2 - 0.5 / PIR8) / DSQ * DSQ_RT(2) - 1.0 / PID4
-                QSA_RF(2, 1) = (DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(1)
-                QSA_RF(2, 2) = (DR2 - 0.5 / PIR8) / DSQ * DSQ_RF(2) + 1.0 / PID4 + &
-                        & (1.0 + 0.5 * LOG(DRSQ)) / (RF(2) * PIR8)
+                qsa_rt(2, 1) = (dr2 - 0.5 / pir8) / dsq * dsq_rt(1)
+                qsa_rt(2, 2) = (dr2 - 0.5 / pir8) / dsq * dsq_rt(2) - 1.0 / pid4
+                qsa_rf(2, 1) = (dr2 - 0.5 / pir8) / dsq * dsq_rf(1)
+                qsa_rf(2, 2) = (dr2 - 0.5 / pir8) / dsq * dsq_rf(2) + 1.0 / pid4 + &
+                        & (1.0 + 0.5 * log(drsq)) / (rf(2) * pir8)
                 !
                 !-------- accumulate integrals, with singular parts (at t=0.5) removed
-                DO K = 1, 2
-                    QG1I(K, IROM) = QG1I(K, IROM) + DT * (QGT(K) * TB - QGA(K))
-                    QG2I(K, IROM) = QG2I(K, IROM) + DT * (QGT(K) * T - QGA(K))
-                    QS1I(K, IROM) = QS1I(K, IROM) + DT * (QST(K) * TB - QSA(K))
-                    QS2I(K, IROM) = QS2I(K, IROM) + DT * (QST(K) * T - QSA(K))
-                    DO J = 1, 2
-                        QG1I_R1(K, J, IROM) = QG1I_R1(K, J, IROM)                 &
-                                & + DT * (QGT_RT(K, J) * TB - QGA_RT(K, J)) &
-                                        & * TB
-                        QG2I_R1(K, J, IROM) = QG2I_R1(K, J, IROM)                 &
-                                & + DT * (QGT_RT(K, J) * T - QGA_RT(K, J))  &
-                                        & * TB
-                        QS1I_R1(K, J, IROM) = QS1I_R1(K, J, IROM)                 &
-                                & + DT * (QST_RT(K, J) * TB - QSA_RT(K, J)) &
-                                        & * TB
-                        QS2I_R1(K, J, IROM) = QS2I_R1(K, J, IROM)                 &
-                                & + DT * (QST_RT(K, J) * T - QSA_RT(K, J))  &
-                                        & * TB
+                do k = 1, 2
+                    qg1i(k, irom) = qg1i(k, irom) + dt * (qgt(k) * tb - qga(k))
+                    qg2i(k, irom) = qg2i(k, irom) + dt * (qgt(k) * t - qga(k))
+                    qs1i(k, irom) = qs1i(k, irom) + dt * (qst(k) * tb - qsa(k))
+                    qs2i(k, irom) = qs2i(k, irom) + dt * (qst(k) * t - qsa(k))
+                    do j = 1, 2
+                        qg1i_r1(k, j, irom) = qg1i_r1(k, j, irom)                 &
+                                & + dt * (qgt_rt(k, j) * tb - qga_rt(k, j)) &
+                                        & * tb
+                        qg2i_r1(k, j, irom) = qg2i_r1(k, j, irom)                 &
+                                & + dt * (qgt_rt(k, j) * t - qga_rt(k, j))  &
+                                        & * tb
+                        qs1i_r1(k, j, irom) = qs1i_r1(k, j, irom)                 &
+                                & + dt * (qst_rt(k, j) * tb - qsa_rt(k, j)) &
+                                        & * tb
+                        qs2i_r1(k, j, irom) = qs2i_r1(k, j, irom)                 &
+                                & + dt * (qst_rt(k, j) * t - qsa_rt(k, j))  &
+                                        & * tb
                         !
-                        QG1I_R2(K, J, IROM) = QG1I_R2(K, J, IROM)                 &
-                                & + DT * (QGT_RT(K, J) * TB - QGA_RT(K, J)) &
-                                        & * T
-                        QG2I_R2(K, J, IROM) = QG2I_R2(K, J, IROM)                 &
-                                & + DT * (QGT_RT(K, J) * T - QGA_RT(K, J)) * T
-                        QS1I_R2(K, J, IROM) = QS1I_R2(K, J, IROM)                 &
-                                & + DT * (QST_RT(K, J) * TB - QSA_RT(K, J)) &
-                                        & * T
-                        QS2I_R2(K, J, IROM) = QS2I_R2(K, J, IROM)                 &
-                                & + DT * (QST_RT(K, J) * T - QSA_RT(K, J)) * T
+                        qg1i_r2(k, j, irom) = qg1i_r2(k, j, irom)                 &
+                                & + dt * (qgt_rt(k, j) * tb - qga_rt(k, j)) &
+                                        & * t
+                        qg2i_r2(k, j, irom) = qg2i_r2(k, j, irom)                 &
+                                & + dt * (qgt_rt(k, j) * t - qga_rt(k, j)) * t
+                        qs1i_r2(k, j, irom) = qs1i_r2(k, j, irom)                 &
+                                & + dt * (qst_rt(k, j) * tb - qsa_rt(k, j)) &
+                                        & * t
+                        qs2i_r2(k, j, irom) = qs2i_r2(k, j, irom)                 &
+                                & + dt * (qst_rt(k, j) * t - qsa_rt(k, j)) * t
                         !
-                        QG1I_RF(K, J, IROM) = QG1I_RF(K, J, IROM)                 &
-                                & + DT * (QGT_RF(K, J) * TB - QGA_RF(K, J))
-                        QG2I_RF(K, J, IROM) = QG2I_RF(K, J, IROM)                 &
-                                & + DT * (QGT_RF(K, J) * T - QGA_RF(K, J))
-                        QS1I_RF(K, J, IROM) = QS1I_RF(K, J, IROM)                 &
-                                & + DT * (QST_RF(K, J) * TB - QSA_RF(K, J))
-                        QS2I_RF(K, J, IROM) = QS2I_RF(K, J, IROM)                 &
-                                & + DT * (QST_RF(K, J) * T - QSA_RF(K, J))
-                    ENDDO
-                ENDDO
-            ENDDO
+                        qg1i_rf(k, j, irom) = qg1i_rf(k, j, irom)                 &
+                                & + dt * (qgt_rf(k, j) * tb - qga_rf(k, j))
+                        qg2i_rf(k, j, irom) = qg2i_rf(k, j, irom)                 &
+                                & + dt * (qgt_rf(k, j) * t - qga_rf(k, j))
+                        qs1i_rf(k, j, irom) = qs1i_rf(k, j, irom)                 &
+                                & + dt * (qst_rf(k, j) * tb - qsa_rf(k, j))
+                        qs2i_rf(k, j, irom) = qs2i_rf(k, j, irom)                 &
+                                & + dt * (qst_rf(k, j) * t - qsa_rf(k, j))
+                    enddo
+                enddo
+            enddo
             !
             !------ Romberg sequence using all previous grid results
-            DO KROM = IROM, 2, -1
+            do krom = irom, 2, -1
                 !-------- weight needed to cancel lowest-order error terms in KROM level
-                W = 2.0**(2 * (IROM - KROM + 1))
-                WM1 = W - 1.0
+                w = 2.0**(2 * (irom - krom + 1))
+                wm1 = w - 1.0
                 !
                 !-------- put Richardson extrapolation for KROM level into KROM-1 level
-                DO K = 1, 2
-                    QG1I(K, KROM - 1) = (W * QG1I(K, KROM) - QG1I(K, KROM - 1)) / WM1
-                    QG2I(K, KROM - 1) = (W * QG2I(K, KROM) - QG2I(K, KROM - 1)) / WM1
-                    QS1I(K, KROM - 1) = (W * QS1I(K, KROM) - QS1I(K, KROM - 1)) / WM1
-                    QS2I(K, KROM - 1) = (W * QS2I(K, KROM) - QS2I(K, KROM - 1)) / WM1
-                    DO J = 1, 2
-                        QG1I_R1(K, J, KROM - 1) = (W * QG1I_R1(K, J, KROM) - QG1I_R1(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_R1(K, J, KROM - 1) = (W * QG2I_R1(K, J, KROM) - QG2I_R1(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_R1(K, J, KROM - 1) = (W * QS1I_R1(K, J, KROM) - QS1I_R1(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_R1(K, J, KROM - 1) = (W * QS2I_R1(K, J, KROM) - QS2I_R1(K, J&
-                                &, KROM - 1)) / WM1
+                do k = 1, 2
+                    qg1i(k, krom - 1) = (w * qg1i(k, krom) - qg1i(k, krom - 1)) / wm1
+                    qg2i(k, krom - 1) = (w * qg2i(k, krom) - qg2i(k, krom - 1)) / wm1
+                    qs1i(k, krom - 1) = (w * qs1i(k, krom) - qs1i(k, krom - 1)) / wm1
+                    qs2i(k, krom - 1) = (w * qs2i(k, krom) - qs2i(k, krom - 1)) / wm1
+                    do j = 1, 2
+                        qg1i_r1(k, j, krom - 1) = (w * qg1i_r1(k, j, krom) - qg1i_r1(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_r1(k, j, krom - 1) = (w * qg2i_r1(k, j, krom) - qg2i_r1(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_r1(k, j, krom - 1) = (w * qs1i_r1(k, j, krom) - qs1i_r1(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_r1(k, j, krom - 1) = (w * qs2i_r1(k, j, krom) - qs2i_r1(k, j&
+                                &, krom - 1)) / wm1
                         !
-                        QG1I_R2(K, J, KROM - 1) = (W * QG1I_R2(K, J, KROM) - QG1I_R2(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_R2(K, J, KROM - 1) = (W * QG2I_R2(K, J, KROM) - QG2I_R2(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_R2(K, J, KROM - 1) = (W * QS1I_R2(K, J, KROM) - QS1I_R2(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_R2(K, J, KROM - 1) = (W * QS2I_R2(K, J, KROM) - QS2I_R2(K, J&
-                                &, KROM - 1)) / WM1
+                        qg1i_r2(k, j, krom - 1) = (w * qg1i_r2(k, j, krom) - qg1i_r2(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_r2(k, j, krom - 1) = (w * qg2i_r2(k, j, krom) - qg2i_r2(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_r2(k, j, krom - 1) = (w * qs1i_r2(k, j, krom) - qs1i_r2(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_r2(k, j, krom - 1) = (w * qs2i_r2(k, j, krom) - qs2i_r2(k, j&
+                                &, krom - 1)) / wm1
                         !
-                        QG1I_RF(K, J, KROM - 1) = (W * QG1I_RF(K, J, KROM) - QG1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QG2I_RF(K, J, KROM - 1) = (W * QG2I_RF(K, J, KROM) - QG2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS1I_RF(K, J, KROM - 1) = (W * QS1I_RF(K, J, KROM) - QS1I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                        QS2I_RF(K, J, KROM - 1) = (W * QS2I_RF(K, J, KROM) - QS2I_RF(K, J&
-                                &, KROM - 1)) / WM1
-                    ENDDO
-                ENDDO
-            ENDDO
+                        qg1i_rf(k, j, krom - 1) = (w * qg1i_rf(k, j, krom) - qg1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qg2i_rf(k, j, krom - 1) = (w * qg2i_rf(k, j, krom) - qg2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs1i_rf(k, j, krom - 1) = (w * qs1i_rf(k, j, krom) - qs1i_rf(k, j&
+                                &, krom - 1)) / wm1
+                        qs2i_rf(k, j, krom - 1) = (w * qs2i_rf(k, j, krom) - qs2i_rf(k, j&
+                                &, krom - 1)) / wm1
+                    enddo
+                enddo
+            enddo
             !
-            IF (IROM>1) THEN
+            if (irom>1) then
                 !------- compare the best-current and best-previous integrals
-                ERRUG1 = QG1I(1, 1) - QG1I(1, 2)
-                ERRVG1 = QG1I(2, 1) - QG1I(2, 2)
-                ERRUG2 = QG2I(1, 1) - QG2I(1, 2)
-                ERRVG2 = QG2I(2, 1) - QG2I(2, 2)
-                ERRUS1 = QS1I(1, 1) - QS1I(1, 2)
-                ERRVS1 = QS1I(2, 1) - QS1I(2, 2)
-                ERRUS2 = QS2I(1, 1) - QS2I(1, 2)
-                ERRVS2 = QS2I(2, 1) - QS2I(2, 2)
+                errug1 = qg1i(1, 1) - qg1i(1, 2)
+                errvg1 = qg1i(2, 1) - qg1i(2, 2)
+                errug2 = qg2i(1, 1) - qg2i(1, 2)
+                errvg2 = qg2i(2, 1) - qg2i(2, 2)
+                errus1 = qs1i(1, 1) - qs1i(1, 2)
+                errvs1 = qs1i(2, 1) - qs1i(2, 2)
+                errus2 = qs2i(1, 1) - qs2i(1, 2)
+                errvs2 = qs2i(2, 1) - qs2i(2, 2)
                 !
-                ERR = MAX(ABS(ERRUG1), ABS(ERRVG1), ABS(ERRUG2), ABS(ERRVG2), &
-                        & ABS(ERRUS1), ABS(ERRVS1), ABS(ERRUS2), ABS(ERRVS2))
+                err = max(abs(errug1), abs(errvg1), abs(errug2), abs(errvg2), &
+                        & abs(errus1), abs(errvs1), abs(errus2), abs(errvs2))
 
                 !         write(13,1200)
                 !     &     ABS(ERRUG1),
@@ -1337,107 +1337,107 @@ contains
                 !     &     ABS(ERRVS2)
                 ! 1200    format(8e16.9)
 
-                IF (ERR * REFL<ROMTOL) GOTO 101
-            ENDIF
-        ENDDO
-        WRITE (*, *) 'DLAMPC: Romberg convergence failed.  Error =', ERR
+                if (err * refl<romtol) goto 101
+            endif
+        enddo
+        write (*, *) 'DLAMPC: Romberg convergence failed.  Error =', err
         !
 
         !cc      write(*,*) IROM, ERR
         !
         !---- return best final results
-        101  DELSQ = (R1(1) - R2(1))**2 + (R1(2) - R2(2))**2
-        DELS = SQRT(DELSQ)
-        DELS_R1(1) = (R1(1) - R2(1)) / DELS
-        DELS_R2(1) = -(R1(1) - R2(1)) / DELS
-        DELS_R1(2) = (R1(2) - R2(2)) / DELS
-        DELS_R2(2) = -(R1(2) - R2(2)) / DELS
+        101  delsq = (r1(1) - r2(1))**2 + (r1(2) - r2(2))**2
+        dels = sqrt(delsq)
+        dels_r1(1) = (r1(1) - r2(1)) / dels
+        dels_r2(1) = -(r1(1) - r2(1)) / dels
+        dels_r1(2) = (r1(2) - r2(2)) / dels
+        dels_r2(2) = -(r1(2) - r2(2)) / dels
         !
         !---- analytically-integrated singular parts which were removed
-        QGAI(1) = (1.0 + LOG(16.0 * RF(2) / DELS)) / (8.0 * PI * RF(2))
-        QGAI(2) = 0.
-        QSAI(1) = 0.
-        QSAI(2) = (1.0 + LOG(2.0 * RF(2) / DELS)) / (8.0 * PI * RF(2))
-        DO J = 1, 2
-            QGAI_R1(1, J) = (-DELS_R1(J) / DELS) / (8.0 * PI * RF(2))
-            QGAI_R1(2, J) = 0.
-            QSAI_R1(1, J) = 0.
-            QSAI_R1(2, J) = (-DELS_R1(J) / DELS) / (8.0 * PI * RF(2))
+        qgai(1) = (1.0 + log(16.0 * rf(2) / dels)) / (8.0 * pi * rf(2))
+        qgai(2) = 0.
+        qsai(1) = 0.
+        qsai(2) = (1.0 + log(2.0 * rf(2) / dels)) / (8.0 * pi * rf(2))
+        do j = 1, 2
+            qgai_r1(1, j) = (-dels_r1(j) / dels) / (8.0 * pi * rf(2))
+            qgai_r1(2, j) = 0.
+            qsai_r1(1, j) = 0.
+            qsai_r1(2, j) = (-dels_r1(j) / dels) / (8.0 * pi * rf(2))
             !
-            QGAI_R2(1, J) = (-DELS_R2(J) / DELS) / (8.0 * PI * RF(2))
-            QGAI_R2(2, J) = 0.
-            QSAI_R2(1, J) = 0.
-            QSAI_R2(2, J) = (-DELS_R2(J) / DELS) / (8.0 * PI * RF(2))
-        ENDDO
+            qgai_r2(1, j) = (-dels_r2(j) / dels) / (8.0 * pi * rf(2))
+            qgai_r2(2, j) = 0.
+            qsai_r2(1, j) = 0.
+            qsai_r2(2, j) = (-dels_r2(j) / dels) / (8.0 * pi * rf(2))
+        enddo
         !
-        QGAI_RF(1, 1) = 0.
-        QGAI_RF(2, 1) = 0.
-        QSAI_RF(1, 1) = 0.
-        QSAI_RF(2, 1) = 0.
+        qgai_rf(1, 1) = 0.
+        qgai_rf(2, 1) = 0.
+        qsai_rf(1, 1) = 0.
+        qsai_rf(2, 1) = 0.
         !
-        QGAI_RF(1, 2) = (1.0 / RF(2)) / (8.0 * PI * RF(2)) - QGAI(1) / RF(2)
-        QGAI_RF(2, 2) = 0.
-        QSAI_RF(1, 2) = 0.
-        QSAI_RF(2, 2) = (1.0 / RF(2)) / (8.0 * PI * RF(2)) - QSAI(2) / RF(2)
+        qgai_rf(1, 2) = (1.0 / rf(2)) / (8.0 * pi * rf(2)) - qgai(1) / rf(2)
+        qgai_rf(2, 2) = 0.
+        qsai_rf(1, 2) = 0.
+        qsai_rf(2, 2) = (1.0 / rf(2)) / (8.0 * pi * rf(2)) - qsai(2) / rf(2)
         !
         !
-        DO K = 1, 2
-            QG1(K) = (QG1I(K, 1) + QGAI(K)) * DELS
-            QG2(K) = (QG2I(K, 1) + QGAI(K)) * DELS
-            QS1(K) = (QS1I(K, 1) + QSAI(K)) * DELS
-            QS2(K) = (QS2I(K, 1) + QSAI(K)) * DELS
-            DO J = 1, 2
-                QG1_R1(K, J) = (QG1I_R1(K, J, 1) + QGAI_R1(K, J))                 &
-                        & * DELS + (QG1I(K, 1) + QGAI(K)) * DELS_R1(J)        &
-                        & + 0.5 * (QG1I_RF(K, J, 1) + QGAI_RF(K, J)) * DELS
-                QG2_R1(K, J) = (QG2I_R1(K, J, 1) + QGAI_R1(K, J))                 &
-                        & * DELS + (QG2I(K, 1) + QGAI(K)) * DELS_R1(J)        &
-                        & + 0.5 * (QG2I_RF(K, J, 1) + QGAI_RF(K, J)) * DELS
-                QS1_R1(K, J) = (QS1I_R1(K, J, 1) + QSAI_R1(K, J))                 &
-                        & * DELS + (QS1I(K, 1) + QSAI(K)) * DELS_R1(J)        &
-                        & + 0.5 * (QS1I_RF(K, J, 1) + QSAI_RF(K, J)) * DELS
-                QS2_R1(K, J) = (QS2I_R1(K, J, 1) + QSAI_R1(K, J))                 &
-                        & * DELS + (QS2I(K, 1) + QSAI(K)) * DELS_R1(J)        &
-                        & + 0.5 * (QS2I_RF(K, J, 1) + QSAI_RF(K, J)) * DELS
+        do k = 1, 2
+            qg1(k) = (qg1i(k, 1) + qgai(k)) * dels
+            qg2(k) = (qg2i(k, 1) + qgai(k)) * dels
+            qs1(k) = (qs1i(k, 1) + qsai(k)) * dels
+            qs2(k) = (qs2i(k, 1) + qsai(k)) * dels
+            do j = 1, 2
+                qg1_r1(k, j) = (qg1i_r1(k, j, 1) + qgai_r1(k, j))                 &
+                        & * dels + (qg1i(k, 1) + qgai(k)) * dels_r1(j)        &
+                        & + 0.5 * (qg1i_rf(k, j, 1) + qgai_rf(k, j)) * dels
+                qg2_r1(k, j) = (qg2i_r1(k, j, 1) + qgai_r1(k, j))                 &
+                        & * dels + (qg2i(k, 1) + qgai(k)) * dels_r1(j)        &
+                        & + 0.5 * (qg2i_rf(k, j, 1) + qgai_rf(k, j)) * dels
+                qs1_r1(k, j) = (qs1i_r1(k, j, 1) + qsai_r1(k, j))                 &
+                        & * dels + (qs1i(k, 1) + qsai(k)) * dels_r1(j)        &
+                        & + 0.5 * (qs1i_rf(k, j, 1) + qsai_rf(k, j)) * dels
+                qs2_r1(k, j) = (qs2i_r1(k, j, 1) + qsai_r1(k, j))                 &
+                        & * dels + (qs2i(k, 1) + qsai(k)) * dels_r1(j)        &
+                        & + 0.5 * (qs2i_rf(k, j, 1) + qsai_rf(k, j)) * dels
                 !
-                QG1_R2(K, J) = (QG1I_R2(K, J, 1) + QGAI_R2(K, J))                 &
-                        & * DELS + (QG1I(K, 1) + QGAI(K)) * DELS_R2(J)        &
-                        & + 0.5 * (QG1I_RF(K, J, 1) + QGAI_RF(K, J)) * DELS
-                QG2_R2(K, J) = (QG2I_R2(K, J, 1) + QGAI_R2(K, J))                 &
-                        & * DELS + (QG2I(K, 1) + QGAI(K)) * DELS_R2(J)        &
-                        & + 0.5 * (QG2I_RF(K, J, 1) + QGAI_RF(K, J)) * DELS
-                QS1_R2(K, J) = (QS1I_R2(K, J, 1) + QSAI_R2(K, J))                 &
-                        & * DELS + (QS1I(K, 1) + QSAI(K)) * DELS_R2(J)        &
-                        & + 0.5 * (QS1I_RF(K, J, 1) + QSAI_RF(K, J)) * DELS
-                QS2_R2(K, J) = (QS2I_R2(K, J, 1) + QSAI_R2(K, J))                 &
-                        & * DELS + (QS2I(K, 1) + QSAI(K)) * DELS_R2(J)        &
-                        & + 0.5 * (QS2I_RF(K, J, 1) + QSAI_RF(K, J)) * DELS
-            ENDDO
-        ENDDO
+                qg1_r2(k, j) = (qg1i_r2(k, j, 1) + qgai_r2(k, j))                 &
+                        & * dels + (qg1i(k, 1) + qgai(k)) * dels_r2(j)        &
+                        & + 0.5 * (qg1i_rf(k, j, 1) + qgai_rf(k, j)) * dels
+                qg2_r2(k, j) = (qg2i_r2(k, j, 1) + qgai_r2(k, j))                 &
+                        & * dels + (qg2i(k, 1) + qgai(k)) * dels_r2(j)        &
+                        & + 0.5 * (qg2i_rf(k, j, 1) + qgai_rf(k, j)) * dels
+                qs1_r2(k, j) = (qs1i_r2(k, j, 1) + qsai_r2(k, j))                 &
+                        & * dels + (qs1i(k, 1) + qsai(k)) * dels_r2(j)        &
+                        & + 0.5 * (qs1i_rf(k, j, 1) + qsai_rf(k, j)) * dels
+                qs2_r2(k, j) = (qs2i_r2(k, j, 1) + qsai_r2(k, j))                 &
+                        & * dels + (qs2i(k, 1) + qsai(k)) * dels_r2(j)        &
+                        & + 0.5 * (qs2i_rf(k, j, 1) + qsai_rf(k, j)) * dels
+            enddo
+        enddo
         !
-    END SUBROUTINE DLAMPC
+    end subroutine dlampc
     !*==RING.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! DLAMPC
 
 
 
 
-    SUBROUTINE RING(XV, RV, XF, RF, UX, UR, SX, SR)
-        IMPLICIT NONE
+    subroutine ring(xv, rv, xf, rf, ux, ur, sx, sr)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        REAL, PARAMETER :: PI = 3.14159265358979
+        real, parameter :: pi = 3.14159265358979
         !
         ! Dummy arguments
         !
-        REAL :: RF, RV, SR, SX, UR, UX, XF, XV
+        real :: rf, rv, sr, sx, ur, ux, xf, xv
         !
         ! Local variables
         !
-        REAL :: AK, ELE, ELK, F, R, SRP, X, XRM, XRP
+        real :: ak, ele, elk, f, r, srp, x, xrm, xrp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -1457,85 +1457,85 @@ contains
         !     SX,SR  velocity at XF,RF for unit source/perimeter
         !-----------------------------------------------------------------------
         !
-        IF (RV<=0.0) THEN
+        if (rv<=0.0) then
             !------ zero-radius ring
-            UX = 0.
-            UR = 0.
-            SX = 0.
-            SR = 0.
-            RETURN
-        ENDIF
+            ux = 0.
+            ur = 0.
+            sx = 0.
+            sr = 0.
+            return
+        endif
         !
         !---- this fails if R=1 and X=0  (on the ring itself)
-        R = RF / RV
-        X = (XV - XF) / RV
+        r = rf / rv
+        x = (xv - xf) / rv
         !
-        IF (R==1.0 .AND. X==0.0) THEN
-            UX = 0.
-            UR = 0.
-            SX = 0.
-            SR = 0.
-            RETURN
-        ENDIF
+        if (r==1.0 .and. x==0.0) then
+            ux = 0.
+            ur = 0.
+            sx = 0.
+            sr = 0.
+            return
+        endif
         !
-        IF (RF==0.0) THEN
+        if (rf==0.0) then
             !----- Control Point on the axis
-            UX = 1.0 / SQRT(1.0 + X**2)**3 / (2.0 * RV)
-            UR = 0.0
-            SX = -X / SQRT(1.0 + X**2)**3 / (2.0 * RV)
-            SR = 0.0
+            ux = 1.0 / sqrt(1.0 + x**2)**3 / (2.0 * rv)
+            ur = 0.0
+            sx = -x / sqrt(1.0 + x**2)**3 / (2.0 * rv)
+            sr = 0.0
             !
-        ELSE
+        else
             !----- Control Point not on X-axis
-            XRP = X**2 + (1.0 + R)**2
-            XRM = X**2 + (1.0 - R)**2
+            xrp = x**2 + (1.0 + r)**2
+            xrm = x**2 + (1.0 - r)**2
             !
-            SRP = SQRT(XRP)
+            srp = sqrt(xrp)
             !
-            AK = XRM / XRP
-            CALL ELLEK(AK, ELE, ELK)
+            ak = xrm / xrp
+            call ellek(ak, ele, elk)
             !
-            F = 2.0 / XRM
+            f = 2.0 / xrm
             !
-            UX = (1.0 / SRP) * (ELK - ELE * (1.0 + F * (R - 1.0))) / (2.0 * PI * RV)
-            UR = (X / (SRP * R)) * (ELK - ELE * (1.0 + F * R)) / (2.0 * PI * RV)
+            ux = (1.0 / srp) * (elk - ele * (1.0 + f * (r - 1.0))) / (2.0 * pi * rv)
+            ur = (x / (srp * r)) * (elk - ele * (1.0 + f * r)) / (2.0 * pi * rv)
             !
-            SX = (X / SRP) * (-ELE * F) / (2.0 * PI * RV)
-            SR = (1.0 / (SRP * R)) * (ELK - ELE * (1.0 + F * (R - R * R))) / (2.0 * PI * RV)
+            sx = (x / srp) * (-ele * f) / (2.0 * pi * rv)
+            sr = (1.0 / (srp * r)) * (elk - ele * (1.0 + f * (r - r * r))) / (2.0 * pi * rv)
             !
             !cC----- streamfunction due to vortex
             !c       PSI = ((1.0 - 2.0*XRP*R)*ELK - ELE)*RV / (2.0*PI*SQRT(XRP))
-        ENDIF
+        endif
         !
-    END SUBROUTINE RING
+    end subroutine ring
     !*==DRING.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE DRING(XV, RV, XF, RF, UX, UX_XV, UX_RV, UX_XF, UX_RF, UR, UR_XV, &
-            & UR_RV, UR_XF, UR_RF, SX, SX_XV, SX_RV, SX_XF, SX_RF, SR, &
-            & SR_XV, SR_RV, SR_XF, SR_RF)
-        IMPLICIT NONE
+    subroutine dring(xv, rv, xf, rf, ux, ux_xv, ux_rv, ux_xf, ux_rf, ur, ur_xv, &
+            & ur_rv, ur_xf, ur_rf, sx, sx_xv, sx_rv, sx_xf, sx_rf, sr, &
+            & sr_xv, sr_rv, sr_xf, sr_rf)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        REAL, PARAMETER :: PI = 3.14159265358979
+        real, parameter :: pi = 3.14159265358979
         !
         ! Dummy arguments
         !
-        REAL :: RF, RV, SR, SR_RF, SR_RV, SR_XF, SR_XV, SX, &
-                & SX_RF, SX_RV, SX_XF, SX_XV, UR, UR_RF, UR_RV, &
-                & UR_XF, UR_XV, UX, UX_RF, UX_RV, UX_XF, UX_XV, &
-                & XF, XV
+        real :: rf, rv, sr, sr_rf, sr_rv, sr_xf, sr_xv, sx, &
+                & sx_rf, sx_rv, sx_xf, sx_xv, ur, ur_rf, ur_rv, &
+                & ur_xf, ur_xv, ux, ux_rf, ux_rv, ux_xf, ux_xv, &
+                & xf, xv
         !
         ! Local variables
         !
-        REAL :: AK, AK_R, AK_X, DELE, DELK, ELE, ELE_R, ELE_X, &
-                & ELK, ELK_R, ELK_X, F, F_R, F_X, HRIP, R, RVI, &
-                & R_RF, R_RV, SRP, SRP_R, SRP_X, SR_R, SR_X, SX_R, &
-                & SX_X, UR_R, UR_X, UX_R, UX_X, X, XRM, XRM_R, &
-                & XRM_X, XRP, XRP_R, XRP_X, X_RV, X_XF, X_XV
+        real :: ak, ak_r, ak_x, dele, delk, ele, ele_r, ele_x, &
+                & elk, elk_r, elk_x, f, f_r, f_x, hrip, r, rvi, &
+                & r_rf, r_rv, srp, srp_r, srp_x, sr_r, sr_x, sx_r, &
+                & sx_x, ur_r, ur_x, ux_r, ux_x, x, xrm, xrm_r, &
+                & xrm_x, xrp, xrp_r, xrp_x, x_rv, x_xf, x_xv
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -1543,151 +1543,151 @@ contains
         !     Same as RING, but also returns AIC derivatives w.r.t. geometry
         !-----------------------------------------------------------------------
         !
-        UX = 0.
-        UR = 0.
-        SX = 0.
-        SR = 0.
+        ux = 0.
+        ur = 0.
+        sx = 0.
+        sr = 0.
         !
-        UX_X = 0.
-        UR_X = 0.
-        SX_X = 0.
-        SR_X = 0.
+        ux_x = 0.
+        ur_x = 0.
+        sx_x = 0.
+        sr_x = 0.
         !
-        UX_R = 0.
-        UR_R = 0.
-        SX_R = 0.
-        SR_R = 0.
+        ux_r = 0.
+        ur_r = 0.
+        sx_r = 0.
+        sr_r = 0.
         !
-        RVI = 0.
+        rvi = 0.
         !
         !----- zero-radius ring
-        IF (RV>0.0) THEN
+        if (rv>0.0) then
             !
-            RVI = 1.0 / RV
+            rvi = 1.0 / rv
             !
             !---- this fails if R=1 and X=0  (on the ring itself)
-            R = RF * RVI
-            X = (XV - XF) * RVI
+            r = rf * rvi
+            x = (xv - xf) * rvi
             !
-            IF (R/=1.0 .OR. X/=0.0) THEN
+            if (r/=1.0 .or. x/=0.0) then
                 !
-                IF (RF==0.0) THEN
+                if (rf==0.0) then
                     !----- Control Point on the axis
-                    UX = 1.0 / SQRT(1.0 + X**2)**3 * PI ! / (2.0*PI*RV)
-                    SX = -X / SQRT(1.0 + X**2)**3 * PI ! / (2.0*PI*RV)
+                    ux = 1.0 / sqrt(1.0 + x**2)**3 * pi ! / (2.0*PI*RV)
+                    sx = -x / sqrt(1.0 + x**2)**3 * pi ! / (2.0*PI*RV)
                     !
-                    UX_X = -3.0 * X * UX / (1.0 + X**2)
-                    SX_X = -3.0 * X * UX / (1.0 + X**2) - UX
+                    ux_x = -3.0 * x * ux / (1.0 + x**2)
+                    sx_x = -3.0 * x * ux / (1.0 + x**2) - ux
                     !
-                ELSE
+                else
                     !----- Control Point not on X-axis
-                    XRP = X**2 + (1.0 + R)**2
-                    XRM = X**2 + (1.0 - R)**2
+                    xrp = x**2 + (1.0 + r)**2
+                    xrm = x**2 + (1.0 - r)**2
                     !
-                    XRP_X = 2.0 * X
-                    XRM_X = 2.0 * X
-                    XRP_R = 2.0 * (1.0 + R)
-                    XRM_R = -2.0 * (1.0 - R)
+                    xrp_x = 2.0 * x
+                    xrm_x = 2.0 * x
+                    xrp_r = 2.0 * (1.0 + r)
+                    xrm_r = -2.0 * (1.0 - r)
                     !
-                    SRP = SQRT(XRP)
-                    SRP_X = (0.5 / SRP) * XRP_X
-                    SRP_R = (0.5 / SRP) * XRP_R
+                    srp = sqrt(xrp)
+                    srp_x = (0.5 / srp) * xrp_x
+                    srp_r = (0.5 / srp) * xrp_r
                     !
-                    AK = XRM / XRP
-                    AK_X = (XRM_X - AK * XRP_X) / XRP
-                    AK_R = (XRM_R - AK * XRP_R) / XRP
+                    ak = xrm / xrp
+                    ak_x = (xrm_x - ak * xrp_x) / xrp
+                    ak_r = (xrm_r - ak * xrp_r) / xrp
                     !
-                    CALL DELLEK(AK, ELE, DELE, ELK, DELK)
-                    ELE_X = DELE * AK_X
-                    ELE_R = DELE * AK_R
-                    ELK_X = DELK * AK_X
-                    ELK_R = DELK * AK_R
+                    call dellek(ak, ele, dele, elk, delk)
+                    ele_x = dele * ak_x
+                    ele_r = dele * ak_r
+                    elk_x = delk * ak_x
+                    elk_r = delk * ak_r
                     !
-                    F = 2.0 / XRM
-                    F_X = (-F / XRM) * XRM_X
-                    F_R = (-F / XRM) * XRM_R
+                    f = 2.0 / xrm
+                    f_x = (-f / xrm) * xrm_x
+                    f_r = (-f / xrm) * xrm_r
                     !
-                    UX = (1.0 / SRP) * (ELK - ELE * (1.0 + F * (R - 1.0)))
-                    UX_X = (1.0 / SRP)                                         &
-                            & * (ELK_X - ELE_X * (1.0 + F * (R - 1.0)) - ELE * (F_X * (R - 1.0)))  &
-                            & - (UX / SRP) * SRP_X
-                    UX_R = (1.0 / SRP)                                         &
-                            & * (ELK_R - ELE_R * (1.0 + F * (R - 1.0)) - ELE * (F_R * (R - 1.0))   &
-                                    & - ELE * F) - (UX / SRP) * SRP_R
+                    ux = (1.0 / srp) * (elk - ele * (1.0 + f * (r - 1.0)))
+                    ux_x = (1.0 / srp)                                         &
+                            & * (elk_x - ele_x * (1.0 + f * (r - 1.0)) - ele * (f_x * (r - 1.0)))  &
+                            & - (ux / srp) * srp_x
+                    ux_r = (1.0 / srp)                                         &
+                            & * (elk_r - ele_r * (1.0 + f * (r - 1.0)) - ele * (f_r * (r - 1.0))   &
+                                    & - ele * f) - (ux / srp) * srp_r
                     !
-                    UR = (X / (SRP * R)) * (ELK - ELE * (1.0 + F * R))
-                    UR_X = (X / (SRP * R)) * (ELK_X - ELE_X * (1.0 + F * R) - ELE * (F_X * R))   &
-                            & + (1.0 / (SRP * R)) * (ELK - ELE * (1.0 + F * R)) - (UR / SRP)    &
-                            & * SRP_X
-                    UR_R = (X / (SRP * R)) * (ELK_R - ELE_R * (1.0 + F * R) - ELE * (F_R * R + F)) &
-                            & - (UR / SRP) * SRP_R - UR / R
+                    ur = (x / (srp * r)) * (elk - ele * (1.0 + f * r))
+                    ur_x = (x / (srp * r)) * (elk_x - ele_x * (1.0 + f * r) - ele * (f_x * r))   &
+                            & + (1.0 / (srp * r)) * (elk - ele * (1.0 + f * r)) - (ur / srp)    &
+                            & * srp_x
+                    ur_r = (x / (srp * r)) * (elk_r - ele_r * (1.0 + f * r) - ele * (f_r * r + f)) &
+                            & - (ur / srp) * srp_r - ur / r
                     !
-                    SX = (X / SRP) * (-ELE * F)
-                    SX_X = (X / SRP) * (-ELE_X * F - ELE * F_X) + (1.0 / SRP) * (-ELE * F)   &
-                            & - (SX / SRP) * SRP_X
-                    SX_R = (X / SRP) * (-ELE_R * F - ELE * F_R) - (SX / SRP) * SRP_R
+                    sx = (x / srp) * (-ele * f)
+                    sx_x = (x / srp) * (-ele_x * f - ele * f_x) + (1.0 / srp) * (-ele * f)   &
+                            & - (sx / srp) * srp_x
+                    sx_r = (x / srp) * (-ele_r * f - ele * f_r) - (sx / srp) * srp_r
                     !
-                    SR = (1.0 / (SRP * R)) * (ELK - ELE * (1.0 + F * (R - R * R)))
-                    SR_X = (1.0 / (SRP * R))                                     &
-                            & * (ELK_X - ELE_X * (1.0 + F * (R - R * R)) - ELE * (F_X * (R - R * R)))  &
-                            & - (SR / SRP) * SRP_X
-                    SR_R = (1.0 / (SRP * R))                                     &
-                            & * (ELK_R - ELE_R * (1.0 + F * (R - R * R)) - ELE * (F_R * (R - R * R)    &
-                                    & + F * (1.0 - 2.0 * R))) - (SR / SRP) * SRP_R - SR / R
+                    sr = (1.0 / (srp * r)) * (elk - ele * (1.0 + f * (r - r * r)))
+                    sr_x = (1.0 / (srp * r))                                     &
+                            & * (elk_x - ele_x * (1.0 + f * (r - r * r)) - ele * (f_x * (r - r * r)))  &
+                            & - (sr / srp) * srp_x
+                    sr_r = (1.0 / (srp * r))                                     &
+                            & * (elk_r - ele_r * (1.0 + f * (r - r * r)) - ele * (f_r * (r - r * r)    &
+                                    & + f * (1.0 - 2.0 * r))) - (sr / srp) * srp_r - sr / r
                     !
-                ENDIF
-            ENDIF
-        ENDIF
+                endif
+            endif
+        endif
         !
         !c    X = (XV-XF)/RV
-        X_XV = RVI
-        X_RV = -X * RVI
-        X_XF = -RVI
+        x_xv = rvi
+        x_rv = -x * rvi
+        x_xf = -rvi
         !
         !c    R = RF/RV
-        R_RV = -R * RVI
-        R_RF = RVI
+        r_rv = -r * rvi
+        r_rf = rvi
         !
-        HRIP = RVI / (2.0 * PI)
+        hrip = rvi / (2.0 * pi)
         !
-        UX = HRIP * UX
-        UR = HRIP * UR
-        SX = HRIP * SX
-        SR = HRIP * SR
+        ux = hrip * ux
+        ur = hrip * ur
+        sx = hrip * sx
+        sr = hrip * sr
         !
-        UX_XV = HRIP * UX_X * X_XV
-        UR_XV = HRIP * UR_X * X_XV
-        SX_XV = HRIP * SX_X * X_XV
-        SR_XV = HRIP * SR_X * X_XV
-        UX_RV = HRIP * (UX_X * X_RV + UX_R * R_RV) - UX * RVI
-        UR_RV = HRIP * (UR_X * X_RV + UR_R * R_RV) - UR * RVI
-        SX_RV = HRIP * (SX_X * X_RV + SX_R * R_RV) - SX * RVI
-        SR_RV = HRIP * (SR_X * X_RV + SR_R * R_RV) - SR * RVI
-        UX_XF = HRIP * UX_X * X_XF
-        UR_XF = HRIP * UR_X * X_XF
-        SX_XF = HRIP * SX_X * X_XF
-        SR_XF = HRIP * SR_X * X_XF
-        UX_RF = HRIP * UX_R * R_RF
-        UR_RF = HRIP * UR_R * R_RF
-        SX_RF = HRIP * SX_R * R_RF
-        SR_RF = HRIP * SR_R * R_RF
+        ux_xv = hrip * ux_x * x_xv
+        ur_xv = hrip * ur_x * x_xv
+        sx_xv = hrip * sx_x * x_xv
+        sr_xv = hrip * sr_x * x_xv
+        ux_rv = hrip * (ux_x * x_rv + ux_r * r_rv) - ux * rvi
+        ur_rv = hrip * (ur_x * x_rv + ur_r * r_rv) - ur * rvi
+        sx_rv = hrip * (sx_x * x_rv + sx_r * r_rv) - sx * rvi
+        sr_rv = hrip * (sr_x * x_rv + sr_r * r_rv) - sr * rvi
+        ux_xf = hrip * ux_x * x_xf
+        ur_xf = hrip * ur_x * x_xf
+        sx_xf = hrip * sx_x * x_xf
+        sr_xf = hrip * sr_x * x_xf
+        ux_rf = hrip * ux_r * r_rf
+        ur_rf = hrip * ur_r * r_rf
+        sx_rf = hrip * sx_r * r_rf
+        sr_rf = hrip * sr_r * r_rf
         !
-    END SUBROUTINE DRING
+    end subroutine dring
     !*==ELLEK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE ELLEK(AK, ELE, ELK)
-        IMPLICIT NONE
+    subroutine ellek(ak, ele, elk)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: AK, ELE, ELK
+        real :: ak, ele, elk
         !
         ! Local variables
         !
-        REAL :: ALK
+        real :: alk
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -1704,37 +1704,37 @@ contains
         !     ELK    complete elliptic integral of the first  kind
         !_______________________________________________________________________
         !
-        ALK = -LOG(AK)
+        alk = -log(ak)
         !
-        ELE = 1.00000000000 + &
+        ele = 1.00000000000 + &
                 & (0.44325141463 + (0.06260601220 + (0.04757383546 + &
-                        & 0.01736506451 * AK) * AK) * AK)                                   &
-                        & * AK + ((0.24998368310 + (0.09200180037 + &
-                & (0.04069697526 + 0.00526449639 * AK) * AK) * AK) * AK) * ALK
+                        & 0.01736506451 * ak) * ak) * ak)                                   &
+                        & * ak + ((0.24998368310 + (0.09200180037 + &
+                & (0.04069697526 + 0.00526449639 * ak) * ak) * ak) * ak) * alk
         !
-        ELK = 1.38629436112 + &
+        elk = 1.38629436112 + &
                 & (0.09666344259 + (0.03590092383 + (0.03742563713 + &
-                        & 0.01451196212 * AK) * AK) * AK)                                   &
-                        & * AK + (0.50000000000 + (0.12498593597 + &
-                & (0.06880248576 + (0.03328355346 + 0.00441787012 * AK) * AK) * AK) * AK) &
-                & * ALK
+                        & 0.01451196212 * ak) * ak) * ak)                                   &
+                        & * ak + (0.50000000000 + (0.12498593597 + &
+                & (0.06880248576 + (0.03328355346 + 0.00441787012 * ak) * ak) * ak) * ak) &
+                & * alk
         !
-    END SUBROUTINE ELLEK
+    end subroutine ellek
     !*==DELLEK.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE DELLEK(AK, ELE, ELE_AK, ELK, ELK_AK)
-        IMPLICIT NONE
+    subroutine dellek(ak, ele, ele_ak, elk, elk_ak)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: AK, ELE, ELE_AK, ELK, ELK_AK
+        real :: ak, ele, ele_ak, elk, elk_ak
         !
         ! Local variables
         !
-        REAL :: ALK
+        real :: alk
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -1753,32 +1753,32 @@ contains
         !     ELK_AK  d(ELK)/d(AK)
         !_______________________________________________________________________
         !
-        ALK = -LOG(AK)
+        alk = -log(ak)
         !
-        ELE = 1.00000000000 + &
+        ele = 1.00000000000 + &
                 & (0.44325141463 + (0.06260601220 + (0.04757383546 + &
-                        & 0.01736506451 * AK) * AK) * AK)                                   &
-                        & * AK + ((0.24998368310 + (0.09200180037 + &
-                & (0.04069697526 + 0.00526449639 * AK) * AK) * AK) * AK) * ALK
+                        & 0.01736506451 * ak) * ak) * ak)                                   &
+                        & * ak + ((0.24998368310 + (0.09200180037 + &
+                & (0.04069697526 + 0.00526449639 * ak) * ak) * ak) * ak) * alk
         !
-        ELK = 1.38629436112 + &
+        elk = 1.38629436112 + &
                 & (0.09666344259 + (0.03590092383 + (0.03742563713 + &
-                        & 0.01451196212 * AK) * AK) * AK)                                   &
-                        & * AK + (0.50000000000 + (0.12498593597 + &
-                & (0.06880248576 + (0.03328355346 + 0.00441787012 * AK) * AK) * AK) * AK) &
-                & * ALK
+                        & 0.01451196212 * ak) * ak) * ak)                                   &
+                        & * ak + (0.50000000000 + (0.12498593597 + &
+                & (0.06880248576 + (0.03328355346 + 0.00441787012 * ak) * ak) * ak) * ak) &
+                & * alk
         !
-        ELE_AK = 0.19326773153 + &
-                & (0.03321022403 + (0.10202453112 + 0.06419576165 * AK) * AK)      &
-                        & * AK + (0.24998368310 + &
-                & (0.18400360074 + (0.12209092578 + 0.02105798556 * AK) * AK) * AK)  &
-                & * ALK
+        ele_ak = 0.19326773153 + &
+                & (0.03321022403 + (0.10202453112 + 0.06419576165 * ak) * ak)      &
+                        & * ak + (0.24998368310 + &
+                & (0.18400360074 + (0.12209092578 + 0.02105798556 * ak) * ak) * ak)  &
+                & * alk
         !
-        ELK_AK = -0.028322493380 + &
-                & (0.002999361900 + (0.078993357930 + 0.053629978360 * AK) * AK)   &
-                        & * AK - 0.50000000000 / AK + &
+        elk_ak = -0.028322493380 + &
+                & (0.002999361900 + (0.078993357930 + 0.053629978360 * ak) * ak)   &
+                        & * ak - 0.50000000000 / ak + &
                 & (0.12498593597 + (0.13760497152 + (0.09985066038 + &
-                        & 0.01767148048 * AK) * AK) * AK) * ALK
+                        & 0.01767148048 * ak) * ak) * ak) * alk
         !
-    END SUBROUTINE DELLEK
+    end subroutine dellek
 end module m_lamp

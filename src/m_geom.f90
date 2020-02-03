@@ -33,21 +33,21 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE XYPSPL(IEL)
+    subroutine xypspl(iel)
         use i_dfdc
         use m_spline, only : scalc, seval, segspl
         use m_geutil, only : lefind
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IEL
+        integer :: iel
         !
         ! Local variables
         !
-        INTEGER :: I, IP1, IP2, N
+        integer :: i, ip1, ip2, n
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -55,95 +55,95 @@ contains
         !     Splines panel-node coordinates
         !     and sets other element-related stuff.
         !---------------------------------------------
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
         !
-        I = IP1
-        N = IP2 - IP1 + 1
-        IF (N>1) THEN
-            CALL SCALC(XP(I), YP(I), SP(I), N)
-            CALL SEGSPL(XP(I), XPS(I), SP(I), N)
-            CALL SEGSPL(YP(I), YPS(I), SP(I), N)
-        ENDIF
+        i = ip1
+        n = ip2 - ip1 + 1
+        if (n>1) then
+            call scalc(xp(i), yp(i), sp(i), n)
+            call segspl(xp(i), xps(i), sp(i), n)
+            call segspl(yp(i), yps(i), sp(i), n)
+        endif
         !
-        IF (LXBOD(IEL)) THEN
+        if (lxbod(iel)) then
             !----- axisymmetric body on axis
-            IF (XP(IP1)<XP(IP2)) THEN
-                SPLE(IEL) = SP(IP1)
-                XPLE(IEL) = XP(IP1)
-                YPLE(IEL) = YP(IP1)
-                XPTE(IEL) = XP(IP2)
-                YPTE(IEL) = YP(IP2)
-            ELSE
-                SPLE(IEL) = SP(IP2)
-                XPLE(IEL) = XP(IP2)
-                YPLE(IEL) = YP(IP2)
-                XPTE(IEL) = XP(IP1)
-                YPTE(IEL) = YP(IP1)
-            ENDIF
+            if (xp(ip1)<xp(ip2)) then
+                sple(iel) = sp(ip1)
+                xple(iel) = xp(ip1)
+                yple(iel) = yp(ip1)
+                xpte(iel) = xp(ip2)
+                ypte(iel) = yp(ip2)
+            else
+                sple(iel) = sp(ip2)
+                xple(iel) = xp(ip2)
+                yple(iel) = yp(ip2)
+                xpte(iel) = xp(ip1)
+                ypte(iel) = yp(ip1)
+            endif
             !
-        ELSEIF (LBODY(IEL) .AND. (LV1ZR(IEL) .OR. LV2ZR(IEL))) THEN
+        elseif (lbody(iel) .and. (lv1zr(iel) .or. lv2zr(iel))) then
             !----- axisymmetric body not closed on axis
-            IF (XP(IP1)<XP(IP2)) THEN
-                SPLE(IEL) = SP(IP1)
-                XPLE(IEL) = XP(IP1)
-                YPLE(IEL) = YP(IP1)
-                XPTE(IEL) = XP(IP2)
-                YPTE(IEL) = YP(IP2)
-            ELSE
-                SPLE(IEL) = SP(IP2)
-                XPLE(IEL) = XP(IP2)
-                YPLE(IEL) = YP(IP2)
-                XPTE(IEL) = XP(IP1)
-                YPTE(IEL) = YP(IP1)
-            ENDIF
+            if (xp(ip1)<xp(ip2)) then
+                sple(iel) = sp(ip1)
+                xple(iel) = xp(ip1)
+                yple(iel) = yp(ip1)
+                xpte(iel) = xp(ip2)
+                ypte(iel) = yp(ip2)
+            else
+                sple(iel) = sp(ip2)
+                xple(iel) = xp(ip2)
+                yple(iel) = yp(ip2)
+                xpte(iel) = xp(ip1)
+                ypte(iel) = yp(ip1)
+            endif
             !
-        ELSEIF (LBODY(IEL) .AND. .NOT.LXBOD(IEL)) THEN
+        elseif (lbody(iel) .and. .not.lxbod(iel)) then
             !----- body off axis
-            CALL LEFIND(SPLE(IEL), XP(I), XPS(I), YP(I), YPS(I), SP(I), N)
-            XPLE(IEL) = SEVAL(SPLE(IEL), XP(I), XPS(I), SP(I), N)
-            YPLE(IEL) = SEVAL(SPLE(IEL), YP(I), YPS(I), SP(I), N)
-            XPTE(IEL) = 0.5 * (XP(IP1) + XP(IP2))
-            YPTE(IEL) = 0.5 * (YP(IP1) + YP(IP2))
+            call lefind(sple(iel), xp(i), xps(i), yp(i), yps(i), sp(i), n)
+            xple(iel) = seval(sple(iel), xp(i), xps(i), sp(i), n)
+            yple(iel) = seval(sple(iel), yp(i), yps(i), sp(i), n)
+            xpte(iel) = 0.5 * (xp(ip1) + xp(ip2))
+            ypte(iel) = 0.5 * (yp(ip1) + yp(ip2))
             !
-        ELSE
+        else
             !----- zero-thickness body
-            SPLE(IEL) = SP(IP1)
-            XPLE(IEL) = XP(IP1)
-            YPLE(IEL) = YP(IP1)
-            XPTE(IEL) = XP(IP2)
-            YPTE(IEL) = YP(IP2)
-        ENDIF
+            sple(iel) = sp(ip1)
+            xple(iel) = xp(ip1)
+            yple(iel) = yp(ip1)
+            xpte(iel) = xp(ip2)
+            ypte(iel) = yp(ip2)
+        endif
         !
         !---- set location for plotted element index
-        IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)==2) THEN
+        if (netype(iel)==0 .or. netype(iel)==1 .or. netype(iel)==2) then
             !----- surface or axis line... set plot location at skin centroid
-            XELNUM(IEL) = XPCENT(IEL)
-            YELNUM(IEL) = YPCENT(IEL)
-        ELSE
+            xelnum(iel) = xpcent(iel)
+            yelnum(iel) = ypcent(iel)
+        else
             !----- point,ring,source line or vortex wake element...
             !      just set plot location at the point itself
-            XELNUM(IEL) = XP(IP1)
-            YELNUM(IEL) = YP(IP1)
-        ENDIF
+            xelnum(iel) = xp(ip1)
+            yelnum(iel) = yp(ip1)
+        endif
         !
-    END SUBROUTINE XYPSPL
+    end subroutine xypspl
     !*==CVPGEN.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XYPSPL
 
 
 
 
-    SUBROUTINE CVPGEN
+    subroutine cvpgen
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        REAL :: DSP, DXP, DYP
-        INTEGER :: IC, IEL, IP
+        real :: dsp, dxp, dyp
+        integer :: ic, iel, ip
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -152,117 +152,117 @@ contains
         !     Sets locations of point sources.
         !---------------------------------------------------------
         !
-        IF (LDBG) WRITE (*, *) 'Setting control points for elements'
+        if (ldbg) write (*, *) 'Setting control points for elements'
         !
-        DO IEL = 1, NEX
-            ICFRST(IEL) = 0
-            ICLAST(IEL) = 0
-        ENDDO
+        do iel = 1, nex
+            icfrst(iel) = 0
+            iclast(iel) = 0
+        enddo
         !
-        DO IC = 1, ICX
-            IPCO(IC) = 0
-            IPCP(IC) = 0
-        ENDDO
+        do ic = 1, icx
+            ipco(ic) = 0
+            ipcp(ic) = 0
+        enddo
         !
         !
         !---- initialize counters for pointer accumulation
-        IC = 0
+        ic = 0
         !
-        DO IEL = 1, NEL
-            IF (NETYPE(IEL)==3 .OR. NETYPE(IEL)==4) THEN
+        do iel = 1, nel
+            if (netype(iel)==3 .or. netype(iel)==4) then
                 !------- ring or point singularity... no control points
-                IP = IPFRST(IEL)
+                ip = ipfrst(iel)
                 !
                 !------- set limits so as to skip over IC do-loops
-                ICFRST(IEL) = 0
-                ICLAST(IEL) = -1
+                icfrst(iel) = 0
+                iclast(iel) = -1
                 !
-                CYCLE
-            ENDIF
+                cycle
+            endif
             !
             !------ first control point in element IEL
-            ICFRST(IEL) = IC + 1
+            icfrst(iel) = ic + 1
             !
             !------ go over all panels on element IEL
-            DO IP = IPFRST(IEL), IPLAST(IEL) - 1
-                IC = IC + 1
-                IF (IC>NCX) STOP 'CVPGEN: Array overflow on NCX'
+            do ip = ipfrst(iel), iplast(iel) - 1
+                ic = ic + 1
+                if (ic>ncx) stop 'CVPGEN: Array overflow on NCX'
                 !
-                DXP = XP(IP + 1) - XP(IP)
-                DYP = YP(IP + 1) - YP(IP)
-                DSP = SQRT(DXP**2 + DYP**2)
+                dxp = xp(ip + 1) - xp(ip)
+                dyp = yp(ip + 1) - yp(ip)
+                dsp = sqrt(dxp**2 + dyp**2)
                 !
-                IF (DSP==0.0) THEN
+                if (dsp==0.0) then
                     !--------- zero-length panel gets dummy control point
-                    ICTYPE(IC) = -1
+                    ictype(ic) = -1
                     !
-                ELSE
+                else
                     !--------- ordinary panel
-                    ICTYPE(IC) = 0
-                    IF (IEL2IR(IEL)==1) THEN
-                        ICTYPE(IC) = 0
-                    ELSEIF (IEL2IR(IEL)>1 .AND. IEL2IR(IEL)<NRP) THEN
+                    ictype(ic) = 0
+                    if (iel2ir(iel)==1) then
+                        ictype(ic) = 0
+                    elseif (iel2ir(iel)>1 .and. iel2ir(iel)<nrp) then
                         !c             ICTYPE(IC) = -2
-                    ELSEIF (IEL2IR(IEL)==NRP) THEN
-                        ICTYPE(IC) = 0
-                    ENDIF
+                    elseif (iel2ir(iel)==nrp) then
+                        ictype(ic) = 0
+                    endif
                     !
-                ENDIF
+                endif
                 !
                 !-------- panel nodes defining sheet strength at IC
-                IPCO(IC) = IP
-                IPCP(IC) = IP + 1
-            ENDDO
+                ipco(ic) = ip
+                ipcp(ic) = ip + 1
+            enddo
             !
             !------ last control point in element IEL
-            ICLAST(IEL) = IC
+            iclast(iel) = ic
             !
-        ENDDO
+        enddo
         !
         !---- total number of control points
-        NCTOT = IC
+        nctot = ic
         !
         !---- compute normal vectors at vortex nodes, compute geometric quantities
-        DO IEL = 1, NEL
+        do iel = 1, nel
             !------ don't do point singularities
-            IF (NETYPE(IEL)==0 .OR. NETYPE(IEL)==1 .OR. NETYPE(IEL)       &
-                    & ==2 .OR. NETYPE(IEL)==5 .OR. NETYPE(IEL)==6 .OR.          &
-                    & NETYPE(IEL)==7) THEN
-                CALL XYCSET(IEL)
-                CALL ANPSET(IEL)
-            ENDIF
-        ENDDO
+            if (netype(iel)==0 .or. netype(iel)==1 .or. netype(iel)       &
+                    & ==2 .or. netype(iel)==5 .or. netype(iel)==6 .or.          &
+                    & netype(iel)==7) then
+                call xycset(iel)
+                call anpset(iel)
+            endif
+        enddo
         !
         !---- invalidate any existing solution
-        LQAIC = .FALSE.
-        LSYSP = .FALSE.
-        LGSYS = .FALSE.
-        LGAMU = .FALSE.
-        LGAMA = .FALSE.
+        lqaic = .false.
+        lsysp = .false.
+        lgsys = .false.
+        lgamu = .false.
+        lgama = .false.
         !
-        LNCVP = .TRUE.
+        lncvp = .true.
         !
-    END SUBROUTINE CVPGEN
+    end subroutine cvpgen
     !*==XYCSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CVPGEN
 
 
 
-    SUBROUTINE XYCSET(IEL)
+    subroutine xycset(iel)
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IEL
+        integer :: iel
         !
         ! Local variables
         !
-        REAL, SAVE :: DCFRAC
-        REAL :: DSCA, DSP, DSPINV, DXP, DYP, STAN, XTAN, YTAN
-        INTEGER :: IC, IC1, IC2, ICE, IP, IP1, IP2, IPO, IPP
+        real, save :: dcfrac
+        real :: dsca, dsp, dspinv, dxp, dyp, stan, xtan, ytan
+        integer :: ic, ic1, ic2, ice, ip, ip1, ip2, ipo, ipp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -272,103 +272,103 @@ contains
         !----------------------------------------------------------------
         !
         !c    DATA DCFRAC / 0.1 /
-        DATA DCFRAC/0.05/
+        data dcfrac/0.05/
         !c    DATA DCFRAC / 0.02 /
         !
-        DO IC = ICFRST(IEL), ICLAST(IEL)
-            IPO = IPCO(IC)
-            IPP = IPCP(IC)
+        do ic = icfrst(iel), iclast(iel)
+            ipo = ipco(ic)
+            ipp = ipcp(ic)
             !
-            DXP = XP(IPP) - XP(IPO)
-            DYP = YP(IPP) - YP(IPO)
-            DSP = SQRT(DXP**2 + DYP**2)
+            dxp = xp(ipp) - xp(ipo)
+            dyp = yp(ipp) - yp(ipo)
+            dsp = sqrt(dxp**2 + dyp**2)
             !
-            IF (DSP==0.0) THEN
+            if (dsp==0.0) then
                 !------- zero-length panel
-                DSPINV = 0.0
-            ELSE
+                dspinv = 0.0
+            else
                 !------- ordinary panel
-                DSPINV = 1.0 / DSP
-            ENDIF
+                dspinv = 1.0 / dsp
+            endif
             !
             !------ assign control point at center of panel
-            XC(IC) = XP(IPO) + 0.5 * DXP
-            YC(IC) = YP(IPO) + 0.5 * DYP
-            DSC(IC) = DSP
-            DSC_DXY(1, IC) = DXP * DSPINV
-            DSC_DXY(2, IC) = DYP * DSPINV
+            xc(ic) = xp(ipo) + 0.5 * dxp
+            yc(ic) = yp(ipo) + 0.5 * dyp
+            dsc(ic) = dsp
+            dsc_dxy(1, ic) = dxp * dspinv
+            dsc_dxy(2, ic) = dyp * dspinv
             !
             !------ normal vector at control point
-            ANC(1, IC) = DYP * DSPINV
-            ANC(2, IC) = -DXP * DSPINV
+            anc(1, ic) = dyp * dspinv
+            anc(2, ic) = -dxp * dspinv
             !
             !------ geometry sensitivities of normal vector for design/optimization stuff
-            ANC_DXY(1, 1, IC) = ANC(1, IC) * ANC(2, IC) * DSPINV
-            ANC_DXY(1, 2, IC) = ANC(2, IC)**2 * DSPINV
-            ANC_DXY(2, 1, IC) = -ANC(1, IC)**2 * DSPINV
-            ANC_DXY(2, 2, IC) = -ANC(2, IC) * ANC(1, IC) * DSPINV
-        ENDDO
+            anc_dxy(1, 1, ic) = anc(1, ic) * anc(2, ic) * dspinv
+            anc_dxy(1, 2, ic) = anc(2, ic)**2 * dspinv
+            anc_dxy(2, 1, ic) = -anc(1, ic)**2 * dspinv
+            anc_dxy(2, 2, ic) = -anc(2, ic) * anc(1, ic) * dspinv
+        enddo
         !
         !
         !------ set up extra QNDOF control points for each body element
-        IF (.NOT.LBODY(IEL)) THEN
-            ICE = NCX + IEL
-            XC(ICE) = 0.
-            YC(ICE) = 0.
+        if (.not.lbody(iel)) then
+            ice = ncx + iel
+            xc(ice) = 0.
+            yc(ice) = 0.
             !
-        ELSEIF (LXBOD(IEL)) THEN
-            IC = ICLAST(IEL)
-            IP = IPLAST(IEL)
+        elseif (lxbod(iel)) then
+            ic = iclast(iel)
+            ip = iplast(iel)
             !
-            ICE = NCX + IEL
-            XC(ICE) = XP(IP) - DCFRAC * DSC(IC)
-            YC(ICE) = 0.
-            ANC(1, ICE) = 1.0
-            ANC(2, ICE) = 0.
+            ice = ncx + iel
+            xc(ice) = xp(ip) - dcfrac * dsc(ic)
+            yc(ice) = 0.
+            anc(1, ice) = 1.0
+            anc(2, ice) = 0.
             !
-        ELSE
-            IC1 = ICFRST(IEL)
-            IC2 = ICLAST(IEL)
+        else
+            ic1 = icfrst(iel)
+            ic2 = iclast(iel)
             !
-            IP1 = IPFRST(IEL)
-            IP2 = IPLAST(IEL)
+            ip1 = ipfrst(iel)
+            ip2 = iplast(iel)
             !
-            XTAN = XP(IP1) - XP(IP1 + 1) + XP(IP2) - XP(IP2 - 1)
-            YTAN = YP(IP1) - YP(IP1 + 1) + YP(IP2) - YP(IP2 - 1)
-            STAN = SQRT(XTAN**2 + YTAN**2)
+            xtan = xp(ip1) - xp(ip1 + 1) + xp(ip2) - xp(ip2 - 1)
+            ytan = yp(ip1) - yp(ip1 + 1) + yp(ip2) - yp(ip2 - 1)
+            stan = sqrt(xtan**2 + ytan**2)
             !
-            DSCA = 0.5 * (DSC(IC1) + DSC(IC2))
+            dsca = 0.5 * (dsc(ic1) + dsc(ic2))
             !
-            ICE = NCX + IEL
-            XC(ICE) = 0.5 * (XP(IP1) + XP(IP2)) - DCFRAC * DSCA * XTAN / STAN
-            YC(ICE) = 0.5 * (YP(IP1) + YP(IP2)) - DCFRAC * DSCA * YTAN / STAN
-            ANC(1, ICE) = XTAN / STAN
-            ANC(2, ICE) = YTAN / STAN
+            ice = ncx + iel
+            xc(ice) = 0.5 * (xp(ip1) + xp(ip2)) - dcfrac * dsca * xtan / stan
+            yc(ice) = 0.5 * (yp(ip1) + yp(ip2)) - dcfrac * dsca * ytan / stan
+            anc(1, ice) = xtan / stan
+            anc(2, ice) = ytan / stan
             !
-        ENDIF
+        endif
         !
-    END SUBROUTINE XYCSET
+    end subroutine xycset
     !*==ANPSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XYCSET
 
 
 
-    SUBROUTINE ANPSET(IEL)
+    subroutine anpset(iel)
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IEL
+        integer :: iel
         !
         ! Local variables
         !
-        REAL :: DS, DSQ, DSQM, DSQP, DX, DXM, DXP, DX_DXM, &
-                & DX_DXP, DX_DYM, DX_DYP, DY, DYM, DYP, DY_DXM, &
-                & DY_DXP, DY_DYM, DY_DYP, TMP1, TMP2
-        INTEGER :: IP, IPM, IPP
+        real :: ds, dsq, dsqm, dsqp, dx, dxm, dxp, dx_dxm, &
+                & dx_dxp, dx_dym, dx_dyp, dy, dym, dyp, dy_dxm, &
+                & dy_dxp, dy_dym, dy_dyp, tmp1, tmp2
+        integer :: ip, ipm, ipp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -378,117 +378,117 @@ contains
         !----------------------------------------------------------------
         !
         !---- don't process single-point elements
-        IF (IPFRST(IEL)==IPLAST(IEL)) RETURN
+        if (ipfrst(iel)==iplast(iel)) return
         !
-        DO IP = IPFRST(IEL), IPLAST(IEL)
+        do ip = ipfrst(iel), iplast(iel)
             !
             !------ examine the two panels IPM..IP, IP..IPP adjoining vortex node IP
-            IPM = MAX(IP - 1, IPFRST(IEL))
-            IPP = MIN(IP + 1, IPLAST(IEL))
+            ipm = max(ip - 1, ipfrst(iel))
+            ipp = min(ip + 1, iplast(iel))
             !
-            DXM = XP(IP) - XP(IPM)
-            DYM = YP(IP) - YP(IPM)
+            dxm = xp(ip) - xp(ipm)
+            dym = yp(ip) - yp(ipm)
             !
-            DXP = XP(IPP) - XP(IP)
-            DYP = YP(IPP) - YP(IP)
+            dxp = xp(ipp) - xp(ip)
+            dyp = yp(ipp) - yp(ip)
             !
-            DSQM = DXM * DXM + DYM * DYM
-            DSQP = DXP * DXP + DYP * DYP
+            dsqm = dxm * dxm + dym * dym
+            dsqp = dxp * dxp + dyp * dyp
             !
-            IF (DSQM==0.0) THEN
+            if (dsqm==0.0) then
                 !------- first point on element, or panel IPM..IP has zero length
-                DX = DXP
-                DY = DYP
-                DX_DXM = 0.
-                DX_DYM = 0.
-                DX_DXP = 1.0
-                DX_DYP = 0.
-                DY_DXM = 0.
-                DY_DYM = 0.
-                DY_DXP = 0.
-                DY_DYP = 1.0
-            ELSEIF (DSQP==0.0) THEN
+                dx = dxp
+                dy = dyp
+                dx_dxm = 0.
+                dx_dym = 0.
+                dx_dxp = 1.0
+                dx_dyp = 0.
+                dy_dxm = 0.
+                dy_dym = 0.
+                dy_dxp = 0.
+                dy_dyp = 1.0
+            elseif (dsqp==0.0) then
                 !------- last point on element, or panel IP..IPP has zero length
-                DX = DXM
-                DY = DYM
-                DX_DXM = 1.0
-                DX_DYM = 0.
-                DX_DXP = 0.
-                DX_DYP = 0.
-                DY_DXM = 0.
-                DY_DYM = 1.0
-                DY_DXP = 0.
-                DY_DYP = 0.
-            ELSE
+                dx = dxm
+                dy = dym
+                dx_dxm = 1.0
+                dx_dym = 0.
+                dx_dxp = 0.
+                dx_dyp = 0.
+                dy_dxm = 0.
+                dy_dym = 1.0
+                dy_dxp = 0.
+                dy_dyp = 0.
+            else
                 !------- usual interior point... normal vector is weighted average
-                DX = DXM * DSQP + DXP * DSQM
-                DY = DYM * DSQP + DYP * DSQM
-                DX_DXM = DSQP + DXP * 2.0 * DXM
-                DX_DYM = +DXP * 2.0 * DYM
-                DX_DXP = DSQM + DXM * 2.0 * DXP
-                DX_DYP = +DXM * 2.0 * DYP
-                DY_DXM = +DYP * 2.0 * DXM
-                DY_DYM = DSQP + DYP * 2.0 * DYM
-                DY_DXP = +DYM * 2.0 * DXP
-                DY_DYP = DSQM + DYM * 2.0 * DYP
-            ENDIF
+                dx = dxm * dsqp + dxp * dsqm
+                dy = dym * dsqp + dyp * dsqm
+                dx_dxm = dsqp + dxp * 2.0 * dxm
+                dx_dym = +dxp * 2.0 * dym
+                dx_dxp = dsqm + dxm * 2.0 * dxp
+                dx_dyp = +dxm * 2.0 * dyp
+                dy_dxm = +dyp * 2.0 * dxm
+                dy_dym = dsqp + dyp * 2.0 * dym
+                dy_dxp = +dym * 2.0 * dxp
+                dy_dyp = dsqm + dym * 2.0 * dyp
+            endif
             !
-            DSQ = DX * DX + DY * DY
-            IF (DSQ==0.0) THEN
+            dsq = dx * dx + dy * dy
+            if (dsq==0.0) then
                 !------- internal error
-                WRITE (*, *) '? ANPSET: zero avg panel length. IEL IP =', &
-                        & IEL, IP
-                RETURN
-            ENDIF
+                write (*, *) '? ANPSET: zero avg panel length. IEL IP =', &
+                        & iel, ip
+                return
+            endif
             !
             !------ set unit normal ANP
-            DS = SQRT(DSQ)
-            ANP(1, IP) = DY / DS
-            ANP(2, IP) = -DX / DS
+            ds = sqrt(dsq)
+            anp(1, ip) = dy / ds
+            anp(2, ip) = -dx / ds
             !
-            TMP1 = -ANP(1, IP) / DSQ
-            ANP_XYM(1, 1, IP) = -DY_DXM / DS - TMP1 * (DX * DX_DXM + DY * DY_DXM)
-            ANP_XYM(1, 2, IP) = -DY_DYM / DS - TMP1 * (DX * DX_DYM + DY * DY_DYM)
+            tmp1 = -anp(1, ip) / dsq
+            anp_xym(1, 1, ip) = -dy_dxm / ds - tmp1 * (dx * dx_dxm + dy * dy_dxm)
+            anp_xym(1, 2, ip) = -dy_dym / ds - tmp1 * (dx * dx_dym + dy * dy_dym)
             !
-            ANP_XYO(1, 1, IP) = DY_DXM / DS + TMP1 * (DX * DX_DXM + DY * DY_DXM)       &
-                    & - DY_DXP / DS - TMP1 * (DX * DX_DXP + DY * DY_DXP)
-            ANP_XYO(1, 2, IP) = DY_DYM / DS + TMP1 * (DX * DX_DYM + DY * DY_DYM)       &
-                    & - DY_DYP / DS - TMP1 * (DX * DX_DYP + DY * DY_DYP)
+            anp_xyo(1, 1, ip) = dy_dxm / ds + tmp1 * (dx * dx_dxm + dy * dy_dxm)       &
+                    & - dy_dxp / ds - tmp1 * (dx * dx_dxp + dy * dy_dxp)
+            anp_xyo(1, 2, ip) = dy_dym / ds + tmp1 * (dx * dx_dym + dy * dy_dym)       &
+                    & - dy_dyp / ds - tmp1 * (dx * dx_dyp + dy * dy_dyp)
             !
-            ANP_XYP(1, 1, IP) = DY_DXP / DS + TMP1 * (DX * DX_DXP + DY * DY_DXP)
-            ANP_XYP(1, 2, IP) = DY_DYP / DS + TMP1 * (DX * DX_DYP + DY * DY_DYP)
+            anp_xyp(1, 1, ip) = dy_dxp / ds + tmp1 * (dx * dx_dxp + dy * dy_dxp)
+            anp_xyp(1, 2, ip) = dy_dyp / ds + tmp1 * (dx * dx_dyp + dy * dy_dyp)
             !
-            TMP2 = -ANP(2, IP) / DSQ
-            ANP_XYM(2, 1, IP) = DX_DXM / DS - TMP2 * (DX * DX_DXM + DY * DY_DXM)
-            ANP_XYM(2, 2, IP) = DX_DYM / DS - TMP2 * (DX * DX_DYM + DY * DY_DYM)
+            tmp2 = -anp(2, ip) / dsq
+            anp_xym(2, 1, ip) = dx_dxm / ds - tmp2 * (dx * dx_dxm + dy * dy_dxm)
+            anp_xym(2, 2, ip) = dx_dym / ds - tmp2 * (dx * dx_dym + dy * dy_dym)
             !
-            ANP_XYO(2, 1, IP) = -DX_DXM / DS + TMP2 * (DX * DX_DXM + DY * DY_DXM)      &
-                    & + DX_DXP / DS - TMP2 * (DX * DX_DXP + DY * DY_DXP)
-            ANP_XYO(2, 2, IP) = -DX_DYM / DS + TMP2 * (DX * DX_DYM + DY * DY_DYM)      &
-                    & + DX_DYP / DS - TMP2 * (DX * DX_DYP + DY * DY_DYP)
+            anp_xyo(2, 1, ip) = -dx_dxm / ds + tmp2 * (dx * dx_dxm + dy * dy_dxm)      &
+                    & + dx_dxp / ds - tmp2 * (dx * dx_dxp + dy * dy_dxp)
+            anp_xyo(2, 2, ip) = -dx_dym / ds + tmp2 * (dx * dx_dym + dy * dy_dym)      &
+                    & + dx_dyp / ds - tmp2 * (dx * dx_dyp + dy * dy_dyp)
             !
-            ANP_XYP(2, 1, IP) = -DX_DXP / DS + TMP2 * (DX * DX_DXP + DY * DY_DXP)
-            ANP_XYP(2, 2, IP) = -DX_DYP / DS + TMP2 * (DX * DX_DYP + DY * DY_DYP)
-        ENDDO
+            anp_xyp(2, 1, ip) = -dx_dxp / ds + tmp2 * (dx * dx_dxp + dy * dy_dxp)
+            anp_xyp(2, 2, ip) = -dx_dyp / ds + tmp2 * (dx * dx_dyp + dy * dy_dyp)
+        enddo
         !
-    END SUBROUTINE ANPSET
+    end subroutine anpset
     !*==ITPSET.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! ANPSET
 
 
-    SUBROUTINE ITPSET(IEL)
+    subroutine itpset(iel)
         use i_dfdc
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IEL
+        integer :: iel
         !
         ! Local variables
         !
-        INTEGER :: IP1, IP2
+        integer :: ip1, ip2
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -496,29 +496,29 @@ contains
         !     Sets TE panel endpoint indices
         !--------------------------------------
         !
-        IP1 = IPFRST(IEL)
-        IP2 = IPLAST(IEL)
+        ip1 = ipfrst(iel)
+        ip2 = iplast(iel)
         !
         !---- default case... no TE panel
-        IPTE1(IEL) = -999
-        IPTE2(IEL) = -999
+        ipte1(iel) = -999
+        ipte2(iel) = -999
         !
         !---- no TE panel on closed axis body or non-solid body
-        IF (LXBOD(IEL) .OR. NETYPE(IEL)/=0) RETURN
+        if (lxbod(iel) .or. netype(iel)/=0) return
         !
         !---- TE panel must be chosen...
-        IF (LTPAN(IEL)) THEN
+        if (ltpan(iel)) then
             !----- usual TE panel closing off body
-            IPTE1(IEL) = IP1
-            IPTE2(IEL) = IP2
-            IF (YP(IP1)==0.0 .AND. YP(IP2)>0.0) THEN
-                IPTE1(IEL) = 0
-                IPTE2(IEL) = IP2
-            ELSEIF (YP(IP2)==0.0 .AND. YP(IP1)>0.0) THEN
-                IPTE1(IEL) = IP1
-                IPTE2(IEL) = 0
-            ENDIF
-        ENDIF
+            ipte1(iel) = ip1
+            ipte2(iel) = ip2
+            if (yp(ip1)==0.0 .and. yp(ip2)>0.0) then
+                ipte1(iel) = 0
+                ipte2(iel) = ip2
+            elseif (yp(ip2)==0.0 .and. yp(ip1)>0.0) then
+                ipte1(iel) = ip1
+                ipte2(iel) = 0
+            endif
+        endif
         !
-    END SUBROUTINE ITPSET
+    end subroutine itpset
 end module m_geom

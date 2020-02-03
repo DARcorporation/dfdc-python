@@ -36,22 +36,22 @@ contains
     !=========================================================================
 
 
-    SUBROUTINE CPCALC(N, Q, QINF, QREF, CP, CP_Q, CP_QINF)
-        IMPLICIT NONE
+    subroutine cpcalc(n, q, qinf, qref, cp, cp_q, cp_qinf)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL :: QINF, QREF
-        REAL, DIMENSION(*) :: CP, CP_QINF
-        REAL, DIMENSION(2, *) :: CP_Q, Q
+        integer :: n
+        real :: qinf, qref
+        real, dimension(*) :: cp, cp_qinf
+        real, dimension(2, *) :: cp_q, q
         !
         ! Local variables
         !
-        INTEGER :: I
-        REAL :: QSQ, QSQREF
+        integer :: i
+        real :: qsq, qsqref
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -59,42 +59,42 @@ contains
         !     Sets Cp from speed.
         !-------------------------------------------------------------
         !
-        IF (QREF/=0.0) THEN
-            QSQREF = QREF**2
-        ELSE
-            QSQREF = 1.0
-        ENDIF
+        if (qref/=0.0) then
+            qsqref = qref**2
+        else
+            qsqref = 1.0
+        endif
         !
-        DO I = 1, N
-            QSQ = Q(1, I)**2 + Q(2, I)**2
-            CP(I) = (QINF**2 - QSQ) / QSQREF
-            CP_Q(1, I) = -2.0 * Q(1, I) / QSQREF
-            CP_Q(2, I) = -2.0 * Q(2, I) / QSQREF
-            CP_QINF(I) = 2.0 * QINF / QSQREF
-        ENDDO
+        do i = 1, n
+            qsq = q(1, i)**2 + q(2, i)**2
+            cp(i) = (qinf**2 - qsq) / qsqref
+            cp_q(1, i) = -2.0 * q(1, i) / qsqref
+            cp_q(2, i) = -2.0 * q(2, i) / qsqref
+            cp_qinf(i) = 2.0 * qinf / qsqref
+        enddo
         !
-    END SUBROUTINE CPCALC
+    end subroutine cpcalc
     !*==CPADDHS.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! CPCALC
 
 
 
-    SUBROUTINE CPADDHS(XX, YY, CP, DHH, DSS, VTT)
+    subroutine cpaddhs(xx, yy, cp, dhh, dss, vtt)
         use i_dfdc
         use m_grdutils, only : xygrdfind
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: CP, DHH, DSS, VTT, XX, YY
+        real :: cp, dhh, dss, vtt, xx, yy
         !
         ! Local variables
         !
-        REAL :: CIRC, QRSQ, VTSQ
-        REAL, SAVE :: EPS
-        INTEGER :: IC, JC
+        real :: circ, qrsq, vtsq
+        real, save :: eps
+        integer :: ic, jc
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -104,56 +104,56 @@ contains
         !     CP is modified and DH,DS and Vtheta are returned
         !-------------------------------------------------------
         !
-        DATA EPS/1.0E-3/
+        data eps/1.0e-3/
         !
-        VTT = 0.0
-        DHH = 0.0
-        DSS = 0.0
+        vtt = 0.0
+        dhh = 0.0
+        dss = 0.0
         !
         !---- Check for point upstream of rotor
-        IF (XX<XGMIN) RETURN
+        if (xx<xgmin) return
         !
         !---- check for point in rotor wake grid
-        CALL XYGRDFIND(XX, YY, IX, XG, YG, II, JJ, IC, JC)
+        call xygrdfind(xx, yy, ix, xg, yg, ii, jj, ic, jc)
         !
-        IF (IC/=0 .AND. JC/=0) THEN
+        if (ic/=0 .and. jc/=0) then
             !c        write(*,99) 'cpaddhs grid point i,j for x,y ',ic,jc,xx,yy
-            QRSQ = QREF**2
-            CIRC = BGAMG(IC, JC)
-            VTT = BGAMG(IC, JC) * PI2I / YY
-            VTSQ = VTT**2
-            DHH = DHG(IC, JC)
-            DSS = DSG(IC, JC)
-            CP = CP + 2.0 * (DHH - DSS) / QRSQ - VTSQ / QRSQ
+            qrsq = qref**2
+            circ = bgamg(ic, jc)
+            vtt = bgamg(ic, jc) * pi2i / yy
+            vtsq = vtt**2
+            dhh = dhg(ic, jc)
+            dss = dsg(ic, jc)
+            cp = cp + 2.0 * (dhh - dss) / qrsq - vtsq / qrsq
             !c      ELSE
             !c        write(*,99) 'cpaddhs no grid point i,j for x,y ',ic,jc,xx,yy
-        ENDIF
-        99   FORMAT (A, 2I5, 5(1X, F12.6))
+        endif
+        99   format (a, 2i5, 5(1x, f12.6))
         !
-    END SUBROUTINE CPADDHS
+    end subroutine cpaddhs
     !*==FCOEFF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE FCOEFF(NC, CPL, CPR, XC, YC, ANC, DSC, CX, CY, CM)
-        IMPLICIT NONE
+    subroutine fcoeff(nc, cpl, cpr, xc, yc, anc, dsc, cx, cy, cm)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        REAL, PARAMETER :: PI = 3.1415926535897932384
+        real, parameter :: pi = 3.1415926535897932384
         !
         ! Dummy arguments
         !
-        REAL :: CM, CX, CY
-        INTEGER :: NC
-        REAL, DIMENSION(2, *) :: ANC
-        REAL, DIMENSION(*) :: CPL, CPR, DSC, XC, YC
+        real :: cm, cx, cy
+        integer :: nc
+        real, dimension(2, *) :: anc
+        real, dimension(*) :: cpl, cpr, dsc, xc, yc
         !
         ! Local variables
         !
-        INTEGER :: IC
-        REAL :: TWOPIR
+        integer :: ic
+        real :: twopir
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -163,18 +163,18 @@ contains
         !
         !
         !
-        CX = 0.
-        CY = 0.
-        CM = 0.
-        DO IC = 1, NC
-            TWOPIR = 2.0 * PI * YC(IC)
-            CX = CX + (CPL(IC) - CPR(IC)) * ANC(1, IC) * DSC(IC) * TWOPIR
+        cx = 0.
+        cy = 0.
+        cm = 0.
+        do ic = 1, nc
+            twopir = 2.0 * pi * yc(ic)
+            cx = cx + (cpl(ic) - cpr(ic)) * anc(1, ic) * dsc(ic) * twopir
             !---- only axisymmetric forces on axisymetric geometry !!
             !cc     CY = CY + (CPL(IC) - CPR(IC))*ANC(2,IC)*DSC(IC)*TWOPIR
             !cc     CM = CM + (CPL(IC) - CPR(IC))
             !cc  &           *(  XC(IC)*ANC(2,IC)
             !cc  &             - YC(IC)*ANC(1,IC) )*DSC(IC)*TWOPIR
-        ENDDO
+        enddo
         !
-    END SUBROUTINE FCOEFF
+    end subroutine fcoeff
 end module m_forces

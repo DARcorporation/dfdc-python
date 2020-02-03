@@ -51,22 +51,22 @@ contains
     !
     !=========================================================================
 
-    SUBROUTINE XSIETA(XM, X1, X2, X3, X4, YM, Y1, Y2, Y3, Y4, XSI, ETA, XSI_X, &
-            & XSI_Y, ETA_X, ETA_Y)
-        IMPLICIT NONE
+    subroutine xsieta(xm, x1, x2, x3, x4, ym, y1, y2, y3, y4, xsi, eta, xsi_x, &
+            & xsi_y, eta_x, eta_y)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: ETA, ETA_X, ETA_Y, X1, X2, X3, X4, XM, XSI, &
-                & XSI_X, XSI_Y, Y1, Y2, Y3, Y4, YM
+        real :: eta, eta_x, eta_y, x1, x2, x3, x4, xm, xsi, &
+                & xsi_x, xsi_y, y1, y2, y3, y4, ym
         !
         ! Local variables
         !
-        REAL :: A11, A12, A21, A22, DET, DETINV, DR1, DR2, DXS, &
-                & ET, XS, Z1, Z2, Z3, Z4
-        INTEGER :: IXY
+        real :: a11, a12, a21, a22, det, detinv, dr1, dr2, dxs, &
+                & et, xs, z1, z2, z3, z4
+        integer :: ixy
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -92,58 +92,58 @@ contains
         !............................................................
         !
         !---- initial guess for xsi, eta  (center of cell)
-        XS = 0.
-        ET = 0.
+        xs = 0.
+        et = 0.
         !
         !---- perform 12 or less Newton iterations for improving the guess
-        DO IXY = 1, 12
-            Z1 = (1.0 - XS) * (1.0 - ET)
-            Z2 = (1.0 + XS) * (1.0 - ET)
-            Z3 = (1.0 + XS) * (1.0 + ET)
-            Z4 = (1.0 - XS) * (1.0 + ET)
-            DR1 = -(Z1 * X1 + Z2 * X2 + Z3 * X3 + Z4 * X4 - 4.0 * XM)
-            DR2 = -(Z1 * Y1 + Z2 * Y2 + Z3 * Y3 + Z4 * Y4 - 4.0 * YM)
-            A11 = -(1.0 - ET) * X1 + (1.0 - ET) * X2 + (1.0 + ET) * X3 - (1.0 + ET) * X4
-            A12 = -(1.0 - XS) * X1 - (1.0 + XS) * X2 + (1.0 + XS) * X3 + (1.0 - XS) * X4
-            A21 = -(1.0 - ET) * Y1 + (1.0 - ET) * Y2 + (1.0 + ET) * Y3 - (1.0 + ET) * Y4
-            A22 = -(1.0 - XS) * Y1 - (1.0 + XS) * Y2 + (1.0 + XS) * Y3 + (1.0 - XS) * Y4
-            DETINV = 1.0 / (A11 * A22 - A12 * A21)
-            DXS = DETINV * (DR1 * A22 - A12 * DR2)
-            DET = DETINV * (A11 * DR2 - DR1 * A21)
-            XS = XS + DXS
-            ET = ET + DET
-            IF (AMAX1(ABS(DXS), ABS(DET))<1.0E-4) GOTO 11
-        ENDDO
-        WRITE (6, *) 'Xsi-Eta conv failed at mrkr', XM, YM, DXS, DET
+        do ixy = 1, 12
+            z1 = (1.0 - xs) * (1.0 - et)
+            z2 = (1.0 + xs) * (1.0 - et)
+            z3 = (1.0 + xs) * (1.0 + et)
+            z4 = (1.0 - xs) * (1.0 + et)
+            dr1 = -(z1 * x1 + z2 * x2 + z3 * x3 + z4 * x4 - 4.0 * xm)
+            dr2 = -(z1 * y1 + z2 * y2 + z3 * y3 + z4 * y4 - 4.0 * ym)
+            a11 = -(1.0 - et) * x1 + (1.0 - et) * x2 + (1.0 + et) * x3 - (1.0 + et) * x4
+            a12 = -(1.0 - xs) * x1 - (1.0 + xs) * x2 + (1.0 + xs) * x3 + (1.0 - xs) * x4
+            a21 = -(1.0 - et) * y1 + (1.0 - et) * y2 + (1.0 + et) * y3 - (1.0 + et) * y4
+            a22 = -(1.0 - xs) * y1 - (1.0 + xs) * y2 + (1.0 + xs) * y3 + (1.0 - xs) * y4
+            detinv = 1.0 / (a11 * a22 - a12 * a21)
+            dxs = detinv * (dr1 * a22 - a12 * dr2)
+            det = detinv * (a11 * dr2 - dr1 * a21)
+            xs = xs + dxs
+            et = et + det
+            if (amax1(abs(dxs), abs(det))<1.0e-4) goto 11
+        enddo
+        write (6, *) 'Xsi-Eta conv failed at mrkr', xm, ym, dxs, det
         !
-        11   XSI = XS
-        ETA = ET
+        11   xsi = xs
+        eta = et
         !
         !---- derivatives are a free bonus from Newton procedure
-        XSI_X = 4.0 * A22 * DETINV
-        ETA_X = -4.0 * A21 * DETINV
-        XSI_Y = -4.0 * A12 * DETINV
-        ETA_Y = 4.0 * A11 * DETINV
+        xsi_x = 4.0 * a22 * detinv
+        eta_x = -4.0 * a21 * detinv
+        xsi_y = -4.0 * a12 * detinv
+        eta_y = 4.0 * a11 * detinv
         !
-    END SUBROUTINE XSIETA
+    end subroutine xsieta
     !*==FINT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XSIETA
 
 
 
-    FUNCTION FINT(XSI, ETA, Q1, Q2, Q3, Q4)
-        IMPLICIT NONE
+    function fint(xsi, eta, q1, q2, q3, q4)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: ETA, Q1, Q2, Q3, Q4, XSI
-        REAL :: FINT
+        real :: eta, q1, q2, q3, q4, xsi
+        real :: fint
         !
         ! Local variables
         !
-        REAL :: Z1, Z2, Z3, Z4
+        real :: z1, z2, z3, z4
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -152,35 +152,35 @@ contains
         !     to marker at local cell coodinates XSI,ETA
         !...................................................
         !
-        Z1 = (1.0 - XSI) * (1.0 - ETA)
-        Z2 = (1.0 + XSI) * (1.0 - ETA)
-        Z3 = (1.0 + XSI) * (1.0 + ETA)
-        Z4 = (1.0 - XSI) * (1.0 + ETA)
+        z1 = (1.0 - xsi) * (1.0 - eta)
+        z2 = (1.0 + xsi) * (1.0 - eta)
+        z3 = (1.0 + xsi) * (1.0 + eta)
+        z4 = (1.0 - xsi) * (1.0 + eta)
         !
-        FINT = (Q1 * Z1 + Q2 * Z2 + Q3 * Z3 + Q4 * Z4) * 0.25
+        fint = (q1 * z1 + q2 * z2 + q3 * z3 + q4 * z4) * 0.25
         !
-    END FUNCTION FINT
+    end function fint
     !*==XYGRDFIND.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! FINT
 
 
 
-    SUBROUTINE XYGRDFIND(XF, YF, IX, X, Y, II, JJ, IC, JC)
-        IMPLICIT NONE
+    subroutine xygrdfind(xf, yf, ix, x, y, ii, jj, ic, jc)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: IC, II, IX, JC, JJ
-        REAL :: XF, YF
-        REAL, DIMENSION(IX, *) :: X, Y
+        integer :: ic, ii, ix, jc, jj
+        real :: xf, yf
+        real, dimension(ix, *) :: x, y
         !
         ! Local variables
         !
-        INTEGER :: INOUT, IO, IP, JO, JP, NQ
-        REAL :: XMAX, XMIN, YMAX, YMIN
-        REAL, DIMENSION(5) :: XQ, YQ
+        integer :: inout, io, ip, jo, jp, nq
+        real :: xmax, xmin, ymax, ymin
+        real, dimension(5) :: xq, yq
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -194,51 +194,51 @@ contains
         !     of grid.
         !..............................................
         !
-        IC = 0
-        JC = 0
+        ic = 0
+        jc = 0
         !
         !---- sweep over all cells in grid
-        DO IO = 1, II - 1
-            IP = IO + 1
-            DO JO = 1, JJ - 1
-                JP = JO + 1
+        do io = 1, ii - 1
+            ip = io + 1
+            do jo = 1, jj - 1
+                jp = jo + 1
                 !
-                XQ(1) = X(IO, JO)
-                XQ(2) = X(IP, JO)
-                XQ(3) = X(IP, JP)
-                XQ(4) = X(IO, JP)
-                YQ(1) = Y(IO, JO)
-                YQ(2) = Y(IP, JO)
-                YQ(3) = Y(IP, JP)
-                YQ(4) = Y(IO, JP)
+                xq(1) = x(io, jo)
+                xq(2) = x(ip, jo)
+                xq(3) = x(ip, jp)
+                xq(4) = x(io, jp)
+                yq(1) = y(io, jo)
+                yq(2) = y(ip, jo)
+                yq(3) = y(ip, jp)
+                yq(4) = y(io, jp)
                 !
                 !------ initial check to see if point is outside cell limits
                 !       (this disqualifies nearly all cells)
-                XMAX = AMAX1(XQ(1), XQ(2), XQ(3), XQ(4))
-                XMIN = AMIN1(XQ(1), XQ(2), XQ(3), XQ(4))
-                YMAX = AMAX1(YQ(1), YQ(2), YQ(3), YQ(4))
-                YMIN = AMIN1(YQ(1), YQ(2), YQ(3), YQ(4))
+                xmax = amax1(xq(1), xq(2), xq(3), xq(4))
+                xmin = amin1(xq(1), xq(2), xq(3), xq(4))
+                ymax = amax1(yq(1), yq(2), yq(3), yq(4))
+                ymin = amin1(yq(1), yq(2), yq(3), yq(4))
                 !
-                IF (XF<=XMAX .AND. XF>=XMIN .AND. YF<=YMAX .AND. YF>=YMIN)&
-                        & THEN
+                if (xf<=xmax .and. xf>=xmin .and. yf<=ymax .and. yf>=ymin)&
+                        & then
                     !
                     !------ Inside test for polygon
-                    NQ = 4
-                    CALL PNPOLY(XF, YF, XQ, YQ, NQ, INOUT)
-                    IF (INOUT>=0) THEN
+                    nq = 4
+                    call pnpoly(xf, yf, xq, yq, nq, inout)
+                    if (inout>=0) then
                         !------ Found point in cell
-                        IC = IO
-                        JC = JO
-                        RETURN
-                    ENDIF
-                ENDIF
+                        ic = io
+                        jc = jo
+                        return
+                    endif
+                endif
                 !
-            ENDDO
-        ENDDO
+            enddo
+        enddo
         !
         !c      WRITE(6,*) 'Point grid location failed. x y =',XF,YF
         !
-    END SUBROUTINE XYGRDFIND
+    end subroutine xygrdfind
     !*==PNPOLY.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! XYGRDFIND
 
@@ -290,91 +290,91 @@ contains
     !
     !     ..................................................................
     !
-    SUBROUTINE PNPOLY(PX, PY, XX, YY, N, INOUT)
-        IMPLICIT NONE
+    subroutine pnpoly(px, py, xx, yy, n, inout)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: MAXDIM = 200
+        integer, parameter :: maxdim = 200
         !
         ! Dummy arguments
         !
-        INTEGER :: INOUT, N
-        REAL :: PX, PY
-        REAL, DIMENSION(N) :: XX, YY
+        integer :: inout, n
+        real :: px, py
+        real, dimension(n) :: xx, yy
         !
         ! Local variables
         !
-        INTEGER :: I, J
-        LOGICAL :: MX, MY, NX, NY
-        REAL :: TEST
-        REAL, DIMENSION(MAXDIM) :: X, Y
+        integer :: i, j
+        logical :: mx, my, nx, ny
+        real :: test
+        real, dimension(maxdim) :: x, y
         !
         !*** End of declarations rewritten by SPAG
         !
 
         !--- Output unit for printed messages
-        IF (N>MAXDIM) THEN
-            WRITE (*, 1)
-            1       FORMAT ('WARNING:', I5, ' too many polygon sides in PNPOLY')
-            RETURN
-        ENDIF
+        if (n>maxdim) then
+            write (*, 1)
+            1       format ('WARNING:', i5, ' too many polygon sides in PNPOLY')
+            return
+        endif
         !
-        DO I = 1, N
-            X(I) = XX(I) - PX
-            Y(I) = YY(I) - PY
-        ENDDO
+        do i = 1, n
+            x(i) = xx(i) - px
+            y(i) = yy(i) - py
+        enddo
         !
-        INOUT = -1
-        DO I = 1, N
-            J = 1 + MOD(I, N)
-            MX = X(I)>=0.0
-            NX = X(J)>=0.0
-            MY = Y(I)>=0.0
-            NY = Y(J)>=0.0
-            IF (.NOT.(.NOT.((MY.OR.NY) .AND. (MX.OR.NX)) .OR.             &
-                    & (MX .AND. NX))) THEN
-                IF (.NOT.(MY .AND. NY .AND. (MX .OR. NX) .AND.             &
-                        & .NOT.(MX .AND. NX))) THEN
+        inout = -1
+        do i = 1, n
+            j = 1 + mod(i, n)
+            mx = x(i)>=0.0
+            nx = x(j)>=0.0
+            my = y(i)>=0.0
+            ny = y(j)>=0.0
+            if (.not.(.not.((my.or.ny) .and. (mx.or.nx)) .or.             &
+                    & (mx .and. nx))) then
+                if (.not.(my .and. ny .and. (mx .or. nx) .and.             &
+                        & .not.(mx .and. nx))) then
                     !
-                    TEST = (Y(I) * X(J) - X(I) * Y(J)) / (X(J) - X(I))
-                    IF (TEST<0.0) THEN
-                    ELSEIF (TEST==0.0) THEN
-                        INOUT = 0
-                        RETURN
-                    ELSEIF (TEST>0.0) THEN
-                        INOUT = -INOUT
-                    ENDIF
-                ELSE
-                    INOUT = -INOUT
-                ENDIF
-            ENDIF
+                    test = (y(i) * x(j) - x(i) * y(j)) / (x(j) - x(i))
+                    if (test<0.0) then
+                    elseif (test==0.0) then
+                        inout = 0
+                        return
+                    elseif (test>0.0) then
+                        inout = -inout
+                    endif
+                else
+                    inout = -inout
+                endif
+            endif
             !
-        ENDDO
+        enddo
         !
-    END SUBROUTINE PNPOLY
+    end subroutine pnpoly
     !*==UVGRDC.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE UVGRDC(IX, II, JJ, X, Y, XPOS, YPOS, UC, VC)
-        IMPLICIT NONE
+    subroutine uvgrdc(ix, ii, jj, x, y, xpos, ypos, uc, vc)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: II, IX, JJ
-        REAL, DIMENSION(IX, *) :: UC, VC, X, Y
-        REAL, DIMENSION(*) :: XPOS, YPOS
+        integer :: ii, ix, jj
+        real, dimension(ix, *) :: uc, vc, x, y
+        real, dimension(*) :: xpos, ypos
         !
         ! Local variables
         !
-        REAL :: AJA, DET, DXAET, DXAXI, DXDET, DXDXI, DXI, &
-                & DYAET, DYAXI, DYDET, DYDXI, XAV, XOO, XOP, XPO, &
-                & XPP, YAV, YOO, YOP, YPO, YPP
-        INTEGER :: IO, IP, JO, JP
+        real :: aja, det, dxaet, dxaxi, dxdet, dxdxi, dxi, &
+                & dyaet, dyaxi, dydet, dydxi, xav, xoo, xop, xpo, &
+                & xpp, yav, yoo, yop, ypo, ypp
+        integer :: io, ip, jo, jp
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -418,73 +418,73 @@ contains
         !
         !
         !------ go over all streamline cell centers
-        DO JO = 1, JJ - 1
-            JP = JO + 1
+        do jo = 1, jj - 1
+            jp = jo + 1
             !
             !-------- for all cell centers on this streamline
-            DO IO = 1, II - 1
-                IP = IO + 1
+            do io = 1, ii - 1
+                ip = io + 1
                 !
-                XOO = X(IO, JO)
-                XPO = X(IP, JO)
-                XOP = X(IO, JP)
-                XPP = X(IP, JP)
-                YOO = Y(IO, JO)
-                YPO = Y(IP, JO)
-                YOP = Y(IO, JP)
-                YPP = Y(IP, JP)
+                xoo = x(io, jo)
+                xpo = x(ip, jo)
+                xop = x(io, jp)
+                xpp = x(ip, jp)
+                yoo = y(io, jo)
+                ypo = y(ip, jo)
+                yop = y(io, jp)
+                ypp = y(ip, jp)
                 !
-                XAV = 0.25 * (XOO + XOP + XPO + XPP)
-                YAV = 0.25 * (YOO + YOP + YPO + YPP)
+                xav = 0.25 * (xoo + xop + xpo + xpp)
+                yav = 0.25 * (yoo + yop + ypo + ypp)
                 !
-                DXAXI = 0.5 * (-XOO - XOP + XPO + XPP)
-                DYAXI = 0.5 * (-YOO - YOP + YPO + YPP)
-                DXAET = 0.5 * (-XOO + XOP - XPO + XPP)
-                DYAET = 0.5 * (-YOO + YOP - YPO + YPP)
+                dxaxi = 0.5 * (-xoo - xop + xpo + xpp)
+                dyaxi = 0.5 * (-yoo - yop + ypo + ypp)
+                dxaet = 0.5 * (-xoo + xop - xpo + xpp)
+                dyaet = 0.5 * (-yoo + yop - ypo + ypp)
                 !
-                DXI = XPOS(IP) - XPOS(IO)
-                DET = YPOS(JP) - YPOS(JO)
+                dxi = xpos(ip) - xpos(io)
+                det = ypos(jp) - ypos(jo)
                 !
-                DXDXI = DXAXI / DXI
-                DYDXI = DYAXI / DXI
-                DXDET = DXAET / DET
-                DYDET = DYAET / DET
+                dxdxi = dxaxi / dxi
+                dydxi = dyaxi / dxi
+                dxdet = dxaet / det
+                dydet = dyaet / det
                 !
-                AJA = DYDET * DXDXI - DXDET * DYDXI
+                aja = dydet * dxdxi - dxdet * dydxi
                 !
-                UC(IO, JO) = DXDXI / YAV / AJA
-                VC(IO, JO) = DYDXI / YAV / AJA
+                uc(io, jo) = dxdxi / yav / aja
+                vc(io, jo) = dydxi / yav / aja
                 !
-            ENDDO
+            enddo
             !
-        ENDDO
+        enddo
         !
-    END SUBROUTINE UVGRDC
+    end subroutine uvgrdc
     !*==UVGRD.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! UVGRDC
 
 
-    SUBROUTINE UVGRD(IX, II, JJ, X, Y, XPOS, YPOS, UG, VG)
-        IMPLICIT NONE
+    subroutine uvgrd(ix, ii, jj, x, y, xpos, ypos, ug, vg)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: II, IX, JJ
-        REAL, DIMENSION(IX, *) :: UG, VG, X, Y
-        REAL, DIMENSION(*) :: XPOS, YPOS
+        integer :: ii, ix, jj
+        real, dimension(ix, *) :: ug, vg, x, y
+        real, dimension(*) :: xpos, ypos
         !
         ! Local variables
         !
-        REAL :: AJA, DETAV, DETL, DETM, DETP, DETQ, DXDE1, &
-                & DXDE2, DXDET, DXDX1, DXDX2, DXDXI, DXIAV, DXIL, &
-                & DXIM, DXIP, DXIQ, DYDE1, DYDE2, DYDET, DYDX1, &
-                & DYDX2, DYDXI, XLO, XMM, XMO, XMP, XOL, XOM, &
-                & XOO, XOP, XOQ, XPM, XPO, XPP, XQO, YAV, YLO, &
-                & YMM, YMO, YMP, YOL, YOM, YOO, YOP, YOQ, YPM, &
-                & YPO, YPP, YQO
-        INTEGER :: IL, IM, IO, IP, IQ, JL, JM, JO, JP, JQ
+        real :: aja, detav, detl, detm, detp, detq, dxde1, &
+                & dxde2, dxdet, dxdx1, dxdx2, dxdxi, dxiav, dxil, &
+                & dxim, dxip, dxiq, dyde1, dyde2, dydet, dydx1, &
+                & dydx2, dydxi, xlo, xmm, xmo, xmp, xol, xom, &
+                & xoo, xop, xoq, xpm, xpo, xpp, xqo, yav, ylo, &
+                & ymm, ymo, ymp, yol, yom, yoo, yop, yoq, ypm, &
+                & ypo, ypp, yqo
+        integer :: il, im, io, ip, iq, jl, jm, jo, jp, jq
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -526,326 +526,326 @@ contains
         !-------------------------------------------------------------
         !
         !------ go over all interior streamlines
-        DO JO = 2, JJ - 1
-            JM = JO - 1
-            JP = JO + 1
+        do jo = 2, jj - 1
+            jm = jo - 1
+            jp = jo + 1
             !
             !-------- for all interior points on this streamline
-            DO IO = 2, II - 1
-                IM = IO - 1
-                IP = IO + 1
+            do io = 2, ii - 1
+                im = io - 1
+                ip = io + 1
                 !
-                XMM = X(IM, JM)
-                XOM = X(IO, JM)
-                XPM = X(IP, JM)
-                XMO = X(IM, JO)
-                XOO = X(IO, JO)
-                XPO = X(IP, JO)
-                XMP = X(IM, JP)
-                XOP = X(IO, JP)
-                XPP = X(IP, JP)
-                YMM = Y(IM, JM)
-                YOM = Y(IO, JM)
-                YPM = Y(IP, JM)
-                YMO = Y(IM, JO)
-                YOO = Y(IO, JO)
-                YPO = Y(IP, JO)
-                YMP = Y(IM, JP)
-                YOP = Y(IO, JP)
-                YPP = Y(IP, JP)
+                xmm = x(im, jm)
+                xom = x(io, jm)
+                xpm = x(ip, jm)
+                xmo = x(im, jo)
+                xoo = x(io, jo)
+                xpo = x(ip, jo)
+                xmp = x(im, jp)
+                xop = x(io, jp)
+                xpp = x(ip, jp)
+                ymm = y(im, jm)
+                yom = y(io, jm)
+                ypm = y(ip, jm)
+                ymo = y(im, jo)
+                yoo = y(io, jo)
+                ypo = y(ip, jo)
+                ymp = y(im, jp)
+                yop = y(io, jp)
+                ypp = y(ip, jp)
                 !
-                DXIM = XPOS(IO) - XPOS(IM)
-                DXIP = XPOS(IP) - XPOS(IO)
-                DXIAV = 0.5 * (DXIM + DXIP)
+                dxim = xpos(io) - xpos(im)
+                dxip = xpos(ip) - xpos(io)
+                dxiav = 0.5 * (dxim + dxip)
                 !
-                DETM = YPOS(JO) - YPOS(JM)
-                DETP = YPOS(JP) - YPOS(JO)
-                DETAV = 0.5 * (DETM + DETP)
+                detm = ypos(jo) - ypos(jm)
+                detp = ypos(jp) - ypos(jo)
+                detav = 0.5 * (detm + detp)
                 !
-                DXDET = 0.5 * (XOP - XOM) / DETAV
-                DYDET = 0.5 * (YOP - YOM) / DETAV
-                DXDXI = 0.5 * (XPO - XMO) / DXIAV
-                DYDXI = 0.5 * (YPO - YMO) / DXIAV
+                dxdet = 0.5 * (xop - xom) / detav
+                dydet = 0.5 * (yop - yom) / detav
+                dxdxi = 0.5 * (xpo - xmo) / dxiav
+                dydxi = 0.5 * (ypo - ymo) / dxiav
                 !
-                AJA = DYDET * DXDXI - DXDET * DYDXI
-                YAV = YOO
+                aja = dydet * dxdxi - dxdet * dydxi
+                yav = yoo
                 !
-                UG(IO, JO) = DXDXI / YAV / AJA
-                VG(IO, JO) = DYDXI / YAV / AJA
+                ug(io, jo) = dxdxi / yav / aja
+                vg(io, jo) = dydxi / yav / aja
                 !
-            ENDDO
+            enddo
             !
-        ENDDO
+        enddo
         !
         !
         !-------- Calculate velocities on grid boundaries (uses backward differences)
         !
         !-------- Velocities on lower streamline
-        JO = 1
-        DO IO = 2, II - 1
-            IP = IO + 1
-            IM = IO - 1
+        jo = 1
+        do io = 2, ii - 1
+            ip = io + 1
+            im = io - 1
             !
-            JP = JO + 1
-            JQ = JO + 2
+            jp = jo + 1
+            jq = jo + 2
             !
-            XOO = X(IO, JO)
-            XOP = X(IO, JP)
-            XOQ = X(IO, JQ)
-            YOO = Y(IO, JO)
-            YOP = Y(IO, JP)
-            YOQ = Y(IO, JQ)
+            xoo = x(io, jo)
+            xop = x(io, jp)
+            xoq = x(io, jq)
+            yoo = y(io, jo)
+            yop = y(io, jp)
+            yoq = y(io, jq)
             !
-            DETP = YPOS(JP) - YPOS(JO)
-            DETQ = YPOS(JQ) - YPOS(JP)
+            detp = ypos(jp) - ypos(jo)
+            detq = ypos(jq) - ypos(jp)
             !
-            DXDE1 = (XOP - XOO) / DETP
-            DXDE2 = (XOQ - XOP) / DETQ
-            DYDE1 = (YOP - YOO) / DETP
-            DYDE2 = (YOQ - YOP) / DETQ
+            dxde1 = (xop - xoo) / detp
+            dxde2 = (xoq - xop) / detq
+            dyde1 = (yop - yoo) / detp
+            dyde2 = (yoq - yop) / detq
             !--- backwards difference at boundary
-            DXDET = DXDE1 - DETP * (DXDE2 - DXDE1) / (DETP + DETQ)
-            DYDET = DYDE1 - DETP * (DYDE2 - DYDE1) / (DETP + DETQ)
+            dxdet = dxde1 - detp * (dxde2 - dxde1) / (detp + detq)
+            dydet = dyde1 - detp * (dyde2 - dyde1) / (detp + detq)
             !
-            XMO = X(IM, JO)
-            XOO = X(IO, JO)
-            XPO = X(IP, JO)
-            YMO = Y(IM, JO)
-            YOO = Y(IO, JO)
-            YPO = Y(IP, JO)
+            xmo = x(im, jo)
+            xoo = x(io, jo)
+            xpo = x(ip, jo)
+            ymo = y(im, jo)
+            yoo = y(io, jo)
+            ypo = y(ip, jo)
             !
-            DXIM = XPOS(IO) - XPOS(IM)
-            DXIP = XPOS(IP) - XPOS(IO)
-            DXIAV = 0.5 * (DXIM + DXIP)
-            DXDXI = 0.5 * (XPO - XMO) / DXIAV
-            DYDXI = 0.5 * (YPO - YMO) / DXIAV
+            dxim = xpos(io) - xpos(im)
+            dxip = xpos(ip) - xpos(io)
+            dxiav = 0.5 * (dxim + dxip)
+            dxdxi = 0.5 * (xpo - xmo) / dxiav
+            dydxi = 0.5 * (ypo - ymo) / dxiav
             !
-            AJA = DYDET * DXDXI - DXDET * DYDXI
-            YAV = YOO
+            aja = dydet * dxdxi - dxdet * dydxi
+            yav = yoo
             !
-            UG(IO, JO) = DXDXI / YAV / AJA
-            VG(IO, JO) = DYDXI / YAV / AJA
-        ENDDO
+            ug(io, jo) = dxdxi / yav / aja
+            vg(io, jo) = dydxi / yav / aja
+        enddo
         !
         !-------- Velocities on upper streamline
-        JO = JJ
-        DO IO = 2, II - 1
-            IP = IO + 1
-            IM = IO - 1
+        jo = jj
+        do io = 2, ii - 1
+            ip = io + 1
+            im = io - 1
             !
-            JM = JO - 1
-            JL = JO - 2
+            jm = jo - 1
+            jl = jo - 2
             !
-            XOO = X(IO, JO)
-            XOM = X(IO, JM)
-            XOL = X(IO, JL)
-            YOO = Y(IO, JO)
-            YOM = Y(IO, JM)
-            YOL = Y(IO, JL)
+            xoo = x(io, jo)
+            xom = x(io, jm)
+            xol = x(io, jl)
+            yoo = y(io, jo)
+            yom = y(io, jm)
+            yol = y(io, jl)
             !
-            DETM = YPOS(JO) - YPOS(JM)
-            DETL = YPOS(JM) - YPOS(JL)
-            DXDE1 = (XOO - XOM) / DETM
-            DYDE1 = (YOO - YOM) / DETM
-            DXDE2 = (XOM - XOL) / DETL
-            DYDE2 = (YOM - YOL) / DETL
+            detm = ypos(jo) - ypos(jm)
+            detl = ypos(jm) - ypos(jl)
+            dxde1 = (xoo - xom) / detm
+            dyde1 = (yoo - yom) / detm
+            dxde2 = (xom - xol) / detl
+            dyde2 = (yom - yol) / detl
             !--- backwards difference at boundary
-            DXDET = DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL)
-            DYDET = DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL)
+            dxdet = dxde1 + detm * (dxde1 - dxde2) / (detm + detl)
+            dydet = dyde1 + detm * (dyde1 - dyde2) / (detm + detl)
             !
-            XMO = X(IM, JO)
-            XOO = X(IO, JO)
-            XPO = X(IP, JO)
-            YMO = Y(IM, JO)
-            YOO = Y(IO, JO)
-            YPO = Y(IP, JO)
+            xmo = x(im, jo)
+            xoo = x(io, jo)
+            xpo = x(ip, jo)
+            ymo = y(im, jo)
+            yoo = y(io, jo)
+            ypo = y(ip, jo)
             !
-            DXIM = XPOS(IO) - XPOS(IM)
-            DXIP = XPOS(IP) - XPOS(IO)
-            DXIAV = 0.5 * (DXIM + DXIP)
-            DXDXI = 0.5 * (XPO - XMO) / DXIAV
-            DYDXI = 0.5 * (YPO - YMO) / DXIAV
+            dxim = xpos(io) - xpos(im)
+            dxip = xpos(ip) - xpos(io)
+            dxiav = 0.5 * (dxim + dxip)
+            dxdxi = 0.5 * (xpo - xmo) / dxiav
+            dydxi = 0.5 * (ypo - ymo) / dxiav
             !
-            AJA = DYDET * DXDXI - DXDET * DYDXI
-            YAV = YOO
+            aja = dydet * dxdxi - dxdet * dydxi
+            yav = yoo
             !
-            UG(IO, JO) = DXDXI / YAV / AJA
-            VG(IO, JO) = DYDXI / YAV / AJA
-        ENDDO
+            ug(io, jo) = dxdxi / yav / aja
+            vg(io, jo) = dydxi / yav / aja
+        enddo
         !
         !-------- Velocities on(i=1) inlet plane (includes corner points J=1,J=JJ)
-        IO = 1
-        IP = IO + 1
-        IQ = IO + 2
+        io = 1
+        ip = io + 1
+        iq = io + 2
         !
-        DO JO = 1, JJ
-            JL = JO - 2
-            JM = JO - 1
-            JP = JO + 1
-            JQ = JO + 2
+        do jo = 1, jj
+            jl = jo - 2
+            jm = jo - 1
+            jp = jo + 1
+            jq = jo + 2
             !
-            IF (JO==1) THEN
+            if (jo==1) then
                 !---- lower streamline inlet corner
-                XOO = X(IO, JO)
-                XOP = X(IO, JP)
-                XOQ = X(IO, JQ)
-                YOO = Y(IO, JO)
-                YOP = Y(IO, JP)
-                YOQ = Y(IO, JQ)
+                xoo = x(io, jo)
+                xop = x(io, jp)
+                xoq = x(io, jq)
+                yoo = y(io, jo)
+                yop = y(io, jp)
+                yoq = y(io, jq)
                 !
-                DETP = YPOS(JP) - YPOS(JO)
-                DETQ = YPOS(JQ) - YPOS(JP)
-                DXDE1 = (XOP - XOO) / DETP
-                DXDE2 = (XOQ - XOP) / DETQ
-                DYDE1 = (YOP - YOO) / DETP
-                DYDE2 = (YOQ - YOP) / DETQ
+                detp = ypos(jp) - ypos(jo)
+                detq = ypos(jq) - ypos(jp)
+                dxde1 = (xop - xoo) / detp
+                dxde2 = (xoq - xop) / detq
+                dyde1 = (yop - yoo) / detp
+                dyde2 = (yoq - yop) / detq
                 !--------- backwards difference at boundary
-                DXDET = DXDE1 - DETP * (DXDE2 - DXDE1) / (DETP + DETQ)
-                DYDET = DYDE1 - DETP * (DYDE2 - DYDE1) / (DETP + DETQ)
-            ELSEIF (JO==JJ) THEN
+                dxdet = dxde1 - detp * (dxde2 - dxde1) / (detp + detq)
+                dydet = dyde1 - detp * (dyde2 - dyde1) / (detp + detq)
+            elseif (jo==jj) then
                 !---- upper streamline inlet corner
-                XOO = X(IO, JO)
-                XOM = X(IO, JM)
-                XOL = X(IO, JL)
-                YOO = Y(IO, JO)
-                YOM = Y(IO, JM)
-                YOL = Y(IO, JL)
+                xoo = x(io, jo)
+                xom = x(io, jm)
+                xol = x(io, jl)
+                yoo = y(io, jo)
+                yom = y(io, jm)
+                yol = y(io, jl)
                 !
-                DETM = YPOS(JO) - YPOS(JM)
-                DETL = YPOS(JM) - YPOS(JL)
-                DXDE1 = (XOO - XOM) / DETM
-                DYDE1 = (YOO - YOM) / DETM
-                DXDE2 = (XOM - XOL) / DETL
-                DYDE2 = (YOM - YOL) / DETL
+                detm = ypos(jo) - ypos(jm)
+                detl = ypos(jm) - ypos(jl)
+                dxde1 = (xoo - xom) / detm
+                dyde1 = (yoo - yom) / detm
+                dxde2 = (xom - xol) / detl
+                dyde2 = (yom - yol) / detl
                 !--------- backwards difference at boundary
-                DXDET = DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL)
-                DYDET = DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL)
+                dxdet = dxde1 + detm * (dxde1 - dxde2) / (detm + detl)
+                dydet = dyde1 + detm * (dyde1 - dyde2) / (detm + detl)
 
-            ELSE
-                XOO = X(IO, JO)
-                XPO = X(IP, JO)
-                XQO = X(IQ, JO)
-                YOO = Y(IO, JO)
-                YPO = Y(IP, JO)
-                YQO = Y(IQ, JO)
+            else
+                xoo = x(io, jo)
+                xpo = x(ip, jo)
+                xqo = x(iq, jo)
+                yoo = y(io, jo)
+                ypo = y(ip, jo)
+                yqo = y(iq, jo)
                 !
-                DXIP = XPOS(IP) - XPOS(IO)
-                DXIQ = XPOS(IQ) - XPOS(IP)
-                DXDX1 = (XPO - XOO) / DXIP
-                DXDX2 = (XQO - XPO) / DXIQ
-                DYDX1 = (YPO - YOO) / DXIP
-                DYDX2 = (YQO - YPO) / DXIQ
+                dxip = xpos(ip) - xpos(io)
+                dxiq = xpos(iq) - xpos(ip)
+                dxdx1 = (xpo - xoo) / dxip
+                dxdx2 = (xqo - xpo) / dxiq
+                dydx1 = (ypo - yoo) / dxip
+                dydx2 = (yqo - ypo) / dxiq
                 !---------- 2nd-order backward 3-point difference at boundary
-                DXDXI = DXDX1 - DXIP * (DXDX2 - DXDX1) / (DXIP + DXIQ)
-                DYDXI = DYDX1 - DXIP * (DYDX2 - DYDX1) / (DXIP + DXIQ)
-            ENDIF
+                dxdxi = dxdx1 - dxip * (dxdx2 - dxdx1) / (dxip + dxiq)
+                dydxi = dydx1 - dxip * (dydx2 - dydx1) / (dxip + dxiq)
+            endif
             !
-            XOM = X(IO, JM)
-            XOO = X(IO, JO)
-            XOP = X(IO, JP)
-            YOM = Y(IO, JM)
-            YOO = Y(IO, JO)
-            YOP = Y(IO, JP)
+            xom = x(io, jm)
+            xoo = x(io, jo)
+            xop = x(io, jp)
+            yom = y(io, jm)
+            yoo = y(io, jo)
+            yop = y(io, jp)
             !
-            DETM = YPOS(JO) - YPOS(JM)
-            DETP = YPOS(JP) - YPOS(JO)
-            DETAV = 0.5 * (DETM + DETP)
-            DXDET = 0.5 * (XOP - XOM) / DETAV
-            DYDET = 0.5 * (YOP - YOM) / DETAV
+            detm = ypos(jo) - ypos(jm)
+            detp = ypos(jp) - ypos(jo)
+            detav = 0.5 * (detm + detp)
+            dxdet = 0.5 * (xop - xom) / detav
+            dydet = 0.5 * (yop - yom) / detav
             !
-            AJA = DYDET * DXDXI - DXDET * DYDXI
-            YAV = YOO
+            aja = dydet * dxdxi - dxdet * dydxi
+            yav = yoo
             !
-            UG(IO, JO) = DXDXI / YAV / AJA
-            VG(IO, JO) = DYDXI / YAV / AJA
-        ENDDO
+            ug(io, jo) = dxdxi / yav / aja
+            vg(io, jo) = dydxi / yav / aja
+        enddo
         !
         !-------- Velocities on (i=II) outlet plane (includes corner points J=1,J=JJ)
-        IO = II
-        IM = IO - 1
-        IL = IO - 2
-        DO JO = 1, JJ
-            JL = JO - 2
-            JM = JO - 1
-            JP = JO + 1
-            JQ = JO + 2
+        io = ii
+        im = io - 1
+        il = io - 2
+        do jo = 1, jj
+            jl = jo - 2
+            jm = jo - 1
+            jp = jo + 1
+            jq = jo + 2
             !
-            IF (JO==1) THEN
+            if (jo==1) then
                 !---- lower streamline outlet corner
-                XOO = X(IO, JO)
-                XOP = X(IO, JP)
-                XOQ = X(IO, JQ)
-                YOO = Y(IO, JO)
-                YOP = Y(IO, JP)
-                YOQ = Y(IO, JQ)
+                xoo = x(io, jo)
+                xop = x(io, jp)
+                xoq = x(io, jq)
+                yoo = y(io, jo)
+                yop = y(io, jp)
+                yoq = y(io, jq)
                 !
-                DETP = YPOS(JP) - YPOS(JO)
-                DETQ = YPOS(JQ) - YPOS(JP)
-                DXDE1 = (XOP - XOO) / DETP
-                DXDE2 = (XOQ - XOP) / DETQ
-                DYDE1 = (YOP - YOO) / DETP
-                DYDE2 = (YOQ - YOP) / DETQ
+                detp = ypos(jp) - ypos(jo)
+                detq = ypos(jq) - ypos(jp)
+                dxde1 = (xop - xoo) / detp
+                dxde2 = (xoq - xop) / detq
+                dyde1 = (yop - yoo) / detp
+                dyde2 = (yoq - yop) / detq
                 !--------- backwards difference at boundary
-                DXDET = DXDE1 - DETP * (DXDE2 - DXDE1) / (DETP + DETQ)
-                DYDET = DYDE1 - DETP * (DYDE2 - DYDE1) / (DETP + DETQ)
-            ELSEIF (JO==JJ) THEN
+                dxdet = dxde1 - detp * (dxde2 - dxde1) / (detp + detq)
+                dydet = dyde1 - detp * (dyde2 - dyde1) / (detp + detq)
+            elseif (jo==jj) then
                 !---- upper streamline outlet corner
-                XOO = X(IO, JO)
-                XOM = X(IO, JM)
-                XOL = X(IO, JL)
-                YOO = Y(IO, JO)
-                YOM = Y(IO, JM)
-                YOL = Y(IO, JL)
+                xoo = x(io, jo)
+                xom = x(io, jm)
+                xol = x(io, jl)
+                yoo = y(io, jo)
+                yom = y(io, jm)
+                yol = y(io, jl)
                 !
-                DETM = YPOS(JO) - YPOS(JM)
-                DETL = YPOS(JM) - YPOS(JL)
-                DXDE1 = (XOO - XOM) / DETM
-                DYDE1 = (YOO - YOM) / DETM
-                DXDE2 = (XOM - XOL) / DETL
-                DYDE2 = (YOM - YOL) / DETL
+                detm = ypos(jo) - ypos(jm)
+                detl = ypos(jm) - ypos(jl)
+                dxde1 = (xoo - xom) / detm
+                dyde1 = (yoo - yom) / detm
+                dxde2 = (xom - xol) / detl
+                dyde2 = (yom - yol) / detl
                 !--------- backwards difference at boundary
-                DXDET = DXDE1 + DETM * (DXDE1 - DXDE2) / (DETM + DETL)
-                DYDET = DYDE1 + DETM * (DYDE1 - DYDE2) / (DETM + DETL)
+                dxdet = dxde1 + detm * (dxde1 - dxde2) / (detm + detl)
+                dydet = dyde1 + detm * (dyde1 - dyde2) / (detm + detl)
 
-            ELSE
+            else
                 !
-                XOO = X(IO, JO)
-                XMO = X(IM, JO)
-                XLO = X(IL, JO)
-                YOO = Y(IO, JO)
-                YMO = Y(IM, JO)
-                YLO = Y(IL, JO)
+                xoo = x(io, jo)
+                xmo = x(im, jo)
+                xlo = x(il, jo)
+                yoo = y(io, jo)
+                ymo = y(im, jo)
+                ylo = y(il, jo)
                 !
-                DXIM = XPOS(IO) - XPOS(IM)
-                DXIL = XPOS(IM) - XPOS(IL)
-                DXDX1 = (XOO - XMO) / DXIM
-                DXDX2 = (XMO - XLO) / DXIL
-                DYDX1 = (YOO - YMO) / DXIM
-                DYDX2 = (YMO - YLO) / DXIL
+                dxim = xpos(io) - xpos(im)
+                dxil = xpos(im) - xpos(il)
+                dxdx1 = (xoo - xmo) / dxim
+                dxdx2 = (xmo - xlo) / dxil
+                dydx1 = (yoo - ymo) / dxim
+                dydx2 = (ymo - ylo) / dxil
                 !---------- 2nd-order 3-point difference for tangential velocity
-                DXDXI = DXDX1 + DXIM * (DXDX1 - DXDX2) / (DXIM + DXIL)
-                DYDXI = DYDX1 + DXIM * (DYDX1 - DYDX2) / (DXIM + DXIL)
-            ENDIF
+                dxdxi = dxdx1 + dxim * (dxdx1 - dxdx2) / (dxim + dxil)
+                dydxi = dydx1 + dxim * (dydx1 - dydx2) / (dxim + dxil)
+            endif
             !
-            XOM = X(IO, JM)
-            XOO = X(IO, JO)
-            XOP = X(IO, JP)
-            YOM = Y(IO, JM)
-            YOO = Y(IO, JO)
-            YOP = Y(IO, JP)
+            xom = x(io, jm)
+            xoo = x(io, jo)
+            xop = x(io, jp)
+            yom = y(io, jm)
+            yoo = y(io, jo)
+            yop = y(io, jp)
             !
-            DETM = YPOS(JO) - YPOS(JM)
-            DETP = YPOS(JP) - YPOS(JO)
-            DETAV = 0.5 * (DETM + DETP)
-            DXDET = 0.5 * (XOP - XOM) / DETAV
-            DYDET = 0.5 * (YOP - YOM) / DETAV
+            detm = ypos(jo) - ypos(jm)
+            detp = ypos(jp) - ypos(jo)
+            detav = 0.5 * (detm + detp)
+            dxdet = 0.5 * (xop - xom) / detav
+            dydet = 0.5 * (yop - yom) / detav
             !
-            AJA = DYDET * DXDXI - DXDET * DYDXI
-            YAV = YOO
+            aja = dydet * dxdxi - dxdet * dydxi
+            yav = yoo
             !
-            UG(IO, JO) = DXDXI / YAV / AJA
-            VG(IO, JO) = DYDXI / YAV / AJA
-        ENDDO
+            ug(io, jo) = dxdxi / yav / aja
+            vg(io, jo) = dydxi / yav / aja
+        enddo
         !
-    END SUBROUTINE UVGRD
+    end subroutine uvgrd
 end module m_grdutils

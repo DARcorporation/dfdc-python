@@ -5,24 +5,24 @@ contains
 
 
 
-    SUBROUTINE GETVEL(FNAME1)
+    subroutine getvel(fname1)
         use i_dfdc
         use m_spline, only : spline
         use m_userio, only : asks, askr
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: FNAME1
+        character(*) :: fname1
         !
         ! Local variables
         !
-        CHARACTER(128) :: FNAME
-        INTEGER :: I, LU, LUTEMP
-        REAL, SAVE :: UWT, VWT
-        REAL, DIMENSION(IRX) :: W1, W2, W3
+        character(128) :: fname
+        integer :: i, lu, lutemp
+        real, save :: uwt, vwt
+        real, dimension(irx) :: w1, w2, w3
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -32,77 +32,77 @@ contains
         !----------------------------------------------------------
         !
         !
-        DATA UWT, VWT/1.0, 1.0/
+        data uwt, vwt/1.0, 1.0/
         !
-        LUTEMP = 3
-        LU = LUTEMP
+        lutemp = 3
+        lu = lutemp
         !
-        FNAME = FNAME1
-        IF (FNAME(1:1)==' ') CALL ASKS('Enter input filename^', FNAME)
+        fname = fname1
+        if (fname(1:1)==' ') call asks('Enter input filename^', fname)
         !
-        OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 95)
-        DO I = 1, IRX
-            READ (LU, *, END = 11, ERR = 95) W1(I), W2(I), W3(I)
-        ENDDO
-        I = IRX + 1
+        open (lu, file = fname, status = 'OLD', err = 95)
+        do i = 1, irx
+            read (lu, *, end = 11, err = 95) w1(i), w2(i), w3(i)
+        enddo
+        i = irx + 1
         !
-        11   IF (I<3) GOTO 96
-        IF (NINFL>=2) THEN
-            WRITE (*, *)
-            WRITE (*, *) '*** Current slipstream profiles overwritten'
-        ENDIF
-        NINFL = I - 1
-        CLOSE (LU)
+        11   if (i<3) goto 96
+        if (ninfl>=2) then
+            write (*, *)
+            write (*, *) '*** Current slipstream profiles overwritten'
+        endif
+        ninfl = i - 1
+        close (lu)
         !
-        DO I = 1, NINFL
-            RINFL(I) = W1(I)
-            VAINFL(I) = W2(I)
-            VTINFL(I) = W3(I)
-        ENDDO
+        do i = 1, ninfl
+            rinfl(i) = w1(i)
+            vainfl(i) = w2(i)
+            vtinfl(i) = w3(i)
+        enddo
         !
-        CALL ASKR('Enter axial velocity weight (0 ===> 1)^', UWT)
-        CALL ASKR('Enter tang. velocity weight (0 , +/-1)^', VWT)
-        DO I = 1, NINFL
-            VAINFL(I) = UWT * VAINFL(I)
-            VTINFL(I) = VWT * VTINFL(I)
-        ENDDO
+        call askr('Enter axial velocity weight (0 ===> 1)^', uwt)
+        call askr('Enter tang. velocity weight (0 , +/-1)^', vwt)
+        do i = 1, ninfl
+            vainfl(i) = uwt * vainfl(i)
+            vtinfl(i) = vwt * vtinfl(i)
+        enddo
         !
-        CALL SPLINE(VAINFL, VAINFLR, RINFL, NINFL)
-        CALL SPLINE(VTINFL, VTINFLR, RINFL, NINFL)
+        call spline(vainfl, vainflr, rinfl, ninfl)
+        call spline(vtinfl, vtinflr, rinfl, ninfl)
         !
-        WRITE (*, 1200)
-        WRITE (*, 1250) (RINFL(I), VAINFL(I), VTINFL(I), I = 1, NINFL)
-        RETURN
+        write (*, 1200)
+        write (*, 1250) (rinfl(i), vainfl(i), vtinfl(i), i = 1, ninfl)
+        return
         !
-        95   WRITE (*, *) 'File read error'
-        96   WRITE (*, *) 'New wake velocities not read'
+        95   write (*, *) 'File read error'
+        96   write (*, *) 'New wake velocities not read'
 
         !....................................................
-        1200 FORMAT (/' External slipstream velocity profiles:'/               &
+        1200 format (/' External slipstream velocity profiles:'/               &
                 &'      r (m)     Vaxi (m/s)  Vrot (m/s)')
         !CC                 0.12341     0.12324    -0.08922
-        1250 FORMAT (1X, 3F12.5)
-    END SUBROUTINE GETVEL
+        1250 format (1x, 3f12.5)
+    end subroutine getvel
     !*==SAVVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SAVVEL(FNAME1)
+    subroutine savvel(fname1)
         use i_dfdc
         use m_userio, only : asks
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        CHARACTER(*) :: FNAME1
+        character(*) :: fname1
         !
         ! Local variables
         !
-        CHARACTER(1) :: ANS
-        CHARACTER(128) :: FNAME
-        INTEGER :: I, LU, LUTEMP, NR
-        REAL :: RDIM, UDIM, VDIM
+        character(1) :: ans
+        character(128) :: fname
+        integer :: i, lu, lutemp, nr
+        real :: rdim, udim, vdim
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -111,74 +111,74 @@ contains
         !     rotor and operating state.
         !--------------------------------------------------
         !
-        LUTEMP = 3
-        LU = LUTEMP
+        lutemp = 3
+        lu = lutemp
         !
-        IF (.NOT.LCONV) THEN
-            WRITE (*, *) 'Must define operating point first.'
-            RETURN
-        ENDIF
+        if (.not.lconv) then
+            write (*, *) 'Must define operating point first.'
+            return
+        endif
         !
-        FNAME = FNAME1
-        IF (FNAME(1:1)==' ') CALL ASKS('Enter output filename^', FNAME)
+        fname = fname1
+        if (fname(1:1)==' ') call asks('Enter output filename^', fname)
         !
-        OPEN (LU, FILE = FNAME, STATUS = 'OLD', ERR = 5)
-        WRITE (*, *)
-        WRITE (*, *) 'Output file exists.  Overwrite?  Y'
-        READ (*, 1000) ANS
-        1000 FORMAT (A)
-        IF (INDEX('Nn', ANS)==0) GOTO 6
+        open (lu, file = fname, status = 'OLD', err = 5)
+        write (*, *)
+        write (*, *) 'Output file exists.  Overwrite?  Y'
+        read (*, 1000) ans
+        1000 format (a)
+        if (index('Nn', ans)==0) goto 6
         !
-        CLOSE (LU)
-        WRITE (*, *) 'Velocities not saved.'
-        RETURN
+        close (lu)
+        write (*, *) 'Velocities not saved.'
+        return
         !
-        5    OPEN (LU, FILE = FNAME, STATUS = 'NEW', ERR = 90)
-        6    REWIND (LU)
+        5    open (lu, file = fname, status = 'NEW', err = 90)
+        6    rewind (lu)
         !
-        NR = 1
-        DO I = 1, NRC
-            RDIM = YRC(I, NR)
-            UDIM = VIND(1, I, NR)
-            VDIM = VIND(3, I, NR)
-            WRITE (LU, *) RDIM, UDIM, VDIM
-        ENDDO
-        CLOSE (LU)
-        RETURN
+        nr = 1
+        do i = 1, nrc
+            rdim = yrc(i, nr)
+            udim = vind(1, i, nr)
+            vdim = vind(3, i, nr)
+            write (lu, *) rdim, udim, vdim
+        enddo
+        close (lu)
+        return
         !
-        90   WRITE (*, *) 'Bad filename.'
-        WRITE (*, *) 'Velocities not saved.'
-    END SUBROUTINE SAVVEL
+        90   write (*, *) 'Bad filename.'
+        write (*, *) 'Velocities not saved.'
+    end subroutine savvel
     !*==UVINFL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE UVINFL(RR, WWA, WWT)
+    subroutine uvinfl(rr, wwa, wwt)
         use i_dfdc
         use m_spline, only : seval
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: RR, WWA, WWT
+        real :: rr, wwa, wwt
         !
         ! Local variables
         !
-        REAL :: RDIM
+        real :: rdim
         !
         !*** End of declarations rewritten by SPAG
         !
         !
-        WWA = 0.0
-        WWT = 0.0
-        IF (NINFL<=1) RETURN
+        wwa = 0.0
+        wwt = 0.0
+        if (ninfl<=1) return
         !
-        RDIM = RR
-        IF (RDIM>=RINFL(1) .AND. RDIM<=RINFL(NINFL)) THEN
-            WWA = SEVAL(RDIM, VAINFL, VAINFLR, RINFL, NINFL)
-            WWT = SEVAL(RDIM, VTINFL, VTINFLR, RINFL, NINFL)
-        ENDIF
+        rdim = rr
+        if (rdim>=rinfl(1) .and. rdim<=rinfl(ninfl)) then
+            wwa = seval(rdim, vainfl, vainflr, rinfl, ninfl)
+            wwt = seval(rdim, vtinfl, vtinflr, rinfl, ninfl)
+        endif
         !
-    END SUBROUTINE UVINFL
+    end subroutine uvinfl
 end module m_viscvel

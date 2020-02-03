@@ -3,24 +3,24 @@ module s_rotoper
 contains
 
 
-    SUBROUTINE CONVGTH(NITER, RLXF, WXEPS)
+    subroutine convgth(niter, rlxf, wxeps)
         use i_dfdc
         use m_rotoper, only : vmavgcalc, vmavginit, updrotvel, gthcalc
         use m_solve, only : gamsolv
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: NITER
-        REAL :: RLXF, WXEPS
+        integer :: niter
+        real :: rlxf, wxeps
         !
         ! Local variables
         !
-        REAL :: DG, DGTHMAX, RLX, RLXG
-        REAL, DIMENSION(IPX) :: DGOLD, GAMTH
-        INTEGER :: IP, IPMAX, ITR
+        real :: dg, dgthmax, rlx, rlxg
+        real, dimension(ipx) :: dgold, gamth
+        integer :: ip, ipmax, itr
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -30,93 +30,93 @@ contains
         !----------------------------------------------------------------
         !
         !
-        RLX = RLXF
-        IF (RLX<=0.0) RLX = 0.5
+        rlx = rlxf
+        if (rlx<=0.0) rlx = 0.5
         !
         !---- check for valid solution before iterating
-        IF (.NOT.LGAMA) THEN
-            IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+        if (.not.lgama) then
+            if (.not.lvmav) call vmavginit(vavginit)
             !---- Generate GTH solution for current wakes
-            CALL GTHCALC(GAMTH)
+            call gthcalc(gamth)
             !---- Update wake gamma from initial solution
-            DO IP = 1, NPTOT
-                GTH(IP) = GAMTH(IP)
-            ENDDO
+            do ip = 1, nptot
+                gth(ip) = gamth(ip)
+            enddo
             !---- Generate GAM solution for current RHS
-            CALL GAMSOLV
-        ENDIF
+            call gamsolv
+        endif
         !
-        DO IP = 1, NPTOT
-            DGOLD(IP) = 0.0
-        ENDDO
+        do ip = 1, nptot
+            dgold(ip) = 0.0
+        enddo
         !
         !----- do specified cycles of under-relaxed iteration
-        DO ITR = 1, NITER
+        do itr = 1, niter
             !c         IF(LDBG) WRITE(*,110) ITR
             !
             !---- Set VMavg velocities at wake points
-            CALL VMAVGCALC
+            call vmavgcalc
             !---- Generate GTH solution for current wakes
-            CALL GTHCALC(GAMTH)
+            call gthcalc(gamth)
             !---- Update wake gamma using CSOR
-            IPMAX = 0
-            DGTHMAX = 0.0
-            RLX = RLXF
-            DO IP = 1, NPTOT
-                DG = GAMTH(IP) - GTH(IP)
-                IF (ABS(DG)>ABS(DGTHMAX)) THEN
-                    DGTHMAX = DG
-                    IPMAX = IP
-                ENDIF
-                RLXG = RLX
-                IF (DG * DGOLD(IP)<0.0) RLXG = 0.6 * RLX
-                IF (DG * DGOLD(IP)>0.0) RLXG = 1.2 * RLX
-                DGOLD(IP) = DG * RLXG
-                GTH(IP) = GTH(IP) + RLXG * DG
-            ENDDO
+            ipmax = 0
+            dgthmax = 0.0
+            rlx = rlxf
+            do ip = 1, nptot
+                dg = gamth(ip) - gth(ip)
+                if (abs(dg)>abs(dgthmax)) then
+                    dgthmax = dg
+                    ipmax = ip
+                endif
+                rlxg = rlx
+                if (dg * dgold(ip)<0.0) rlxg = 0.6 * rlx
+                if (dg * dgold(ip)>0.0) rlxg = 1.2 * rlx
+                dgold(ip) = dg * rlxg
+                gth(ip) = gth(ip) + rlxg * dg
+            enddo
             !---- Generate GAM solution for current RHS
-            LGAMA = .FALSE.
-            CALL GAMSOLV
+            lgama = .false.
+            call gamsolv
             !
             !c         IF(LDBG)
-            WRITE (*, 100) ITR, DGTHMAX, IPMAX, RLX
-            IF (ABS(DGTHMAX)<WXEPS * QREF) THEN
-                LCONV = .TRUE.
-                GOTO 20
-            ENDIF
-        ENDDO
-        LCONV = .FALSE.
+            write (*, 100) itr, dgthmax, ipmax, rlx
+            if (abs(dgthmax)<wxeps * qref) then
+                lconv = .true.
+                goto 20
+            endif
+        enddo
+        lconv = .false.
         !
-        100  FORMAT (I3, ' dGTHmax=', F9.5, ' @IP=', I5, ' RLX=', F8.5)
-        120  FORMAT (1X, 7G11.4)
+        100  format (i3, ' dGTHmax=', f9.5, ' @IP=', i5, ' RLX=', f8.5)
+        120  format (1x, 7g11.4)
         !
         !---- Update rotor velocities
-        20   CALL UPDROTVEL
+        20   call updrotvel
         !
-    END SUBROUTINE CONVGTH
+    end subroutine convgth
     !*==CONVGTHT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE CONVGTHT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
+    subroutine convgtht(niter, rlxf, wxeps, tspec, ispec)
         use i_dfdc
         use m_rotoper, only : vmavgcalc, updrotvel, tqcalc, vmavginit, gthcalc
         use m_solve, only : gamsolv
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: ISPEC, NITER
-        REAL :: RLXF, TSPEC, WXEPS
+        integer :: ispec, niter
+        real :: rlxf, tspec, wxeps
         !
         ! Local variables
         !
-        REAL :: BGAV, BGMAG, BGMAX, BGMIN, BLDS, DA, DBG, &
-                & DBGMAX, DG, DGTHMAX, DR, FDBG, RLX, RLXB, RLXG, &
-                & THR, TSCL
-        REAL, DIMENSION(IPX) :: DGOLD, GAMTH
-        INTEGER :: IP, IPMAX, IR, ITR, NR
+        real :: bgav, bgmag, bgmax, bgmin, blds, da, dbg, &
+                & dbgmax, dg, dgthmax, dr, fdbg, rlx, rlxb, rlxg, &
+                & thr, tscl
+        real, dimension(ipx) :: dgold, gamth
+        integer :: ip, ipmax, ir, itr, nr
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -128,153 +128,153 @@ contains
         !----------------------------------------------------------------
         !
         !
-        RLX = RLXF
-        IF (RLX<=0.0) RLX = 0.5
+        rlx = rlxf
+        if (rlx<=0.0) rlx = 0.5
         !
         !---- check for valid solution before iterating
-        IF (.NOT.LGAMA) THEN
-            IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+        if (.not.lgama) then
+            if (.not.lvmav) call vmavginit(vavginit)
             !---- Generate GTH solution for current wakes
-            CALL GTHCALC(GAMTH)
+            call gthcalc(gamth)
             !---- Update wake gamma from initial solution
-            DO IP = 1, NPTOT
-                GTH(IP) = GAMTH(IP)
-            ENDDO
+            do ip = 1, nptot
+                gth(ip) = gamth(ip)
+            enddo
             !---- Generate GAM solution for current RHS
-            CALL GAMSOLV
-        ENDIF
+            call gamsolv
+        endif
         !
-        DO IP = 1, NPTOT
-            DGOLD(IP) = 0.0
-        ENDDO
+        do ip = 1, nptot
+            dgold(ip) = 0.0
+        enddo
         !
         !----- Iteration loop for driving thrust using B*GAM
-        NR = 1
-        BLDS = FLOAT(NRBLD(NR))
-        DO ITR = 1, NITER
+        nr = 1
+        blds = float(nrbld(nr))
+        do itr = 1, niter
             !c         IF(LDBG) WRITE(*,110) ITR
             !---- Update rotor velocities
-            CALL UPDROTVEL
+            call updrotvel
             !
-            BGAV = 0.0
-            BGMAX = BGAM(1, NR)
-            BGMIN = BGMAX
-            DO IR = 1, NRC
-                DR = YRP(IR + 1, NR) - YRP(IR, NR)
-                DA = PI * (YRP(IR + 1, NR)**2 - YRP(IR, NR)**2)
-                BGAV = BGAV + BGAM(IR, NR)
-                BGMAX = MAX(BGMAX, BGAM(IR, NR))
-                BGMIN = MIN(BGMIN, BGAM(IR, NR))
-            ENDDO
-            BGAV = BGAV / FLOAT(NRC)
-            BGMAG = MAX(ABS(BGAV), BGMIN, BGMAX, 0.1)
+            bgav = 0.0
+            bgmax = bgam(1, nr)
+            bgmin = bgmax
+            do ir = 1, nrc
+                dr = yrp(ir + 1, nr) - yrp(ir, nr)
+                da = pi * (yrp(ir + 1, nr)**2 - yrp(ir, nr)**2)
+                bgav = bgav + bgam(ir, nr)
+                bgmax = max(bgmax, bgam(ir, nr))
+                bgmin = min(bgmin, bgam(ir, nr))
+            enddo
+            bgav = bgav / float(nrc)
+            bgmag = max(abs(bgav), bgmin, bgmax, 0.1)
             !
             !---- Calculate current rotor thrust
-            CALL TQCALC(1)
+            call tqcalc(1)
             !---- Drive thrust from rotor for ISPEC=1, total thrust for ISPEC=2
-            IF (ISPEC==1) THEN
-                THR = TTOT
-            ELSE
-                THR = TTOT + TDUCT
-            ENDIF
+            if (ispec==1) then
+                thr = ttot
+            else
+                thr = ttot + tduct
+            endif
             !---- Scale factor for BGAM from current value to get desired rotor thrust
-            TSCL = 1.0
-            IF (THR/=0.0) TSCL = TSPEC / THR
+            tscl = 1.0
+            if (thr/=0.0) tscl = tspec / thr
             !
             !---- Check for rational relaxation factors based on BGAM changes
-            DBGMAX = 0.0
-            RLXB = RLX
-            DO IR = 1, NRC
-                DBG = (TSCL - 1.0) * BGAM(IR, NR)
-                DBGMAX = MAX(DBGMAX, ABS(DBG))
-                IF (BGMAG/=0.0) THEN
-                    FDBG = ABS(DBG) / BGMAG
-                    IF (FDBG * RLXB>0.3) RLXB = 0.3 / FDBG
-                ENDIF
-            ENDDO
+            dbgmax = 0.0
+            rlxb = rlx
+            do ir = 1, nrc
+                dbg = (tscl - 1.0) * bgam(ir, nr)
+                dbgmax = max(dbgmax, abs(dbg))
+                if (bgmag/=0.0) then
+                    fdbg = abs(dbg) / bgmag
+                    if (fdbg * rlxb>0.3) rlxb = 0.3 / fdbg
+                endif
+            enddo
             !
-            DO IR = 1, NRC
-                DBG = (TSCL - 1.0) * BGAM(IR, NR)
+            do ir = 1, nrc
+                dbg = (tscl - 1.0) * bgam(ir, nr)
                 !---- Update BGAM
-                BGAM(IR, NR) = BGAM(IR, NR) + RLXB * DBG
-            ENDDO
-            IF (TGAP>0.0) BGAM(NRC, NR) = 0.0
+                bgam(ir, nr) = bgam(ir, nr) + rlxb * dbg
+            enddo
+            if (tgap>0.0) bgam(nrc, nr) = 0.0
             !
             !---- Set VMavg velocities at wake points
-            CALL VMAVGCALC
+            call vmavgcalc
             !---- Generate GTH estimate for updated circulations
-            CALL GTHCALC(GAMTH)
-            IPMAX = 0
-            DGTHMAX = 0.0
-            DO IP = 1, NPTOT
-                DG = GAMTH(IP) - GTH(IP)
-                IF (ABS(DG)>ABS(DGTHMAX)) THEN
-                    DGTHMAX = DG
-                    IPMAX = IP
-                ENDIF
-                RLXG = RLXB
-                IF (DG * DGOLD(IP)<0.0) RLXG = 0.6 * RLXB
-                IF (DG * DGOLD(IP)>0.0) RLXG = 1.2 * RLXB
-                DGOLD(IP) = DG * RLXG
+            call gthcalc(gamth)
+            ipmax = 0
+            dgthmax = 0.0
+            do ip = 1, nptot
+                dg = gamth(ip) - gth(ip)
+                if (abs(dg)>abs(dgthmax)) then
+                    dgthmax = dg
+                    ipmax = ip
+                endif
+                rlxg = rlxb
+                if (dg * dgold(ip)<0.0) rlxg = 0.6 * rlxb
+                if (dg * dgold(ip)>0.0) rlxg = 1.2 * rlxb
+                dgold(ip) = dg * rlxg
                 !---- Update GTH wake gamma using CSOR
-                GTH(IP) = GTH(IP) + RLXG * DG
-            ENDDO
+                gth(ip) = gth(ip) + rlxg * dg
+            enddo
             !
             !---- Generate GAM solution for current RHS
-            LGAMA = .FALSE.
-            CALL GAMSOLV
+            lgama = .false.
+            call gamsolv
             !
             !c       IF(LDBG) THEN
             !c         WRITE(*,*) ' '
-            WRITE (*, 100) ITR, DGTHMAX, IPMAX, DBGMAX, RLXB
-            IF (ABS(DGTHMAX)<WXEPS * QREF .AND. ABS(DBGMAX)<=0.001 * BGMAG)  &
-                    & THEN
-                LCONV = .TRUE.
-                GOTO 20
-            ENDIF
-            LGAMA = .FALSE.
-        ENDDO
-        LCONV = .FALSE.
+            write (*, 100) itr, dgthmax, ipmax, dbgmax, rlxb
+            if (abs(dgthmax)<wxeps * qref .and. abs(dbgmax)<=0.001 * bgmag)  &
+                    & then
+                lconv = .true.
+                goto 20
+            endif
+            lgama = .false.
+        enddo
+        lconv = .false.
         !
-        100  FORMAT (I3, ' dGTHmax=', F9.5, ' @IP=', I5, '  dBGmax=', F9.5, ' RLX=', &
-                & F8.5)
-        110  FORMAT (/'Blade velocities on iteration ', I5, &
+        100  format (i3, ' dGTHmax=', f9.5, ' @IP=', i5, '  dBGmax=', f9.5, ' RLX=', &
+                & f8.5)
+        110  format (/'Blade velocities on iteration ', i5, &
                 &/'     r          Wx         Wr', &
                 &'         Wt        Phi       CL       BGam')
-        120  FORMAT (1X, 7G11.4)
+        120  format (1x, 7g11.4)
         !
         !---- Update rotor velocities
-        20   CALL UPDROTVEL
+        20   call updrotvel
         !
-    END SUBROUTINE CONVGTHT
+    end subroutine convgtht
     !*==CONVGTHBG.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE CONVGTHBG(NITER, RLXF, WXEPS)
+    subroutine convgthbg(niter, rlxf, wxeps)
         use i_dfdc
         use m_inigrd, only : setgrdflw
         use m_solve, only : gamsolv
         use m_rotoper, only : vmavgcalc, vmavginit, updrotvel, gthcalc
         use m_aero, only : getclcdcm
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: NITER
-        REAL :: RLXF, WXEPS
+        integer :: niter
+        real :: rlxf, wxeps
         !
         ! Local variables
         !
-        REAL :: ALF, BGAV, BGMAG, BGMAX, BGMIN, BLDS, CD_ALF, &
-                & CD_REY, CD_W, CLB, CLMAX, CLMIN, CL_ALF, CL_W, &
-                & CMOM, CM_AL, CM_W, DBG, DBGMAX, DCL_STALL, DG, &
-                & DGTHMAX, FDBG, PHIB, REY, RLX, RLXB, RLXBG, &
-                & RLXG, SECSIG, SECSTAGR, VTBG, WTB, WWB, XI
-        REAL, DIMENSION(IRX) :: BGX, DBGOLD
-        REAL, DIMENSION(IPX) :: DGOLD, GAMTH
-        INTEGER :: IG, IP, IPMAX, IR, IRMAX, ITR, NR
+        real :: alf, bgav, bgmag, bgmax, bgmin, blds, cd_alf, &
+                & cd_rey, cd_w, clb, clmax, clmin, cl_alf, cl_w, &
+                & cmom, cm_al, cm_w, dbg, dbgmax, dcl_stall, dg, &
+                & dgthmax, fdbg, phib, rey, rlx, rlxb, rlxbg, &
+                & rlxg, secsig, secstagr, vtbg, wtb, wwb, xi
+        real, dimension(irx) :: bgx, dbgold
+        real, dimension(ipx) :: dgold, gamth
+        integer :: ig, ip, ipmax, ir, irmax, itr, nr
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -284,59 +284,59 @@ contains
         !----------------------------------------------------------------
         !
         !
-        RLX = RLXF
-        IF (RLX<=0.0) RLX = 0.5
+        rlx = rlxf
+        if (rlx<=0.0) rlx = 0.5
         !
         !---- check for valid solution before iterating
-        IF (.NOT.LGAMA) THEN
-            IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+        if (.not.lgama) then
+            if (.not.lvmav) call vmavginit(vavginit)
             !---- Generate GTH solution for current wakes
-            CALL GTHCALC(GAMTH)
+            call gthcalc(gamth)
             !---- Update wake gamma from initial solution
-            DO IP = 1, NPTOT
-                GTH(IP) = GAMTH(IP)
-            ENDDO
+            do ip = 1, nptot
+                gth(ip) = gamth(ip)
+            enddo
             !---- Generate GAM solution for current RHS
-            CALL GAMSOLV
-        ENDIF
+            call gamsolv
+        endif
         !
-        DO IP = 1, NPTOT
-            DGOLD(IP) = 0.0
-        ENDDO
-        DO IR = 1, NRC
-            DBGOLD(IR) = 0.0
-        ENDDO
+        do ip = 1, nptot
+            dgold(ip) = 0.0
+        enddo
+        do ir = 1, nrc
+            dbgold(ir) = 0.0
+        enddo
         !
         !c      write(15,*) 'new solution '
         !----- do several cycles of under-relaxed iteration to converge
         !      BGAM and GTH from specified CL and chord
-        DO ITR = 1, NITER
+        do itr = 1, niter
             !c           write(15,*) 'iter ',itr
             !c         IF(LDBG) WRITE(*,110) ITR
             !
             !---- Generate GAM solution for current RHS
-            CALL GAMSOLV
+            call gamsolv
             !---- Update rotor velocities
-            CALL UPDROTVEL
+            call updrotvel
             !
-            RLXG = 0.0
-            RLXBG = 0.0
-            DBGMAX = 0.0
-            DGTHMAX = 0.0
+            rlxg = 0.0
+            rlxbg = 0.0
+            dbgmax = 0.0
+            dgthmax = 0.0
             !
-            DO NR = 1, NROTOR
-                IF (IRTYPE(NR)==2) THEN
-                    IG = IGROTOR(NR)
+            do nr = 1, nrotor
+                if (irtype(nr)==2) then
+                    ig = igrotor(nr)
                     !
-                    BLDS = FLOAT(NRBLD(NR))
+                    blds = float(nrbld(nr))
                     !---- convert to blade relative velocities
-                    BGAV = 0.0
-                    BGMAX = BGAM(1, NR)
-                    BGMIN = BGMAX
-                    DO IR = 1, NRC
+                    bgav = 0.0
+                    bgmax = bgam(1, nr)
+                    bgmin = bgmax
+                    do ir = 1, nrc
                         !---- theta velocity at blade lifting line
-                        VTBG = BGAM(IR, NR) * PI2I / YRC(IR, NR)
-                        WTB = VREL(3, IR, NR) - 0.5 * VTBG
+                        vtbg = bgam(ir, nr) * pi2i / yrc(ir, nr)
+                        wtb = vrel(3, ir, nr) - 0.5 * vtbg
                         !
                         !           IF(NR.EQ.1) THEN
                         !             CIRC = 0.0
@@ -348,166 +348,166 @@ contains
                         !           VROT = - OMEGA(NR)*YRC(IR,NR)
                         !           WTB = VTIN - OMEGA(NR)*YRC(IR,NR) + 0.5*VTBG
                         !
-                        WWB = SQRT(VREL(1, IR, NR)**2 + WTB**2)
-                        PHIB = ATAN2(VREL(1, IR, NR), -WTB)
+                        wwb = sqrt(vrel(1, ir, nr)**2 + wtb**2)
+                        phib = atan2(vrel(1, ir, nr), -wtb)
                         !
                         !           write(15,89) 'n,i,vin,vbg,vout,wtb,phi ',nr,ir,VTIN,
                         !     &                     VTBG,VREL(3,IR,NR),WTB,phib/dtr,vrot
                         ! 89        format(a,2i4,6F12.5)
                         !
-                        XI = YRC(IR, NR) / RTIP(NR)
-                        ALF = BETAR(IR, NR) - PHIB
-                        REY = WWB * CHR(IR, NR) * RHO / RMU
-                        SECSIG = BLDS * CHR(IR, NR) / (2.0 * PI * YRC(IR, NR))
-                        SECSTAGR = 0.5 * PI - BETAR(IR, NR)
-                        CALL GETCLCDCM(NR, IR, XI, ALF, WWB, REY, SECSIG, SECSTAGR, &
-                                & CLB, CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, &
-                                & LSTALLR(IR, NR), CDR(IR, NR), CD_ALF, CD_W, &
-                                & CD_REY, CMOM, CM_AL, CM_W)
-                        CLR(IR, NR) = CLB
-                        CLALF(IR, NR) = CL_ALF
-                        ALFAR(IR, NR) = ALF
+                        xi = yrc(ir, nr) / rtip(nr)
+                        alf = betar(ir, nr) - phib
+                        rey = wwb * chr(ir, nr) * rho / rmu
+                        secsig = blds * chr(ir, nr) / (2.0 * pi * yrc(ir, nr))
+                        secstagr = 0.5 * pi - betar(ir, nr)
+                        call getclcdcm(nr, ir, xi, alf, wwb, rey, secsig, secstagr, &
+                                & clb, cl_alf, cl_w, clmax, clmin, dcl_stall, &
+                                & lstallr(ir, nr), cdr(ir, nr), cd_alf, cd_w, &
+                                & cd_rey, cmom, cm_al, cm_w)
+                        clr(ir, nr) = clb
+                        clalf(ir, nr) = cl_alf
+                        alfar(ir, nr) = alf
                         !
-                        BGX(IR) = BLDS * 0.5 * WWB * CHR(IR, NR) * CLR(IR, NR)
-                        BGAV = BGAV + BGAM(IR, NR)
-                        BGMAX = MAX(BGMAX, BGAM(IR, NR))
-                        BGMIN = MIN(BGMIN, BGAM(IR, NR))
+                        bgx(ir) = blds * 0.5 * wwb * chr(ir, nr) * clr(ir, nr)
+                        bgav = bgav + bgam(ir, nr)
+                        bgmax = max(bgmax, bgam(ir, nr))
+                        bgmin = min(bgmin, bgam(ir, nr))
                         !
                         !            WRITE(*,120) YRC(IR,NR),
                         !     &                   VREL(1,IR,NR),VREL(2,IR,NR),WTB,
                         !     &                   PHIB/DTR,CLR(IR,NR),BGX(IR),CLALF(IR,NR)
-                        IF (LDBG) WRITE (*, 120) YRC(IR, NR), VREL(1, IR, NR), &
-                                & VREL(2, IR, NR), WTB, PHIB / DTR, &
-                                & CLR(IR, NR), BGX(IR), CLALF(IR, NR)
-                    ENDDO
-                    BGAV = BGAV / FLOAT(NRC)
-                    IF (BGAV>=0.0) THEN
-                        BGMAG = MAX(BGAV, BGMAX, 0.1)
-                    ELSE
-                        BGMAG = MIN(BGAV, BGMIN, -0.1)
-                    ENDIF
-                    IF (TGAP>0.0 .AND. OMEGA(NR)/=0.0) THEN
-                        BGX(NRC) = 0.0
-                        CLR(NRC, NR) = 0.0
-                        ALFAR(NRC, NR) = 0.0
-                    ENDIF
+                        if (ldbg) write (*, 120) yrc(ir, nr), vrel(1, ir, nr), &
+                                & vrel(2, ir, nr), wtb, phib / dtr, &
+                                & clr(ir, nr), bgx(ir), clalf(ir, nr)
+                    enddo
+                    bgav = bgav / float(nrc)
+                    if (bgav>=0.0) then
+                        bgmag = max(bgav, bgmax, 0.1)
+                    else
+                        bgmag = min(bgav, bgmin, -0.1)
+                    endif
+                    if (tgap>0.0 .and. omega(nr)/=0.0) then
+                        bgx(nrc) = 0.0
+                        clr(nrc, nr) = 0.0
+                        alfar(nrc, nr) = 0.0
+                    endif
                     !
                     !---- Check for rational relaxation factors based on BGAM changes
-                    RLXB = RLX
-                    IRMAX = 0
-                    DBGMAX = 0.0
-                    DO IR = 1, NRC
-                        DBG = (BGX(IR) - BGAM(IR, NR))
-                        IF (ABS(DBG)>ABS(DBGMAX)) THEN
-                            DBGMAX = DBG
-                            IRMAX = IR
-                        ENDIF
-                        IF (BGMAG/=0.0) THEN
+                    rlxb = rlx
+                    irmax = 0
+                    dbgmax = 0.0
+                    do ir = 1, nrc
+                        dbg = (bgx(ir) - bgam(ir, nr))
+                        if (abs(dbg)>abs(dbgmax)) then
+                            dbgmax = dbg
+                            irmax = ir
+                        endif
+                        if (bgmag/=0.0) then
                             !             FDBG = ABS(DBG)/BGAM(IR,NR)
                             !             IF(FDBG*RLXB.GT.0.5) RLXB = 0.5/FDBG
                             !             FDBG = DBG/BGAM(IR,NR)
-                            FDBG = DBG / BGMAG
-                            IF (FDBG * RLXB<-0.2) RLXB = -0.2 / FDBG
-                            IF (FDBG * RLXB>0.4) RLXB = 0.4 / FDBG
-                        ENDIF
-                    ENDDO
+                            fdbg = dbg / bgmag
+                            if (fdbg * rlxb<-0.2) rlxb = -0.2 / fdbg
+                            if (fdbg * rlxb>0.4) rlxb = 0.4 / fdbg
+                        endif
+                    enddo
                     !
                     !---- Update blade circulation using CSOR
-                    DO IR = 1, NRC
-                        DBG = (BGX(IR) - BGAM(IR, NR))
-                        RLXBG = 0.5 * RLXB
-                        IF (DBG * DBGOLD(IR)<0.0) RLXBG = 0.6 * RLXB
+                    do ir = 1, nrc
+                        dbg = (bgx(ir) - bgam(ir, nr))
+                        rlxbg = 0.5 * rlxb
+                        if (dbg * dbgold(ir)<0.0) rlxbg = 0.6 * rlxb
                         !            IF(DBG*DBGOLD(IR).GT.0.0) RLXBG = 1.2*RLXB
-                        DBGOLD(IR) = DBG * RLXBG
-                        BGAM(IR, NR) = BGAM(IR, NR) + RLXBG * DBG
-                    ENDDO
-                    IF (TGAP>0.0 .AND. OMEGA(NR)/=0.0) BGAM(NRC, NR) = 0.0
+                        dbgold(ir) = dbg * rlxbg
+                        bgam(ir, nr) = bgam(ir, nr) + rlxbg * dbg
+                    enddo
+                    if (tgap>0.0 .and. omega(nr)/=0.0) bgam(nrc, nr) = 0.0
                     !---- Update grid flowfield
-                    CALL SETGRDFLW
-                ENDIF
+                    call setgrdflw
+                endif
                 !
-            ENDDO ! loop over NROTOR
+            enddo ! loop over NROTOR
             !
             !---- Set VMavg velocities at wake points
-            CALL VMAVGCALC
+            call vmavgcalc
             !---- Generate GTH estimate for updated circulations
-            CALL GTHCALC(GAMTH)
-            IPMAX = 0
-            DGTHMAX = 0.0
-            DO IP = 1, NPTOT
-                DG = GAMTH(IP) - GTH(IP)
-                IF (ABS(DG)>ABS(DGTHMAX)) THEN
-                    DGTHMAX = DG
-                    IPMAX = IP
-                ENDIF
-                RLXG = RLX
-                IF (DG * DGOLD(IP)<0.0) RLXG = 0.6 * RLX
-                IF (DG * DGOLD(IP)>0.0) RLXG = 1.2 * RLX
-                DGOLD(IP) = DG * RLXG
+            call gthcalc(gamth)
+            ipmax = 0
+            dgthmax = 0.0
+            do ip = 1, nptot
+                dg = gamth(ip) - gth(ip)
+                if (abs(dg)>abs(dgthmax)) then
+                    dgthmax = dg
+                    ipmax = ip
+                endif
+                rlxg = rlx
+                if (dg * dgold(ip)<0.0) rlxg = 0.6 * rlx
+                if (dg * dgold(ip)>0.0) rlxg = 1.2 * rlx
+                dgold(ip) = dg * rlxg
                 !---- Update GTH wake gamma using CSOR
-                GTH(IP) = GTH(IP) + RLXG * DG
-            ENDDO
+                gth(ip) = gth(ip) + rlxg * dg
+            enddo
             !
             !---- Generate GAM solution for current RHS
-            LGAMA = .FALSE.
+            lgama = .false.
             !cc         CALL GAMSOLV
             !
             !c       IF(LDBG) THEN
             !c         WRITE(*,*) ' '
-            IF (RLXBG/=0.0) THEN
-                WRITE (*, 100) ITR, DGTHMAX, IPMAX, DBGMAX, IRMAX, RLXBG
+            if (rlxbg/=0.0) then
+                write (*, 100) itr, dgthmax, ipmax, dbgmax, irmax, rlxbg
                 !c           WRITE(*,100) ITR,DGTHMAX,IPMAX,DBGMAX,IRMAX,RLXBG,BGMAG
-            ELSE
-                WRITE (*, 105) ITR, DGTHMAX, IPMAX, RLXG
-            ENDIF
-            IF (ABS(DGTHMAX)<WXEPS * QREF .AND. ABS(DBGMAX)                 &
-                    & <=0.001 * ABS(BGMAG)) THEN
-                LCONV = .TRUE.
-                GOTO 20
-            ENDIF
-            LGAMA = .FALSE.
-        ENDDO
-        LCONV = .FALSE.
+            else
+                write (*, 105) itr, dgthmax, ipmax, rlxg
+            endif
+            if (abs(dgthmax)<wxeps * qref .and. abs(dbgmax)                 &
+                    & <=0.001 * abs(bgmag)) then
+                lconv = .true.
+                goto 20
+            endif
+            lgama = .false.
+        enddo
+        lconv = .false.
         !
-        100  FORMAT (I3, ' dGTHmax=', F10.5, ' @IP=', I4, '  dBGmax=', F10.5, ' @IR=', &
-                & I4, ' RLX=', F8.5)
+        100  format (i3, ' dGTHmax=', f10.5, ' @IP=', i4, '  dBGmax=', f10.5, ' @IR=', &
+                & i4, ' RLX=', f8.5)
         !c     &          '  dBGmax=',F10.5,' @IR=',I4,' RLX=',F8.5,' BGMG=',F8.5)
-        105  FORMAT (I3, ' dGTHmax=', F10.5, ' @IP=', I4, ' RLX=', F8.5)
-        110  FORMAT (/'Disk velocities on iteration ', I4, &
+        105  format (i3, ' dGTHmax=', f10.5, ' @IP=', i4, ' RLX=', f8.5)
+        110  format (/'Disk velocities on iteration ', i4, &
                 &/'     r          Wx         Wr', &
                 &'         Wt        Phi       CL       BGam      CLalf')
-        120  FORMAT (1X, 8G10.4)
+        120  format (1x, 8g10.4)
         !
         !---- Update rotor velocities
-        20   CALL UPDROTVEL
+        20   call updrotvel
         !
-    END SUBROUTINE CONVGTHBG
+    end subroutine convgthbg
     !*==CONVGTHBGT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE CONVGTHBGT(NITER, RLXF, WXEPS, TSPEC, ISPEC)
+    subroutine convgthbgt(niter, rlxf, wxeps, tspec, ispec)
         use i_dfdc
         use m_rotoper, only : tqcalc, updrotvel
         use m_aero, only : getclcdcm
         use m_solve, only : gamsolv
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: ISPEC, NITER
-        REAL :: RLXF, TSPEC, WXEPS
+        integer :: ispec, niter
+        real :: rlxf, tspec, wxeps
         !
         ! Local variables
         !
-        REAL :: ALF, BGAV, BGEPS, BGFAC, BGMAG, BGMAX, BGMIN, &
-                & BLDS, CD_ALF, CD_REY, CD_W, CLB, CLMAX, CLMIN, &
-                & CL_ALF, CL_W, CMOM, CM_AL, CM_W, DA, DBETA, DBG, &
-                & DBGMAX, DCL_STALL, DR, DTDALF, FDBG, PHIB, REY, &
-                & RLX, RLXB, SECSIG, SECSTAGR, THR, TSCL, VTBG, &
-                & WTB, WWB, XI
-        INTEGER :: IR, ITR, NITER0, NR
+        real :: alf, bgav, bgeps, bgfac, bgmag, bgmax, bgmin, &
+                & blds, cd_alf, cd_rey, cd_w, clb, clmax, clmin, &
+                & cl_alf, cl_w, cmom, cm_al, cm_w, da, dbeta, dbg, &
+                & dbgmax, dcl_stall, dr, dtdalf, fdbg, phib, rey, &
+                & rlx, rlxb, secsig, secstagr, thr, tscl, vtbg, &
+                & wtb, wwb, xi
+        integer :: ir, itr, niter0, nr
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -519,139 +519,139 @@ contains
         !----------------------------------------------------------------
         !
         !
-        RLX = RLXF
-        IF (RLX<=0.0) RLX = 0.5
+        rlx = rlxf
+        if (rlx<=0.0) rlx = 0.5
         !
         !---- check for valid solution before iterating
         !---- Generate GAM solution for current RHS
-        IF (.NOT.LGAMA) CALL GAMSOLV
+        if (.not.lgama) call gamsolv
         !
         !----- do several cycles of under-relaxed iteration to converge
         !      BGAM and GTH from specified CL and chord
-        NR = 1
-        BLDS = FLOAT(NRBLD(NR))
-        DO ITR = 1, NITER
+        nr = 1
+        blds = float(nrbld(nr))
+        do itr = 1, niter
             !c         IF(LDBG) WRITE(*,110) ITR
             !
-            BGEPS = 20.0 * WXEPS
-            RLXB = RLXF
-            NITER0 = MIN(3, NITER / 2)
-            CALL CONVGTHBG(NITER, RLXB, BGEPS)
+            bgeps = 20.0 * wxeps
+            rlxb = rlxf
+            niter0 = min(3, niter / 2)
+            call convgthbg(niter, rlxb, bgeps)
             !
-            CALL TQCALC(1)
+            call tqcalc(1)
             !---- Drive thrust from rotor for ISPEC=1, total thrust for ISPEC=2
-            IF (ISPEC==1) THEN
-                THR = TTOT
-            ELSE
-                THR = TTOT + TDUCT
-            ENDIF
+            if (ispec==1) then
+                thr = ttot
+            else
+                thr = ttot + tduct
+            endif
             !
             !---- Check for disk type (actuator disk or bladed)
-            IF (IRTYPE(NR)==1) THEN
+            if (irtype(nr)==1) then
                 !---- Actuator disk
-                BGAV = 0.0
-                BGMAX = BGAM(1, NR)
-                BGMIN = BGMAX
-                DO IR = 1, NRC
-                    DR = YRP(IR + 1, NR) - YRP(IR, NR)
-                    DA = PI * (YRP(IR + 1, NR)**2 - YRP(IR, NR)**2)
-                    BGAV = BGAV + BGAM(IR, NR)
-                    BGMAX = MAX(BGMAX, BGAM(IR, NR))
-                    BGMIN = MIN(BGMIN, BGAM(IR, NR))
-                ENDDO
-                BGAV = BGAV / FLOAT(NRC)
-                BGMAG = MAX(ABS(BGAV), BGMIN, BGMAX, 0.1)
+                bgav = 0.0
+                bgmax = bgam(1, nr)
+                bgmin = bgmax
+                do ir = 1, nrc
+                    dr = yrp(ir + 1, nr) - yrp(ir, nr)
+                    da = pi * (yrp(ir + 1, nr)**2 - yrp(ir, nr)**2)
+                    bgav = bgav + bgam(ir, nr)
+                    bgmax = max(bgmax, bgam(ir, nr))
+                    bgmin = min(bgmin, bgam(ir, nr))
+                enddo
+                bgav = bgav / float(nrc)
+                bgmag = max(abs(bgav), bgmin, bgmax, 0.1)
                 !---- Scale factor for BGAM from current value to get desired rotor thrust
-                TSCL = 1.0
-                IF (THR/=0.0) TSCL = TSPEC / THR
+                tscl = 1.0
+                if (thr/=0.0) tscl = tspec / thr
                 !---- Check for rational relaxation factors based on BGAM changes
-                DBGMAX = 0.0
-                RLXB = RLX
-                DO IR = 1, NRC
-                    DBG = (TSCL - 1.0) * BGAM(IR, NR)
-                    DBGMAX = MAX(DBGMAX, ABS(DBG))
-                    IF (BGMAG/=0.0) THEN
-                        FDBG = ABS(DBG) / BGMAG
-                        IF (FDBG * RLXB>0.3) RLXB = 0.3 / FDBG
-                    ENDIF
-                ENDDO
+                dbgmax = 0.0
+                rlxb = rlx
+                do ir = 1, nrc
+                    dbg = (tscl - 1.0) * bgam(ir, nr)
+                    dbgmax = max(dbgmax, abs(dbg))
+                    if (bgmag/=0.0) then
+                        fdbg = abs(dbg) / bgmag
+                        if (fdbg * rlxb>0.3) rlxb = 0.3 / fdbg
+                    endif
+                enddo
                 !---- Update BGAM
-                DO IR = 1, NRC
-                    BGFAC = (TSCL - 1.0) * BGAM(IR, NR)
-                    BGAM(IR, NR) = BGAM(IR, NR) + RLXB * BGFAC
-                ENDDO
-                IF (TGAP>0.0 .AND. OMEGA(NR)/=0.0) BGAM(NRC, NR) = 0.0
+                do ir = 1, nrc
+                    bgfac = (tscl - 1.0) * bgam(ir, nr)
+                    bgam(ir, nr) = bgam(ir, nr) + rlxb * bgfac
+                enddo
+                if (tgap>0.0 .and. omega(nr)/=0.0) bgam(nrc, nr) = 0.0
                 !
-                WRITE (*, 110) ITR, RLXB, DBGMAX * RLXB
-                IF (ABS(DBGMAX * RLXB)<=0.001 * BGMAG) THEN
-                    LCONV = .TRUE.
-                    GOTO 20
-                ENDIF
-                LGAMA = .FALSE.
+                write (*, 110) itr, rlxb, dbgmax * rlxb
+                if (abs(dbgmax * rlxb)<=0.001 * bgmag) then
+                    lconv = .true.
+                    goto 20
+                endif
+                lgama = .false.
                 !
-            ELSEIF (IRTYPE(NR)==2) THEN
+            elseif (irtype(nr)==2) then
                 !---- Bladed disk
-                DTDALF = 0.0
-                DO IR = 1, NRC
+                dtdalf = 0.0
+                do ir = 1, nrc
                     !---- theta velocity at blade (use only 1/2 of induced Vt from circulation)
-                    VTBG = BGAM(IR, NR) * PI2I / YRC(IR, NR)
-                    WTB = VREL(3, IR, NR) - 0.5 * VTBG
-                    WWB = SQRT(VREL(1, IR, NR)**2 + WTB**2)
-                    PHIB = ATAN2(VREL(1, IR, NR), -WTB)
+                    vtbg = bgam(ir, nr) * pi2i / yrc(ir, nr)
+                    wtb = vrel(3, ir, nr) - 0.5 * vtbg
+                    wwb = sqrt(vrel(1, ir, nr)**2 + wtb**2)
+                    phib = atan2(vrel(1, ir, nr), -wtb)
                     !
-                    XI = YRC(IR, NR) / RTIP(NR)
-                    ALF = BETAR(IR, NR) - PHIB
-                    REY = WWB * CHR(IR, NR) * RHO / RMU
-                    SECSIG = BLDS * CHR(IR, NR) / (2.0 * PI * YRC(IR, NR))
-                    SECSTAGR = 0.5 * PI - BETAR(IR, NR)
-                    CALL GETCLCDCM(NR, IR, XI, ALF, WWB, REY, SECSIG, SECSTAGR, CLB, &
-                            & CL_ALF, CL_W, CLMAX, CLMIN, DCL_STALL, &
-                            & LSTALLR(IR, NR), CDR(IR, NR), CD_ALF, CD_W, &
-                            & CD_REY, CMOM, CM_AL, CM_W)
-                    CLR(IR, NR) = CLB
-                    CLALF(IR, NR) = CL_ALF
-                    ALFAR(IR, NR) = ALF
+                    xi = yrc(ir, nr) / rtip(nr)
+                    alf = betar(ir, nr) - phib
+                    rey = wwb * chr(ir, nr) * rho / rmu
+                    secsig = blds * chr(ir, nr) / (2.0 * pi * yrc(ir, nr))
+                    secstagr = 0.5 * pi - betar(ir, nr)
+                    call getclcdcm(nr, ir, xi, alf, wwb, rey, secsig, secstagr, clb, &
+                            & cl_alf, cl_w, clmax, clmin, dcl_stall, &
+                            & lstallr(ir, nr), cdr(ir, nr), cd_alf, cd_w, &
+                            & cd_rey, cmom, cm_al, cm_w)
+                    clr(ir, nr) = clb
+                    clalf(ir, nr) = cl_alf
+                    alfar(ir, nr) = alf
                     !
-                    IF (IR==NRC .AND. TGAP>0.0 .AND. OMEGA(NR)/=0.0) THEN
-                        CLR(IR, NR) = 0.0
-                        CLALF(IR, NR) = 0.0
-                        ALFAR(IR, NR) = 0.0
-                    ENDIF
+                    if (ir==nrc .and. tgap>0.0 .and. omega(nr)/=0.0) then
+                        clr(ir, nr) = 0.0
+                        clalf(ir, nr) = 0.0
+                        alfar(ir, nr) = 0.0
+                    endif
                     !
-                    DTDALF = DTDALF + TI_GAM(IR, NR) * 0.5 * WWB * CHR(IR, NR) * CL_ALF
-                ENDDO
+                    dtdalf = dtdalf + ti_gam(ir, nr) * 0.5 * wwb * chr(ir, nr) * cl_alf
+                enddo
                 !---- Change blade pitch to drive thrust
-                RLXB = RLXF
-                DBETA = 0.0
-                IF (DTDALF/=0.0) DBETA = (TSPEC - THR) / DTDALF
+                rlxb = rlxf
+                dbeta = 0.0
+                if (dtdalf/=0.0) dbeta = (tspec - thr) / dtdalf
                 !---- Limit DBETA changes in iteration to get desired rotor thrust
-                IF (ABS(DBETA) * RLXB>0.1) RLXB = 0.1 / ABS(DBETA)
+                if (abs(dbeta) * rlxb>0.1) rlxb = 0.1 / abs(dbeta)
                 !---- update BETA by estimate
-                DO IR = 1, NRC
-                    BETAR(IR, NR) = BETAR(IR, NR) + RLXB * DBETA
-                ENDDO
+                do ir = 1, nrc
+                    betar(ir, nr) = betar(ir, nr) + rlxb * dbeta
+                enddo
                 !
-                WRITE (*, 100) ITR, RLXB, DBETA / DTR
-                IF (ABS(DBETA)<0.001) THEN
-                    LCONV = .TRUE.
-                    GOTO 20
-                ENDIF
-                LGAMA = .FALSE.
+                write (*, 100) itr, rlxb, dbeta / dtr
+                if (abs(dbeta)<0.001) then
+                    lconv = .true.
+                    goto 20
+                endif
+                lgama = .false.
                 !
-            ENDIF
+            endif
             !
-        ENDDO
-        LCONV = .FALSE.
+        enddo
+        lconv = .false.
         !
-        100  FORMAT (I3, ' RLX=', F8.5, ' dBeta=', F9.5)
-        110  FORMAT (I3, ' RLX=', F8.5, ' dBGmax=', F9.5)
+        100  format (i3, ' RLX=', f8.5, ' dBeta=', f9.5)
+        110  format (i3, ' RLX=', f8.5, ' dBGmax=', f9.5)
         !
         !---- Final iterations to converge case
-        20   CALL CONVGTHBG(NITER, RLXF, WXEPS)
+        20   call convgthbg(niter, rlxf, wxeps)
         !---- Update rotor velocities
-        CALL UPDROTVEL
+        call updrotvel
         !
-    END SUBROUTINE CONVGTHBGT
+    end subroutine convgthbgt
     !*==UPDROTVEL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 end module s_rotoper

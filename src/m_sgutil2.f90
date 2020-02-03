@@ -33,20 +33,20 @@ contains
     !
     !=========================================================================
 
-    INTEGER FUNCTION ISGFIND(SS, S, N)
-        IMPLICIT NONE
+    integer function isgfind(ss, s, n)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL :: SS
-        REAL, DIMENSION(N) :: S
+        integer :: n
+        real :: ss
+        real, dimension(n) :: s
         !
         ! Local variables
         !
-        INTEGER :: I, ILOW, IMID
+        integer :: i, ilow, imid
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -54,74 +54,74 @@ contains
         !---- Find closest value in S1 array to SS and return index
         !     Assumes array S in ascending value order and uses binary search to
         !     locate interval with S(I-1)<=SS<S(I)
-        ILOW = 1
-        I = N
+        ilow = 1
+        i = n
         !
-        DO WHILE (I - ILOW>1)
+        do while (i - ilow>1)
             !
-            IMID = (I + ILOW) / 2
-            IF (SS<S(IMID)) THEN
-                I = IMID
-            ELSE
-                ILOW = IMID
-            ENDIF
-        ENDDO
+            imid = (i + ilow) / 2
+            if (ss<s(imid)) then
+                i = imid
+            else
+                ilow = imid
+            endif
+        enddo
         !
         !---- Check S(I-1) and S(I) for closest value to SS
-        ISGFIND = I
-        IF (I>1) THEN
-            IF (ABS(SS - S(I))>ABS(SS - S(I - 1))) ISGFIND = I - 1
-        ENDIF
+        isgfind = i
+        if (i>1) then
+            if (abs(ss - s(i))>abs(ss - s(i - 1))) isgfind = i - 1
+        endif
         !
-    END FUNCTION ISGFIND
+    end function isgfind
     !*==SGCOPY.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGCOPY(S1, S2, N)
+    subroutine sgcopy(s1, s2, n)
         !---- Copy N elements from S1 to S2
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL, DIMENSION(N) :: S1, S2
+        integer :: n
+        real, dimension(n) :: s1, s2
         !
         ! Local variables
         !
-        INTEGER :: I
+        integer :: i
         !
         !*** End of declarations rewritten by SPAG
         !
         !
-        DO I = 1, N
-            S2(I) = S1(I)
-        ENDDO
+        do i = 1, n
+            s2(i) = s1(i)
+        enddo
         !
-    END SUBROUTINE SGCOPY
+    end subroutine sgcopy
     !*==SGCOPF.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGCOPF(S1, S2, N, SOFF1, SWT1, SOFF2, SWT2, FOFF, F1, FX1, X1, N1, &
-            & F2, FX2, X2, N2)
+    subroutine sgcopf(s1, s2, n, soff1, swt1, soff2, swt2, foff, f1, fx1, x1, n1, &
+            & f2, fx2, x2, n2)
         use m_spline, only : seval, deval
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: FOFF, SOFF1, SOFF2, SWT1, SWT2
-        INTEGER :: N, N1, N2
-        REAL, DIMENSION(N1) :: F1, FX1, X1
-        REAL, DIMENSION(N2) :: F2, FX2, X2
-        REAL, DIMENSION(N) :: S1, S2
+        real :: foff, soff1, soff2, swt1, swt2
+        integer :: n, n1, n2
+        real, dimension(n1) :: f1, fx1, x1
+        real, dimension(n2) :: f2, fx2, x2
+        real, dimension(n) :: s1, s2
         !
         ! Local variables
         !
-        REAL :: DELS1, DEV1, DS1, FEV1, FEV2, RES, RES_S1
-        INTEGER :: I, ITER
+        real :: dels1, dev1, ds1, fev1, fev2, res, res_s1
+        integer :: i, iter
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -129,119 +129,119 @@ contains
         !---- reset array S1 so that  f1(s1) = f2(s2) + foff ,
         !-    with  s1 = S1*SWT1 + SOFF1  and  s2 = S2*SWT2 + SOFF2
         !
-        DELS1 = S1(N) - S1(1)
-        DO I = 2, N - 1
-            FEV2 = SEVAL((S2(I) * SWT2 + SOFF2), F2, FX2, X2, N2) + FOFF
+        dels1 = s1(n) - s1(1)
+        do i = 2, n - 1
+            fev2 = seval((s2(i) * swt2 + soff2), f2, fx2, x2, n2) + foff
             !
-            DO ITER = 1, 10
-                FEV1 = SEVAL((S1(I) * SWT1 + SOFF1), F1, FX1, X1, N1)
-                DEV1 = DEVAL((S1(I) * SWT1 + SOFF1), F1, FX1, X1, N1)
-                RES = FEV1 - FEV2
-                RES_S1 = DEV1 * SWT1
-                DS1 = -RES / RES_S1
-                S1(I) = S1(I) + DS1
-                IF (ABS(DS1 / DELS1)<1.0E-5) GOTO 20
-            ENDDO
-            WRITE (*, *) 'SGCOPF: Convergence failed.  dS/Smax =', &
-                    & DS1 / DELS1
+            do iter = 1, 10
+                fev1 = seval((s1(i) * swt1 + soff1), f1, fx1, x1, n1)
+                dev1 = deval((s1(i) * swt1 + soff1), f1, fx1, x1, n1)
+                res = fev1 - fev2
+                res_s1 = dev1 * swt1
+                ds1 = -res / res_s1
+                s1(i) = s1(i) + ds1
+                if (abs(ds1 / dels1)<1.0e-5) goto 20
+            enddo
+            write (*, *) 'SGCOPF: Convergence failed.  dS/Smax =', &
+                    & ds1 / dels1
             !
-        20   ENDDO
+        20   enddo
         !
-    END SUBROUTINE SGCOPF
+    end subroutine sgcopf
     !*==SGAVG.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGAVG(S1, S2, N, C1)
-        IMPLICIT NONE
+    subroutine sgavg(s1, s2, n, c1)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        REAL :: C1
-        INTEGER :: N
-        REAL, DIMENSION(N) :: S1, S2
+        real :: c1
+        integer :: n
+        real, dimension(n) :: s1, s2
         !
         ! Local variables
         !
-        REAL :: F1, F2
-        INTEGER :: I
+        real :: f1, f2
+        integer :: i
         !
         !*** End of declarations rewritten by SPAG
         !
         !
         !---- average arrays S1 S2,
         !-    preserving S1 spacing at right point and S2 spacing at left endpoint
-        DO I = 1, N
-            F1 = FLOAT(I - 1) * C1
-            F2 = FLOAT(N - I)
-            S1(I) = (S1(I) * F1 + S2(I) * F2) / (F1 + F2)
-            S2(I) = S1(I)
-        ENDDO
+        do i = 1, n
+            f1 = float(i - 1) * c1
+            f2 = float(n - i)
+            s1(i) = (s1(i) * f1 + s2(i) * f2) / (f1 + f2)
+            s2(i) = s1(i)
+        enddo
         !
-    END SUBROUTINE SGAVG
+    end subroutine sgavg
     !*==SGAVG1.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGAVG1(S1, S2, N)
-        IMPLICIT NONE
+    subroutine sgavg1(s1, s2, n)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL, DIMENSION(N) :: S1, S2
+        integer :: n
+        real, dimension(n) :: s1, s2
         !
         ! Local variables
         !
-        REAL :: F1, F2
-        INTEGER :: I
+        real :: f1, f2
+        integer :: i
         !
         !*** End of declarations rewritten by SPAG
         !
         !
         !---- impose spacing of array S1 on S2 at right endpoint
-        DO I = 1, N
-            F1 = FLOAT(I - 1)
-            F2 = FLOAT(N - I)
-            S2(I) = (S1(I) * F1 + S2(I) * F2) / (F1 + F2)
-        ENDDO
+        do i = 1, n
+            f1 = float(i - 1)
+            f2 = float(n - i)
+            s2(i) = (s1(i) * f1 + s2(i) * f2) / (f1 + f2)
+        enddo
         !
-    END SUBROUTINE SGAVG1
+    end subroutine sgavg1
     !*==SGAVG2.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGAVG2(S1, S2, N)
-        IMPLICIT NONE
+    subroutine sgavg2(s1, s2, n)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL, DIMENSION(N) :: S1, S2
+        integer :: n
+        real, dimension(n) :: s1, s2
         !
         ! Local variables
         !
-        REAL :: F1, F2
-        INTEGER :: I
+        real :: f1, f2
+        integer :: i
         !
         !*** End of declarations rewritten by SPAG
         !
         !
         !---- impose spacing of array S2 on S1 at left endpoint
-        DO I = 1, N
-            F1 = FLOAT(I - 1)
-            F2 = FLOAT(N - I)
-            S1(I) = (S1(I) * F1 + S2(I) * F2) / (F1 + F2)
-        ENDDO
+        do i = 1, n
+            f1 = float(i - 1)
+            f2 = float(n - i)
+            s1(i) = (s1(i) * f1 + s2(i) * f2) / (f1 + f2)
+        enddo
         !
-    END SUBROUTINE SGAVG2
+    end subroutine sgavg2
     !*==SGSHFT.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGSHFT(SBEG, SEND, SOLD, SNEW, S1, S2, N)
+    subroutine sgshft(sbeg, send, sold, snew, s1, s2, n)
         !
         !---- Shift S1 values between limits SBEG and SEND such that
         !     value at SOLD is shifted to SNEW in S2.  S1 values
@@ -249,81 +249,81 @@ contains
         !     the range SBEG to SNEW. S1 values between SOLD and
         !     SEND are scaled to the range SNEW to SEND.
         !
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Dummy arguments
         !
-        INTEGER :: N
-        REAL :: SBEG, SEND, SNEW, SOLD
-        REAL, DIMENSION(N) :: S1, S2
+        integer :: n
+        real :: sbeg, send, snew, sold
+        real, dimension(n) :: s1, s2
         !
         ! Local variables
         !
-        REAL :: FAC1, FAC2
-        INTEGER :: I
+        real :: fac1, fac2
+        integer :: i
         !
         !*** End of declarations rewritten by SPAG
         !
         !
-        IF (SBEG>=SEND) THEN
-            WRITE (*, *) 'SGSHFT: Bad input range SBEG,SEND ', SBEG, SEND
-            STOP
-        ENDIF
+        if (sbeg>=send) then
+            write (*, *) 'SGSHFT: Bad input range SBEG,SEND ', sbeg, send
+            stop
+        endif
         !
-        IF (SBEG>SOLD .OR. SEND<SOLD) THEN
-            WRITE (*, *) 'SGSHFT: Bad input range SBEG/SOLD/SEND ', SBEG, &
-                    & SOLD, SEND
-            STOP
-        ENDIF
+        if (sbeg>sold .or. send<sold) then
+            write (*, *) 'SGSHFT: Bad input range SBEG/SOLD/SEND ', sbeg, &
+                    & sold, send
+            stop
+        endif
         !
-        IF (SBEG>SNEW .OR. SEND<SNEW) THEN
-            WRITE (*, *) 'SGSHFT: Bad input range SBEG/SNEW/SEND ', SBEG, &
-                    & SNEW, SEND
-            STOP
-        ENDIF
+        if (sbeg>snew .or. send<snew) then
+            write (*, *) 'SGSHFT: Bad input range SBEG/SNEW/SEND ', sbeg, &
+                    & snew, send
+            stop
+        endif
         !
         !---- Shift S1 values in SBEG-SEND range to new values such
         !     that SOLD becomes SNEW (linearly interpolated from both
         !     ends of range).
-        FAC1 = (SNEW - SBEG) / (SOLD - SBEG)
-        FAC2 = (SEND - SNEW) / (SEND - SOLD)
-        DO I = 1, N
-            IF (S1(I)<=SBEG) THEN
-                S2(I) = S1(I)
-            ELSEIF (S1(I)>SBEG .AND. S1(I)<=SOLD) THEN
-                S2(I) = SBEG + (S1(I) - SBEG) * FAC1
-            ELSEIF (S1(I)>SOLD .AND. S1(I)<SEND) THEN
-                S2(I) = SEND - (SEND - S1(I)) * FAC2
-            ELSE
-                S2(I) = S1(I)
-            ENDIF
-        ENDDO
+        fac1 = (snew - sbeg) / (sold - sbeg)
+        fac2 = (send - snew) / (send - sold)
+        do i = 1, n
+            if (s1(i)<=sbeg) then
+                s2(i) = s1(i)
+            elseif (s1(i)>sbeg .and. s1(i)<=sold) then
+                s2(i) = sbeg + (s1(i) - sbeg) * fac1
+            elseif (s1(i)>sold .and. s1(i)<send) then
+                s2(i) = send - (send - s1(i)) * fac2
+            else
+                s2(i) = s1(i)
+            endif
+        enddo
         !
-    END SUBROUTINE SGSHFT
+    end subroutine sgshft
     !*==SGRENUM.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
 
 
-    SUBROUTINE SGRENUM(S, N1, N2)
-        IMPLICIT NONE
+    subroutine sgrenum(s, n1, n2)
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! PARAMETER definitions
         !
-        INTEGER, PARAMETER :: NMAX = 2000
+        integer, parameter :: nmax = 2000
         !
         ! Dummy arguments
         !
-        INTEGER :: N1, N2
-        REAL, DIMENSION(*) :: S
+        integer :: n1, n2
+        real, dimension(*) :: s
         !
         ! Local variables
         !
-        REAL, DIMENSION(NMAX) :: C, X, XI
-        REAL :: CX1, CX2, FRAC, RI, T
-        INTEGER :: I, J
+        real, dimension(nmax) :: c, x, xi
+        real :: cx1, cx2, frac, ri, t
+        integer :: i, j
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -333,42 +333,42 @@ contains
         !     The first and last elements in S will remain the same.
         !----------------------------------------------------------------------
         !
-        IF (N1>NMAX) STOP 'NEWNUM:  Array overflow'
+        if (n1>nmax) stop 'NEWNUM:  Array overflow'
         !
         !---- save old input array
-        DO I = 1, N1
-            X(I) = S(I)
-        ENDDO
+        do i = 1, n1
+            x(i) = s(i)
+        enddo
         !
         !---- spline X(i)  (set up and solve tridiagonal system on the fly)
-        C(1) = 0.5
-        XI(1) = 1.5 * (X(2) - X(1))
-        DO I = 2, N1 - 1
-            C(I) = 1.0 / (4.0 - C(I - 1))
-            XI(I) = (3.0 * (X(I + 1) - X(I - 1)) - XI(I - 1)) * C(I)
-        ENDDO
-        I = N1
-        XI(I) = (3.0 * (X(I) - X(I - 1)) - XI(I - 1)) / (2.0 - C(I - 1))
+        c(1) = 0.5
+        xi(1) = 1.5 * (x(2) - x(1))
+        do i = 2, n1 - 1
+            c(i) = 1.0 / (4.0 - c(i - 1))
+            xi(i) = (3.0 * (x(i + 1) - x(i - 1)) - xi(i - 1)) * c(i)
+        enddo
+        i = n1
+        xi(i) = (3.0 * (x(i) - x(i - 1)) - xi(i - 1)) / (2.0 - c(i - 1))
         !
-        DO I = N1 - 1, 1, -1
-            XI(I) = XI(I) - C(I) * XI(I + 1)
-        ENDDO
+        do i = n1 - 1, 1, -1
+            xi(i) = xi(i) - c(i) * xi(i + 1)
+        enddo
         !
         !---- evaluate s(i) spline at new points
-        DO J = 1, N2
-            FRAC = FLOAT(J - 1) / FLOAT(N2 - 1)
-            RI = 1.0 + FRAC * FLOAT(N1 - 1)
-            I = MIN(INT(RI), N1 - 1)
+        do j = 1, n2
+            frac = float(j - 1) / float(n2 - 1)
+            ri = 1.0 + frac * float(n1 - 1)
+            i = min(int(ri), n1 - 1)
             !
-            T = RI - FLOAT(I)
-            CX1 = XI(I) - X(I + 1) + X(I)
-            CX2 = XI(I + 1) - X(I + 1) + X(I)
-            S(J) = T * X(I + 1) + (1.0 - T) * X(I) + (T - T * T) * ((1.0 - T) * CX1 - T * CX2)
-        ENDDO
+            t = ri - float(i)
+            cx1 = xi(i) - x(i + 1) + x(i)
+            cx2 = xi(i + 1) - x(i + 1) + x(i)
+            s(j) = t * x(i + 1) + (1.0 - t) * x(i) + (t - t * t) * ((1.0 - t) * cx1 - t * cx2)
+        enddo
         !
         !---- make sure new endpoints are exactly the same as old ones
-        S(1) = X(1)
-        S(N2) = X(N1)
+        s(1) = x(1)
+        s(n2) = x(n1)
         !
-    END SUBROUTINE SGRENUM
+    end subroutine sgrenum
 end module m_sgutil2

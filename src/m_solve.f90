@@ -35,7 +35,7 @@ contains
     !=========================================================================
 
 
-    SUBROUTINE GAMSOLV
+    subroutine gamsolv
         use i_dfdc
         use m_inigrd, only : setgrdflw
         use m_gauss, only : ludcmp
@@ -44,7 +44,7 @@ contains
         use m_system, only : qcsum, gsolve, gsys, sysp
         use m_qaic, only : qaic
         use m_vels, only : qcpfor
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
@@ -54,61 +54,61 @@ contains
         !     Generates inviscid panel solution with current flow condition
         !------------------------------------------------------------------
         !
-        IF (LDBG) THEN
-            WRITE (*, *) 'Entering GAMSOLV'
-            WRITE (*, *) ' LNCVP ', LNCVP
-            WRITE (*, *) ' LQAIC ', LQAIC
-            WRITE (*, *) ' LSYSP ', LSYSP
-            WRITE (*, *) ' LGSYS ', LGSYS
-            WRITE (*, *) ' LGAMA ', LGAMA
-            WRITE (*, *) ' LVMAV ', LVMAV
-        ENDIF
+        if (ldbg) then
+            write (*, *) 'Entering GAMSOLV'
+            write (*, *) ' LNCVP ', lncvp
+            write (*, *) ' LQAIC ', lqaic
+            write (*, *) ' LSYSP ', lsysp
+            write (*, *) ' LGSYS ', lgsys
+            write (*, *) ' LGAMA ', lgama
+            write (*, *) ' LVMAV ', lvmav
+        endif
         !
         !---- set control points and assign their pointers
-        IF (.NOT.LNCVP) CALL CVPGEN
+        if (.not.lncvp) call cvpgen
         !
         !---- set AIC matrix for velocities at control points
-        IF (.NOT.LQAIC) CALL QAIC(.FALSE.)
+        if (.not.lqaic) call qaic(.false.)
         !
         !---- set up pointers for direct problem
-        IF (.NOT.LSYSP) CALL SYSP
+        if (.not.lsysp) call sysp
         !
         !---- set up and factor system for direct problem
-        IF (.NOT.LGSYS) THEN
-            CALL GSYS(.TRUE., .TRUE., .TRUE., 1, NPTOT, 1, 0)
-            IF (LDBG) WRITE (*, *) 'Factoring system matrix...'
-            CALL LUDCMP(NSYSX, NSYS, SYS(1, 1))
-        ENDIF
+        if (.not.lgsys) then
+            call gsys(.true., .true., .true., 1, nptot, 1, 0)
+            if (ldbg) write (*, *) 'Factoring system matrix...'
+            call ludcmp(nsysx, nsys, sys(1, 1))
+        endif
         !
         !---- Set rotor drag source strengths from current velocities
-        CALL SETROTORSRC
+        call setrotorsrc
         !---- Set (known) drag object source strengths from current velocities
-        CALL SETDRGOBJSRC
+        call setdrgobjsrc
         !
         !---- Initialize VMAVG for wake gamma relaxatio
-        IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+        if (.not.lvmav) call vmavginit(vavginit)
         !
         !---- Solve for current RHS knowns (Qinf,sources,GTH)
-        IF (.NOT.LGAMA) CALL GSOLVE
+        if (.not.lgama) call gsolve
         !
         !---- Calculate velocities at control points
-        CALL QCSUM
+        call qcsum
         !---- Calculate Cp's on surfaces, forces
-        CALL QCPFOR
+        call qcpfor
         !---- Put flow data into wake grid
-        CALL SETGRDFLW
+        call setgrdflw
         !---- Find stagnation points
-        CALL STGFIND
+        call stgfind
         !
         !c      write(*,*) 'Qn =', (QNDOF(IEL), IEL=1, 2)
 
-    END SUBROUTINE GAMSOLV
+    end subroutine gamsolv
     !*==GAMSOL.f90  processed by SPAG 7.25DB at 08:52 on  3 Feb 2020
     ! GAMSOLV
 
 
 
-    SUBROUTINE GAMSOL
+    subroutine gamsol
         use i_dfdc
         use m_inigrd, only : setgrdflw
         use m_gauss, only : ludcmp
@@ -117,13 +117,13 @@ contains
         use m_system, only : gusum, qcsum, gucalc, gsys, sysp
         use m_qaic, only : qaic
         use m_vels, only : qcpfor
-        IMPLICIT NONE
+        implicit none
         !
         !*** Start of declarations rewritten by SPAG
         !
         ! Local variables
         !
-        INTEGER :: IEL, IP, IP1, IP2, IR, IU
+        integer :: iel, ip, ip1, ip2, ir, iu
         !
         !*** End of declarations rewritten by SPAG
         !
@@ -133,46 +133,46 @@ contains
         !--------------------------------------------
         !
         !---- set control points and assign their pointers
-        IF (.NOT.LNCVP) CALL CVPGEN
+        if (.not.lncvp) call cvpgen
         !
         !---- set AIC matrix for velocities at control points
-        IF (.NOT.LQAIC) CALL QAIC(.FALSE.)
+        if (.not.lqaic) call qaic(.false.)
         !
         !---- set up pointers for direct problem
-        IF (.NOT.LSYSP) CALL SYSP
+        if (.not.lsysp) call sysp
         !
         !---- set up and factor system for direct problem
-        IF (.NOT.LGSYS) THEN
-            CALL GSYS(.TRUE., .TRUE., .TRUE., 1, NPTOT, 1, 0)
-            IF (LDBG) WRITE (*, *) 'Factoring system matrix...'
-            CALL LUDCMP(NSYSX, NSYS, SYS(1, 1))
-        ENDIF
+        if (.not.lgsys) then
+            call gsys(.true., .true., .true., 1, nptot, 1, 0)
+            if (ldbg) write (*, *) 'Factoring system matrix...'
+            call ludcmp(nsysx, nsys, sys(1, 1))
+        endif
         !
-        IF (.NOT.LGAMU) THEN
+        if (.not.lgamu) then
             !
             !----- all r.h.s. vectors are to be considered invalid...
-            IF (LDBG) WRITE (*, *) 'Clearing unit-strength solutions...'
-            NU = 0
-            IUQINF = 0
-            DO IR = 1, NRP
-                IUVWK(IR) = 0
-            ENDDO
-            DO IP = 1, NPTOT
-                IUGAM(IP) = 0
-                IUSIG(IP) = 0
-            ENDDO
-            DO IU = 1, NUX
-                LUSET(IU) = .FALSE.
-            ENDDO
-            LGAMU = .TRUE.
+            if (ldbg) write (*, *) 'Clearing unit-strength solutions...'
+            nu = 0
+            iuqinf = 0
+            do ir = 1, nrp
+                iuvwk(ir) = 0
+            enddo
+            do ip = 1, nptot
+                iugam(ip) = 0
+                iusig(ip) = 0
+            enddo
+            do iu = 1, nux
+                luset(iu) = .false.
+            enddo
+            lgamu = .true.
             !
-        ENDIF
+        endif
         !
         !---- New unit solution for Qinf
-        IF (QINF/=0.0) THEN
-            IF (LDBG) WRITE (*, *) 'Qinf unit calc'
-            CALL GUCALC(.TRUE., .FALSE., 0, -1)
-        ENDIF
+        if (qinf/=0.0) then
+            if (ldbg) write (*, *) 'Qinf unit calc'
+            call gucalc(.true., .false., 0, -1)
+        endif
         !
         !---- New unit solutions for B*Circ rotor circulation distribution
         !      LBGAM = .FALSE.
@@ -185,46 +185,46 @@ contains
         !      ENDIF
         !
         !---- New unit solutions for RHS singularities
-        DO IEL = 1, NEL
-            IF (GAMSET(IEL)/=0.0 .OR. SIGSET(IEL)/=0.0 .OR. NETYPE(IEL)   &
-                    & ==5 .OR. NETYPE(IEL)==6) THEN
-                IP1 = IPFRST(IEL)
-                IP2 = IPLAST(IEL)
-                IF (LDBG) WRITE (*, *) 'Element set unit calc IEL ', IEL
-                CALL GUCALC(.FALSE., .FALSE., IP1, IP2)
-            ENDIF
-        ENDDO
+        do iel = 1, nel
+            if (gamset(iel)/=0.0 .or. sigset(iel)/=0.0 .or. netype(iel)   &
+                    & ==5 .or. netype(iel)==6) then
+                ip1 = ipfrst(iel)
+                ip2 = iplast(iel)
+                if (ldbg) write (*, *) 'Element set unit calc IEL ', iel
+                call gucalc(.false., .false., ip1, ip2)
+            endif
+        enddo
         !
         !---- no imposed viscous strengths
-        DO IP = 1, NPTOT
-            GAMVSP(IP) = 0.
-            SIGVSP(IP) = 0.
-        ENDDO
+        do ip = 1, nptot
+            gamvsp(ip) = 0.
+            sigvsp(ip) = 0.
+        enddo
         !
         !---- Set rotor drag source strengths from current velocities
-        CALL SETROTORSRC
+        call setrotorsrc
         !---- Set (known) drag object source strengths from current velocities
-        CALL SETDRGOBJSRC
+        call setdrgobjsrc
         !
         !---- Initialize VMAVG for wake gamma relaxatio
-        IF (.NOT.LVMAV) CALL VMAVGINIT(VAVGINIT)
+        if (.not.lvmav) call vmavginit(vavginit)
         !
         !---- combine unit vorticities weighted by current singularities and freestream
-        IF (.NOT.LGAMA) CALL GUSUM
+        if (.not.lgama) call gusum
         !ccHHY
         !---- Calculate velocities at control points
-        CALL QCSUM
+        call qcsum
         !ccHHY
         !
         !---- Calculate Cp's on surfaces, forces
-        CALL QCPFOR
+        call qcpfor
         !
         !---- Put flow data into wake grid
-        CALL SETGRDFLW
+        call setgrdflw
         !---- Find stagnation points
-        CALL STGFIND
+        call stgfind
         !
         !c      write(*,*) 'Qn =', (QNDOF(IEL), IEL=1, 2)
 
-    END SUBROUTINE GAMSOL
+    end subroutine gamsol
 end module m_solve
