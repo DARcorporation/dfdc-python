@@ -33,7 +33,7 @@ contains
     !
     !=========================================================================
     
-    FUNCTION ISGFIND(SS, S, N)
+    INTEGER FUNCTION ISGFIND(SS, S, N)
         IMPLICIT NONE
         !
         !*** Start of declarations rewritten by SPAG
