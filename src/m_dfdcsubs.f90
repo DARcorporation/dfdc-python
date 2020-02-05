@@ -61,7 +61,7 @@ contains
     subroutine dfinit(ldebug)
         use i_dfdc
         use m_atmo, only : atmo
-        use m_aero, only : putaero
+        use m_aero_old, only : putaero
         implicit none
         !
         !*** Start of declarations rewritten by SPAG
@@ -2090,14 +2090,14 @@ contains
 
 
 
-
+! TODO: The load and safe function will have to be rewritten for the polar based approach.
     subroutine dfload(fnamin, ferror)
         use i_dfdc
         use m_userio, only : getflt, rdline, strip
         use m_pnsubs, only : panget
         use m_airio, only : areadnr
         use m_atmo, only : atmo
-        use m_aero, only : putaero
+        use m_aero_old, only : putaero
         implicit none
         !
         !*** Start of declarations rewritten by SPAG
@@ -2588,7 +2588,7 @@ contains
     subroutine dfsave(fnamein)
         use i_dfdc
         use m_userio, only : asks, strip
-        use m_aero, only : getaero
+        use m_aero_old, only : getaero
         use m_airio, only : awrite
         implicit none
         !
