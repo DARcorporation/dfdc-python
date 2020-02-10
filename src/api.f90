@@ -4,6 +4,19 @@ module api
     implicit none
 contains
 
+!    subroutine analyze(&
+!            i__n_rotors, &
+!            i__vinf, i__vref, i__rpms, &
+!            i__rho, i__vso, i__rmu, i__alt, &
+!            i__xdwake, i__nwake, i__lwkrlx, &
+!            i__n_polars, i__n_polar_points, i__xi_polars, i__polardata, &
+!            i__xdisk, i__n_blades, i__nrpdef, i__n_stations, i__rotorgeom, &
+!            i__n_cb, i__cbgeom, &
+!            i__n_duct, i__ductgeom&
+!    )
+!
+!    end subroutine analyze
+
     subroutine init()
         use m_dfdcsubs, only : dfinit
         ! bind(c, name = 'init')
@@ -20,23 +33,6 @@ contains
         !        CALL LOFTINIT2(1,NRX)
     end subroutine init
 
-    subroutine load_case_old(fname)
-        use i_dfdc
-        use m_dfdcsubs, only : dfload
-        ! bind(c, name = 'set_case')
-        implicit none
-        character(*) :: fname
-        logical :: ferror
-        !
-        !*** Start of declarations rewritten by SPAG
-        !
-        !*** End of declarations rewritten by SPAG
-        !
-        call dfload(fname, ferror)
-        !            CALL LOFTINIT2(1,NROTOR)
-        if (.not.ferror) loname = name
-    end subroutine load_case_old
-
     subroutine set_case(&
                 m__n_rotors, &
                 m__vinf, m__vref, m__rpms, &
@@ -48,7 +44,7 @@ contains
                 m__n_duct, m__ductgeom)
         use i_dfdc
         use m_aero, only : putpolars
-        use m_dfdcsubs, only : geproc
+        use m_dfdcsubs, only : geproc, gengeom
 
         ! inputs
         integer(c_int), intent(in) :: m__n_rotors
@@ -65,7 +61,7 @@ contains
         logical(c_bool), intent(in) :: m__lwkrlx
 
         ! locals
-        integer :: i_rotor
+        integer :: i_rotor, ip
 
         lbldef = .false.
         lconv = .false.
@@ -137,37 +133,7 @@ contains
         do i_rotor = 1, m__n_rotors
             lbbloft(i_rotor) = .false.
         enddo
-    end subroutine set_case
 
-    subroutine get_case(fname)
-        use m_dfdcsubs, only : dfsave
-        ! bind(c, name = 'get_case')
-        implicit none
-        character(*) :: fname
-        !
-        !*** Start of declarations rewritten by SPAG
-        !
-        !*** End of declarations rewritten by SPAG
-        !
-        call dfsave(fname)
-    end subroutine get_case
-
-    subroutine oper()
-        use i_dfdc
-        use m_inigrd, only : setgrdflw
-        use m_rotoper, only : rotinitbgam, tqcalc, rotrprt, rotinitbld
-        use m_wakesubs, only : wakereset
-        use s_rotoper, only : convgthbg
-        use m_dfdcsubs, only : gengeom
-        ! bind(c, name = 'oper')
-        implicit none
-        real :: rlx, rlxf, wxeps
-        integer :: ip, ir, itrmax, ityp, n
-        !
-        !*** Start of declarations rewritten by SPAG
-        !
-        !*** End of declarations rewritten by SPAG
-        !
         ! generate paneled geometry for case
         call gengeom
 
@@ -182,7 +148,23 @@ contains
             gamvsp(ip) = 0.
             sigvsp(ip) = 0.
         enddo
+    end subroutine set_case
 
+    subroutine oper()
+        use i_dfdc
+        use m_inigrd, only : setgrdflw
+        use m_rotoper, only : rotinitbgam, tqcalc, rotrprt, rotinitbld
+        use m_wakesubs, only : wakereset
+        use s_rotoper, only : convgthbg
+        ! bind(c, name = 'oper')
+        implicit none
+        real :: rlx, rlxf, wxeps
+        integer :: ir, itrmax, ityp, n
+        !
+        !*** Start of declarations rewritten by SPAG
+        !
+        !*** End of declarations rewritten by SPAG
+        !
         ! Calculate solution for current actuator or blade using new solver
         rlx = rlxsolv
         wxeps = epssolv
@@ -226,5 +208,52 @@ contains
             call rotrprt(6)
         endif
     end subroutine oper
+
+    subroutine oper_thrust(thrust)
+        use i_dfdc
+        use m_inigrd, only : setgrdflw
+        use m_rotoper, only : tqcalc, rotrprt, rotinitthr, rotinitbld
+        use m_wakesubs, only : wakereset
+        use s_rotoper, only : convgthbgt
+        ! bind(c, name = 'oper')
+        implicit none
+        real :: thrust
+        real :: rlx, rlxf, wxeps
+        integer :: itrmax, ityp, n, ispec
+        !
+        !*** Start of declarations rewritten by SPAG
+        !
+        !*** End of declarations rewritten by SPAG
+        !
+        ! drive total thrust (ISPEC=2), drive rotor thrust for ISPEC=1
+        ispec = 2
+
+        ! Calculate solution for current actuator or blade using new solver
+        rlx = rlxsolv
+        wxeps = epssolv
+        itrmax = itrmaxsolv
+
+        n = 1
+        if (irtype(n) == 2) then
+            write (*, *) 'Driving PITCH to get specified thrust'
+            ! initialize rotor from blade definition
+            ! if rotor is defined converge operating point from rotor geometry
+            rlxf = rlx
+            call convgthbgt(itmax, rlxf, wxeps, thrust, ispec)
+        else
+            write (*, *) 'Driving BGAM to get specified thrust'
+            ! initialize rotor BGAM from thrust spec (constant BGAM)
+            if (.not. lconv) call rotinitthr(thrust)
+            ! Put flow data into wake grid
+            call setgrdflw
+            ! converge operating point from specified BGAM
+            rlxf = rlx
+            call convgthbgt(itmax, rlxf, wxeps, thrust, ispec)
+        end if
+
+        ityp = 1
+        call tqcalc(ityp)
+        call rotrprt(6)
+    end subroutine oper_thrust
 
 end module api

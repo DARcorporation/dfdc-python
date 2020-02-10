@@ -122,7 +122,7 @@ contains
                 clift, cl_alf, cl_w, stallf, &
                 cdrag, cd_alf, cd_w, cd_rey, &
                 cmom, cm_al, cm_w, &
-                polar, .true.)
+                polar, .false.)
 
         !--- Check for another bounding section, if not we are done,
         !    if we have another section linearly interpolate data to station IS
@@ -142,7 +142,7 @@ contains
                     clift2, cl_alf2, cl_w2, stallf2, &
                     cdrag2, cd_alf2, cd_w2, cd_rey2, &
                     cmom2, cm_al2, cm_w2, &
-                    polar, .true.)
+                    polar, .false.)
 
             !--- Interpolate aero data to blade station
             stallf = stallf .or. stallf2

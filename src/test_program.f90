@@ -3,7 +3,7 @@ program dfdc_test
     use m_dfdcsubs, only : gengeom
 
     use m_aero_old, only : clcdcm
-    use i_dfdc, only : dtr
+    use i_dfdc, only : dtr, ldbg
 
     integer, parameter :: &
             n_rotors = 1, &
@@ -118,6 +118,9 @@ program dfdc_test
 
     real :: a
     integer :: i
+
+    ldbg = .true.
+
     do i = 1, n_polar_points(1)
         polardata(i, 1) = (a_range(1) + real(i) * (a_range(2) - a_range(1)) / real(n_polar_points(1))) * dtr
         call clcdcm(&
@@ -140,4 +143,5 @@ program dfdc_test
             n_cb, cbgeom, &
             n_duct, ductgeom)
     call oper
+    call oper_thrust(1000.0)
 end program dfdc_test
